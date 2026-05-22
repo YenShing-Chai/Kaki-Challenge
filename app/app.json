@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Kaki",
+    "slug": "kaki",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "kaki",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.kaki.app",
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "Kaki reads your daily step count to verify challenge completion.",
+        "NSHealthUpdateUsageDescription": "Kaki does not write to Apple Health."
+      }
+    },
+    "android": {
+      "package": "com.kaki.app",
+      "adaptiveIcon": { "backgroundColor": "#ffffff" },
+      "permissions": ["android.permission.ACTIVITY_RECOGNITION"]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": ["expo-router", "expo-secure-store"],
+    "experiments": { "typedRoutes": true }
+  }
+}

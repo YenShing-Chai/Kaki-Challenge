@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Do-and-Earn — Onboarding v2 (fun + social)</title>
+<style>
+  :root {
+    --primary: #3FA84E;
+    --primary-dark: #2E7D3A;
+    --power: #7BBF52;
+    --mint: #E8F5EC;
+    --mint-dark: #CDEAD4;
+    --ink: #0F2A1A;
+    --muted: #666;
+    --faint: #999;
+    --micro: #888;
+    --bg: #FFFFFF;
+    --bg-soft: #FAFAFA;
+    --border: #EEEEEE;
+    --border-strong: #E5E7EB;
+    --shadow: 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-hero: 0 8px 16px rgba(0,0,0,0.08);
+
+    --accent-fun-1: #FFD166;
+    --accent-fun-2: #EF476F;
+    --accent-fun-3: #06A77D;
+    --accent-fun-4: #4F86F7;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #F4F5F6;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { padding: 56px 24px 96px; }
+  .doc-header {
+    max-width: 1280px;
+    margin: 0 auto 32px;
+    padding: 0 20px;
+  }
+  .doc-header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .doc-header .sub { color: var(--muted); font-size: 14px; line-height: 1.5; margin: 0 0 12px; }
+  .doc-header .pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .doc-pill {
+    background: var(--mint);
+    color: var(--primary-dark);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .doc-pill.red {
+    background: #FEF2F2;
+    color: #B91C1C;
+  }
+
+  /* TAGLINE PICKER */
+  .tagline-picker {
+    max-width: 1280px;
+    margin: 0 auto 56px;
+    padding: 0 20px;
+  }
+  .tagline-picker h2 {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0 0 6px;
+    letter-spacing: -0.3px;
+  }
+  .tagline-picker .lead-l {
+    color: var(--muted);
+    margin: 0 0 18px;
+    font-size: 14px;
+  }
+  .tag-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .tag-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 22px 20px;
+    border: 2px solid var(--border);
+    cursor: default;
+    transition: border-color 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tag-card .pick {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .tag-card .ttl {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    min-height: 50px;
+  }
+  .tag-card .body {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .tag-card .label-id {
+    background: var(--mint);
+    color: var(--primary-dark);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    align-self: flex-start;
+  }
+  .tag-card .vibe {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--micro);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-top: 4px;
+  }
+
+  /* DECK */
+  .deck {
+    display: flex;
+    gap: 32px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow-x: auto;
+    padding: 16px 0 48px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .phone {
+    flex: 0 0 auto;
+    width: 320px;
+    background: #111;
+    border-radius: 44px;
+    padding: 12px;
+    box-shadow: 0 24px 48px -16px rgba(0,0,0,0.25), 0 8px 16px -8px rgba(0,0,0,0.15);
+    position: relative;
+  }
+  .phone::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 26px;
+    background: #111;
+    border-radius: 14px;
+    z-index: 2;
+  }
+  .phone-screen {
+    width: 100%;
+    height: 660px;
+    background: var(--bg);
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .status-bar .right { display: flex; gap: 6px; align-items: center; font-size: 12px; font-weight: 600; }
+
+  .progress-bar { height: 3px; background: var(--border); position: relative; }
+  .progress-fill { position: absolute; inset: 0 auto 0 0; background: var(--primary); }
+
+  .content {
+    flex: 1 1 auto;
+    padding: 24px 22px 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1.15;
+    margin: 6px 0 0;
+  }
+  .h1 .accent { color: var(--primary); }
+  .h1 .funYel { color: #D97706; }
+  .lead {
+    font-size: 15px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.45;
+    margin: 0 4px;
+  }
+  .lead strong { color: var(--ink); }
+
+  /* Group avatar visual (welcome screen) */
+  .group-stage {
+    height: 220px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -8px;
+  }
+  .group-stage .avatar-circle {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 800;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.18);
+    border: 4px solid #fff;
+    position: absolute;
+  }
+  .group-stage .a1 { background: linear-gradient(135deg, #7BBF52, #3FA84E); left: 28%; top: 56px; }
+  .group-stage .a2 { background: linear-gradient(135deg, #FBBF24, #D97706); right: 28%; top: 56px; }
+  .group-stage .a3 { background: linear-gradient(135deg, #F472B6, #BE185D); left: 50%; transform: translateX(-50%); top: 0; }
+  .group-stage .a4 { background: linear-gradient(135deg, #60A5FA, #1D4ED8); left: 22%; top: 130px; }
+  .group-stage .a5 { background: linear-gradient(135deg, #A78BFA, #7C3AED); right: 22%; top: 130px; }
+  .group-stage .mascot-bubble {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 84px;
+    background: #fff;
+    border-radius: 26px;
+    padding: 12px 16px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.10);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .group-stage .mascot-bubble::before {
+    content: '🦘';
+    margin-right: 6px;
+    font-size: 16px;
+  }
+
+  /* Tagline options on welcome */
+  .tagline-options-line {
+    text-align: center;
+    margin-top: 8px;
+  }
+  .tagline-options-line .opt {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--mint);
+    color: var(--primary-dark);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 2px;
+  }
+
+  .mini-icon {
+    font-size: 52px;
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* Categories grid (screen 2) */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .cat-card {
+    border-radius: 18px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 72px;
+    color: #fff;
+  }
+  .cat-card .emo { font-size: 22px; line-height: 1; }
+  .cat-card .ttl { font-size: 13px; font-weight: 800; letter-spacing: -0.1px; }
+  .cat-card .sub-l { font-size: 10px; font-weight: 700; opacity: 0.85; }
+  .cat-fit  { background: linear-gradient(135deg, #7BBF52, #3FA84E); }
+  .cat-read { background: linear-gradient(135deg, #C77F33, #8B4513); }
+  .cat-mind { background: linear-gradient(135deg, #A78BFA, #7C3AED); }
+  .cat-learn{ background: linear-gradient(135deg, #60A5FA, #1D4ED8); }
+  .cat-prod { background: linear-gradient(135deg, #FBBF24, #D97706); }
+  .cat-crea { background: linear-gradient(135deg, #F472B6, #BE185D); }
+  .cat-well { background: linear-gradient(135deg, #818CF8, #4338CA); }
+  .cat-money{ background: linear-gradient(135deg, #FCD34D, #F59E0B); }
+  .cat-create {
+    background: #fff;
+    border: 2px dashed var(--primary);
+    color: var(--primary-dark);
+    grid-column: span 2;
+    min-height: 56px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+  .cat-create .emo { font-size: 18px; }
+  .cat-create .ttl { font-size: 13px; color: var(--primary-dark); }
+
+  /* How it works steps */
+  .label-row { display: flex; align-items: flex-start; gap: 12px; padding: 6px 0; }
+  .step-num {
+    width: 36px; height: 36px; border-radius: 18px;
+    background: var(--primary); color: #fff;
+    font-weight: 800; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-num.power { background: var(--accent-fun-1); color: var(--ink); }
+  .step-num.heart { background: var(--accent-fun-2); }
+  .step-body { flex: 1; }
+  .step-title { font-size: 15px; font-weight: 800; color: var(--ink); letter-spacing: -0.2px; }
+  .step-desc { font-size: 13px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+
+  /* Payment screen */
+  .mint-card {
+    background: var(--mint);
+    border-radius: 18px;
+    padding: 18px;
+    text-align: center;
+  }
+  .mint-card .big { font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: -0.6px; }
+  .mint-card .sub-l { font-size: 11px; font-weight: 800; color: var(--primary-dark); text-transform: uppercase; letter-spacing: 1.2px; margin-top: 2px; }
+
+  /* Reminder cards */
+  .reminder-card {
+    background: var(--bg-soft);
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    border: 1px solid var(--border);
+  }
+  .reminder-card .em {
+    font-size: 20px;
+    background: var(--mint);
+    width: 36px; height: 36px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .reminder-card .ttl { font-size: 13px; font-weight: 800; color: var(--ink); }
+  .reminder-card .body { font-size: 11px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+  .reminder-card.fun { background: linear-gradient(135deg, #FFF7ED, #FEF3C7); border-color: #FDE68A; }
+  .reminder-card.fun .em { background: #FBBF24; color: #fff; }
+
+  /* CTA */
+  .cta-area {
+    padding: 0 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--bg);
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    padding: 16px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 15px;
+    text-align: center;
+  }
+  .btn-secondary {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 13px;
+    text-align: center;
+    padding: 6px;
+  }
+
+  .home-indicator {
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg);
+  }
+  .home-indicator::after {
+    content: '';
+    width: 134px;
+    height: 5px;
+    border-radius: 3px;
+    background: #111;
+  }
+
+  .caption {
+    color: #555;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+  }
+  .caption .num { color: var(--primary); margin-right: 4px; }
+
+  /* Group invite preview chips (Done screen) */
+  .invite-preview {
+    background: var(--mint);
+    border-radius: 18px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .invite-preview .row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .invite-preview .av {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; font-size: 12px;
+    border: 2px solid #fff;
+  }
+  .invite-preview .av-stack {
+    display: flex; align-items: center;
+  }
+  .invite-preview .av-stack .av { margin-left: -10px; }
+  .invite-preview .av-stack .av:first-child { margin-left: 0; }
+  .invite-preview .ttl { font-size: 13px; font-weight: 800; color: var(--ink); }
+  .invite-preview .sub { font-size: 11px; color: var(--primary-dark); font-weight: 600; }
+
+  .pill-row {
+    display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 4px;
+  }
+  .pill-row .pill {
+    background: var(--mint);
+    border: 1px solid var(--mint-dark);
+    color: var(--primary-dark);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+  <div class="doc-header">
+    <h1>Onboarding v2 — fun, social, group-first</h1>
+    <p class="sub">Repositioning: <strong>not a fitness app, not a punishment app.</strong> A challenge app for friend groups and families to keep each other accountable. Light, playful, with a competitive edge.</p>
+    <div class="pills">
+      <span class="doc-pill red">Old: "Walk or pay" — too solo, too fitness</span>
+      <span class="doc-pill">New tone: party + accountability + stakes</span>
+      <span class="doc-pill">Mascot 🦘 stays</span>
+      <span class="doc-pill">Welcome shows group, not solo</span>
+    </div>
+  </div>
+
+  <!-- TAGLINE PICKER -->
+  <div class="tagline-picker">
+    <h2>Tagline options — pick one</h2>
+    <p class="lead-l">Four directions. All are friend/family-coded, none are fitness-coded, none mention "walk" or "step." Reply with the letter.</p>
+    <div class="tag-grid">
+      <div class="tag-card">
+        <div class="label-id">OPTION A</div>
+        <div class="ttl">Hold each other to it.</div>
+        <div class="body">Warm, group-coded. Implies friends keeping each other accountable. Soft threat, no money mention.</div>
+        <div class="vibe">Vibe: friendly · social</div>
+      </div>
+      <div class="tag-card">
+        <div class="label-id">OPTION B</div>
+        <div class="ttl">Habits, with your people.</div>
+        <div class="body">Direct, warm. "Your people" implies inner circle — close friends + family. Feels like Spotify Wrapped energy.</div>
+        <div class="vibe">Vibe: warm · inclusive</div>
+      </div>
+      <div class="tag-card">
+        <div class="label-id">OPTION C</div>
+        <div class="ttl">Dare your crew.</div>
+        <div class="body">Playful, competitive. "Crew" implies friend group. "Dare" is fun-threatening — a game, not punishment.</div>
+        <div class="vibe">Vibe: playful · competitive</div>
+      </div>
+      <div class="tag-card">
+        <div class="label-id">OPTION D</div>
+        <div class="ttl">Game on. With stakes.</div>
+        <div class="body">Direct, snappy. Frames the whole thing as a game (fun) with real money stakes (accountability).</div>
+        <div class="vibe">Vibe: gamified · energetic</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DECK -->
+  <div class="deck">
+    <!-- ============ SCREEN 1 — WELCOME ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:16.6%"></div></div>
+          <div class="content">
+            <div style="text-align:center;font-size:11px;font-weight:800;letter-spacing:2px;color:var(--primary-dark);text-transform:uppercase">Do-and-Earn</div>
+            <div class="group-stage">
+              <div class="avatar-circle a3">😎</div>
+              <div class="avatar-circle a1">🦘</div>
+              <div class="avatar-circle a2">🤘</div>
+              <div class="avatar-circle a4">🥹</div>
+              <div class="avatar-circle a5">😅</div>
+            </div>
+            <div class="h1">Hold each other<br><span class="accent">to it.</span></div>
+            <p class="lead">A challenge app for friend groups and families.<br><strong>Make a habit. Stake some money. Survive together.</strong></p>
+            <div class="tagline-options-line" style="margin-top:10px">
+              <span style="font-size:10px;color:var(--faint);font-weight:600">Tagline shown: OPTION&nbsp;A</span>
+            </div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Get started</div>
+            <div style="text-align:center;font-size:12px;color:var(--faint)">Already have an account? <span style="color:var(--primary);font-weight:700">Sign in</span></div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">01</span>Welcome · group-feel</div>
+    </div>
+
+    <!-- ============ SCREEN 2 — WHAT KINDS ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:33.3%"></div></div>
+          <div class="content">
+            <div class="mini-icon">🎯</div>
+            <div class="h1">Anything goes.</div>
+            <p class="lead">Workout, read, meditate, save money, cut social media — whatever your crew's into.</p>
+            <div class="cat-grid">
+              <div class="cat-card cat-fit"><div class="emo">🏃</div><div class="ttl">Fitness</div><div class="sub-l">Steps · workouts</div></div>
+              <div class="cat-card cat-read"><div class="emo">📚</div><div class="ttl">Reading</div><div class="sub-l">Books · articles</div></div>
+              <div class="cat-card cat-mind"><div class="emo">🧘</div><div class="ttl">Mindfulness</div><div class="sub-l">Meditate · journal</div></div>
+              <div class="cat-card cat-money"><div class="emo">💰</div><div class="ttl">Money</div><div class="sub-l">Save · no-spend</div></div>
+              <div class="cat-card cat-prod"><div class="emo">⚡</div><div class="ttl">Productivity</div><div class="sub-l">Focus · routine</div></div>
+              <div class="cat-card cat-crea"><div class="emo">🎨</div><div class="ttl">Creative</div><div class="sub-l">Write · draw · build</div></div>
+              <div class="cat-card cat-create">
+                <div class="emo">✨</div>
+                <div class="ttl">+ Create your own</div>
+              </div>
+            </div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Cool, I'm in</div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">02</span>Categories · "create your own" emphasis</div>
+    </div>
+
+    <!-- ============ SCREEN 3 — HOW IT WORKS ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+          <div class="content">
+            <div class="mini-icon">🎲</div>
+            <div class="h1">How the game works</div>
+            <div style="margin-top:8px;">
+              <div class="label-row">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                  <div class="step-title">Start or join a challenge</div>
+                  <div class="step-desc">Invite your crew, or join one open to anyone. Pick the daily habit + how many days.</div>
+                </div>
+              </div>
+              <div class="label-row">
+                <div class="step-num power">2</div>
+                <div class="step-body">
+                  <div class="step-title">Everyone stakes in</div>
+                  <div class="step-desc">$5, $10, $50 — your call. Goes into the shared pot. Skin in the game.</div>
+                </div>
+              </div>
+              <div class="label-row">
+                <div class="step-num heart">3</div>
+                <div class="step-body">
+                  <div class="step-title">Last ones standing split it</div>
+                  <div class="step-desc">Show up every day. Drop out? Your stake funds the survivors. 🍿</div>
+                </div>
+              </div>
+            </div>
+            <div class="pill-row">
+              <div class="pill">🏃 Auto-tracked</div>
+              <div class="pill">📷 Photo proof</div>
+              <div class="pill">✋ Honor tap</div>
+            </div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Let's go</div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">03</span>How it works · "game" framing</div>
+    </div>
+
+    <!-- ============ SCREEN 4 — PAYMENT ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:66.6%"></div></div>
+          <div class="content">
+            <div class="mini-icon">💳</div>
+            <div class="h1">Stakes make it real.</div>
+            <p class="lead">We only charge if you miss. Stripe holds the funds —<br>we never touch them.</p>
+            <div class="mint-card">
+              <div class="big">$0</div>
+              <div class="sub-l">Charged today · always</div>
+            </div>
+            <div class="reminder-card">
+              <div class="em">🔒</div>
+              <div>
+                <div class="ttl">No skin in the game = no challenge</div>
+                <div class="body">A card on file is what makes the bet real. You can swap or remove it any time.</div>
+              </div>
+            </div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Add a card</div>
+            <div class="btn-secondary">I'll do this later</div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">04</span>Payment · friendlier framing</div>
+    </div>
+
+    <!-- ============ SCREEN 5 — NOTIFICATIONS ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:83.3%"></div></div>
+          <div class="content">
+            <div class="mini-icon">🔔</div>
+            <div class="h1">Don't be the first to drop.</div>
+            <p class="lead">We ping you when your crew's ahead — or when you're about to lose.</p>
+            <div class="reminder-card fun">
+              <div class="em">🤘</div>
+              <div>
+                <div class="ttl">Sarah just hit her day. Day 5 of 7.</div>
+                <div class="body">Cheer her on — or catch up before she laps you.</div>
+              </div>
+            </div>
+            <div class="reminder-card">
+              <div class="em">⚠️</div>
+              <div>
+                <div class="ttl">Danger zone — 3h left</div>
+                <div class="body">"You're 2,400 steps short."</div>
+              </div>
+            </div>
+            <div class="reminder-card">
+              <div class="em">😱</div>
+              <div>
+                <div class="ttl">Last-hour panic</div>
+                <div class="body">"$10 about to disappear."</div>
+              </div>
+            </div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Turn on notifications</div>
+            <div class="btn-secondary">Skip</div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">05</span>Notifications · social framing</div>
+    </div>
+
+    <!-- ============ SCREEN 6 — DONE ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+          <div class="content">
+            <div class="mini-icon" style="font-size:64px">🎉</div>
+            <div class="h1">You're in.</div>
+            <p class="lead">Find a challenge that looks fun,<br>or <strong>start one and invite your crew.</strong></p>
+
+            <div class="invite-preview" style="margin-top:6px">
+              <div class="row">
+                <div class="ttl">🦘 Quick Cash</div>
+                <div style="flex:1"></div>
+                <div class="sub">$20 pot</div>
+              </div>
+              <div class="row">
+                <div class="av-stack">
+                  <div class="av" style="background:#3FA84E">A</div>
+                  <div class="av" style="background:#F472B6">S</div>
+                  <div class="av" style="background:#60A5FA">M</div>
+                  <div class="av" style="background:#FBBF24">+2</div>
+                </div>
+                <div style="flex:1"></div>
+                <div class="sub">5 players · 3 days</div>
+              </div>
+            </div>
+
+            <div class="pill-row">
+              <div class="pill">📚 Read 30 min</div>
+              <div class="pill">🧘 Meditate</div>
+              <div class="pill">💰 No-spend</div>
+            </div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Browse challenges →</div>
+            <div class="btn-secondary">Create your own</div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">06</span>Done · with "create your own" + crew preview</div>
+    </div>
+  </div>
+
+  <!-- KEY MOVES -->
+  <div style="max-width:1280px;margin:40px auto 0;padding:0 20px">
+    <h2 style="font-size:22px;font-weight:800;margin:0 0 14px;letter-spacing:-0.3px">Key tone moves</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="background:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow)">
+        <div style="font-size:11px;font-weight:800;color:#B91C1C;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Cut</div>
+        <ul style="margin:0;padding-left:20px;color:var(--muted);line-height:1.7;font-size:13px">
+          <li>"Walk or pay" — too fitness, too solo</li>
+          <li>"Financial fear" framing — felt punitive</li>
+          <li>Solo kangaroo on welcome — implied lone-wolf vibe</li>
+          <li>Health-permission as screen 3 — became premature</li>
+          <li>"Put your money where your steps are" — fitness-coded</li>
+        </ul>
+      </div>
+      <div style="background:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow)">
+        <div style="font-size:11px;font-weight:800;color:var(--primary-dark);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Add</div>
+        <ul style="margin:0;padding-left:20px;color:var(--muted);line-height:1.7;font-size:13px">
+          <li>Group-feel hero — 5 avatars + mascot in the middle</li>
+          <li>"Crew" / "your people" language throughout</li>
+          <li>"How the <em>game</em> works" framing</li>
+          <li>"+ Create your own" emphasis in categories grid</li>
+          <li>Social FOMO notification example ("Sarah just hit her day")</li>
+          <li>Crew preview card on Done screen</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1280px;margin:40px auto 0;padding:24px;background:var(--mint);border-radius:18px;color:var(--ink);font-size:14px;line-height:1.6">
+    <strong>What I need from you:</strong>
+    Pick a tagline letter (A / B / C / D), and tell me if the group-feel welcome screen is the right direction. Once you green-light, I'll wire the new copy + visuals into the actual <code>app/onboarding.tsx</code>.
+  </div>
+</body>
+</html>

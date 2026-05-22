@@ -1,0 +1,951 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Do-and-Earn — Design Concepts</title>
+<style>
+:root {
+  --green: #3FA84E;
+  --green-dark: #2E7D3A;
+  --power: #7BBF52;
+  --mint: #E8F5EC;
+  --mint-dark: #CDEAD4;
+  --ink: #0F2A1A;
+  --ink-pure: #0F0F0F;
+  --paper: #FAFAF7;
+  --paper-2: #F4F2EC;
+  --line: #E8E6DF;
+  --muted: #6B6B66;
+  --danger: #B91C1C;
+}
+* { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+body {
+  margin: 0;
+  background: #1a1a1a;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", sans-serif;
+}
+header.page-header {
+  padding: 48px 32px 32px;
+  text-align: center;
+}
+header.page-header h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+header.page-header p { margin: 0; opacity: 0.7; font-size: 15px; }
+
+.style-block {
+  padding: 48px 24px 24px;
+  border-top: 1px solid #2a2a2a;
+}
+.style-header {
+  max-width: 1400px;
+  margin: 0 auto 28px;
+  padding: 0 16px;
+}
+.style-header h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 700;
+}
+.style-header .pill {
+  display: inline-block;
+  padding: 3px 10px;
+  background: #fff;
+  color: #000;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-right: 8px;
+}
+.style-header p { margin: 8px 0 0; opacity: 0.75; font-size: 14px; max-width: 720px; line-height: 1.5; }
+
+.phones-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+@media (max-width: 1200px) { .phones-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 720px)  { .phones-row { grid-template-columns: 1fr; } }
+
+.phone-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.phone-caption { font-size: 12px; opacity: 0.7; font-weight: 500; }
+
+/* Phone frame */
+.phone {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 9 / 19.5;
+  border-radius: 42px;
+  padding: 12px;
+  background: #0a0a0a;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6), 0 0 0 2px #2a2a2a;
+  overflow: hidden;
+}
+.phone .screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 32px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.status-bar {
+  height: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 18px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.tab-bar {
+  margin-top: auto;
+  padding: 8px 12px 18px;
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid currentColor;
+  border-top-color: rgba(0, 0, 0, 0.06);
+  font-size: 10px;
+  font-weight: 600;
+}
+.tab-bar .t { display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0.5; }
+.tab-bar .t.active { opacity: 1; }
+.tab-bar .t .ic { font-size: 16px; }
+
+/* Scroll body */
+.body { flex: 1; overflow-y: auto; }
+
+/* ───────── STYLE A — VIBRANT GAMIFIED (StepBet-inspired) ───────── */
+.A .screen { background: #fff; color: #0F2A1A; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; }
+.A .status-bar { color: #0F2A1A; }
+.A .body { padding: 12px 16px; }
+.A .h-eyebrow { color: #888; text-transform: uppercase; letter-spacing: 1.5px; font-size: 10px; font-weight: 700; margin-bottom: 4px; }
+.A .h-title { font-size: 26px; font-weight: 800; margin: 0 0 16px; letter-spacing: -0.02em; }
+.A .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin: 0 -16px 16px; padding-left: 16px; padding-right: 16px; }
+.A .chip { padding: 8px 14px; border-radius: 99px; border: 1.5px solid #E5E7EB; background: #fff; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.A .chip.active { background: var(--green); border-color: var(--green); color: #fff; }
+.A .card-A {
+  background: #fff;
+  border-radius: 18px;
+  padding: 14px;
+  margin-bottom: 12px;
+  border: 1px solid #EEE;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.04);
+}
+.A .hero-img {
+  height: 90px;
+  background: linear-gradient(135deg, #7BBF52, #3FA84E);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.A .hero-img.reading { background: linear-gradient(135deg, #C77F33, #8B4513); }
+.A .hero-img.meditate { background: linear-gradient(135deg, #A78BFA, #7C3AED); }
+.A .hero-img.money { background: linear-gradient(135deg, #FCD34D, #F59E0B); }
+.A .hero-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.5));
+}
+.A .hero-img .badge {
+  position: absolute; top: 8px; left: 8px;
+  background: rgba(255,255,255,0.95); padding: 4px 8px;
+  border-radius: 99px; font-size: 10px; font-weight: 700; color: #14532d; z-index: 2;
+}
+.A .hero-img .emo {
+  position: absolute; right: 8px; top: 8px;
+  background: rgba(255,255,255,0.95); width: 28px; height: 28px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.A .card-title { font-size: 16px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.01em; }
+.A .card-meta { font-size: 11px; color: #777; margin: 0 0 10px; }
+.A .pool-block { background: var(--mint); border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; }
+.A .pool-block .label { font-size: 10px; font-weight: 800; color: var(--green); text-transform: uppercase; letter-spacing: 1px; }
+.A .pool-block .val { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+.A .pool-block .stats { text-align: right; font-size: 11px; color: var(--green-dark); font-weight: 600; }
+.A .pill-cta { background: var(--green); color: #fff; padding: 14px; border-radius: 99px; font-weight: 700; font-size: 14px; text-align: center; }
+.A .format-pill { padding: 3px 8px; border-radius: 99px; background: var(--mint); color: #14532d; font-size: 9px; font-weight: 800; display: inline-block; letter-spacing: 0.5px; }
+.A .tab-bar { background: #fff; color: #888; }
+.A .tab-bar .t.active { color: var(--green); }
+
+/* Detail-A */
+.A .detail-hero { background: linear-gradient(135deg, var(--mint), var(--mint-dark)); border-radius: 18px; padding: 18px; margin-bottom: 14px; }
+.A .detail-hero .label { font-size: 10px; font-weight: 800; color: var(--green); text-transform: uppercase; letter-spacing: 1.5px; }
+.A .detail-hero .big { font-size: 42px; font-weight: 800; color: var(--ink); letter-spacing: -0.03em; line-height: 1; margin: 4px 0; }
+.A .detail-hero .sub { font-size: 12px; color: var(--green-dark); font-weight: 600; }
+.A .stat-row { display: flex; gap: 6px; margin-bottom: 14px; }
+.A .stat { flex: 1; padding: 10px; background: #fff; border: 1px solid #EEE; border-radius: 12px; text-align: center; }
+.A .stat .v { font-size: 15px; font-weight: 800; }
+.A .stat .l { font-size: 9px; color: #999; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+.A .sect-title { font-size: 14px; font-weight: 800; margin: 12px 0 8px; }
+.A .step-row { display: flex; gap: 10px; padding: 8px 0; align-items: flex-start; }
+.A .step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--green); color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.A .step-text { flex: 1; }
+.A .step-text .t { font-size: 12px; font-weight: 700; color: var(--ink); }
+.A .step-text .b { font-size: 10px; color: #777; line-height: 1.4; }
+.A .lb-row { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 10px; border: 1px solid #EEE; margin-bottom: 6px; }
+.A .lb-row.me { border-color: var(--green); background: var(--mint); border-width: 2px; }
+.A .avatar { width: 24px; height: 24px; border-radius: 50%; background: #ddd; font-size: 10px; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.A .lb-row.me .avatar { background: var(--green); }
+.A .lb-name { font-size: 11px; font-weight: 700; flex: 1; }
+.A .lb-pct { font-size: 10px; color: #777; }
+
+/* Home-A — ring */
+.A .home-card { background: #FAFAFA; border-radius: 18px; padding: 16px; border: 1px solid #EEE; }
+.A .ring-wrap { display: flex; align-items: center; justify-content: center; padding: 14px 0; }
+.A .ring { width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(var(--green) 0deg 252deg, var(--mint) 252deg); display: flex; align-items: center; justify-content: center; position: relative; }
+.A .ring-inner { width: 110px; height: 110px; background: #fff; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.A .ring-inner .big { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+.A .ring-inner .sub { font-size: 9px; color: #999; font-weight: 600; }
+.A .metric-row { display: flex; gap: 6px; margin-top: 10px; }
+.A .metric { flex: 1; padding: 8px; background: #fff; border-radius: 10px; border: 1px solid #EEE; text-align: center; }
+.A .metric .v { font-size: 12px; font-weight: 800; }
+.A .metric .l { font-size: 8px; color: #999; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
+
+/* Create-A — wizard step */
+.A .step-pip-row { display: flex; gap: 6px; margin-bottom: 16px; }
+.A .step-pip { flex: 1; height: 4px; border-radius: 2px; background: #EEE; }
+.A .step-pip.active { background: var(--green); }
+.A .step-pip.done { background: var(--green-dark); }
+.A .field-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--ink); margin-bottom: 8px; }
+.A .field-input { width: 100%; padding: 12px 14px; border: 1.5px solid #E5E7EB; border-radius: 12px; font-size: 14px; margin-bottom: 14px; background: #fff; font-family: inherit; color: var(--ink); }
+.A .field-input::placeholder { color: #BBB; }
+.A .option-row { padding: 12px 14px; border: 1.5px solid #E5E7EB; border-radius: 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.A .option-row.sel { border-color: var(--green); background: var(--mint); }
+.A .option-row .o-em { font-size: 18px; }
+.A .option-row .o-text { flex: 1; }
+.A .option-row .o-t { font-size: 13px; font-weight: 700; color: var(--ink); }
+.A .option-row .o-b { font-size: 10px; color: #777; line-height: 1.3; }
+.A .option-row .o-check { width: 18px; height: 18px; border-radius: 50%; background: var(--green); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+.A .option-row:not(.sel) .o-check { display: none; }
+
+/* ───────── STYLE B — MINIMALIST EDITORIAL ───────── */
+.B .screen { background: var(--paper); color: var(--ink-pure); font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", sans-serif; }
+.B .status-bar { color: var(--ink-pure); }
+.B .body { padding: 18px 22px; }
+.B .h-eyebrow { color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-size: 10px; font-weight: 600; margin-bottom: 6px; }
+.B .h-title { font-size: 32px; font-weight: 700; margin: 0 0 24px; letter-spacing: -0.03em; line-height: 1.05; }
+.B .chip-row { display: flex; gap: 6px; overflow-x: auto; margin: 0 -22px 24px; padding: 0 22px 6px; }
+.B .chip { padding: 7px 13px; border-radius: 99px; border: 1px solid var(--line); background: transparent; font-size: 11px; font-weight: 500; white-space: nowrap; flex-shrink: 0; color: var(--ink-pure); }
+.B .chip.active { background: var(--ink-pure); border-color: var(--ink-pure); color: var(--paper); }
+.B .card-B { padding: 16px 0; border-bottom: 1px solid var(--line); }
+.B .card-B:last-child { border-bottom: none; }
+.B .card-meta-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.B .card-meta-row .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); }
+.B .card-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 8px; line-height: 1.15; }
+.B .card-desc { font-size: 13px; color: var(--muted); line-height: 1.5; margin: 0 0 10px; }
+.B .card-pool { display: flex; justify-content: space-between; align-items: baseline; padding-top: 4px; }
+.B .card-pool .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.B .card-pool .val { font-size: 22px; font-weight: 700; color: var(--green); letter-spacing: -0.02em; }
+.B .pill-cta { background: var(--ink-pure); color: var(--paper); padding: 14px; border-radius: 4px; font-weight: 600; font-size: 13px; text-align: center; letter-spacing: 0.5px; text-transform: uppercase; }
+.B .tab-bar { background: var(--paper); color: var(--muted); border-top-color: var(--line); }
+.B .tab-bar .t.active { color: var(--ink-pure); }
+
+/* Detail-B */
+.B .detail-meta { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 8px; }
+.B .detail-title { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 24px; }
+.B .pool-line { padding: 22px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; }
+.B .pool-line .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; }
+.B .pool-line .v { font-size: 38px; font-weight: 700; color: var(--green); letter-spacing: -0.03em; }
+.B .stat-line { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; }
+.B .stat-line .l { font-size: 12px; color: var(--muted); }
+.B .stat-line .v { font-size: 13px; font-weight: 600; color: var(--ink-pure); }
+.B .sect-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin: 24px 0 12px; }
+.B .step-row { display: flex; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.B .step-row:last-child { border-bottom: none; }
+.B .step-num { font-size: 22px; font-weight: 300; color: var(--green); width: 28px; flex-shrink: 0; line-height: 1; }
+.B .step-text .t { font-size: 13px; font-weight: 600; }
+.B .step-text .b { font-size: 11px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+.B .lb-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.B .lb-row.me { color: var(--green); }
+.B .lb-row .rank { font-size: 11px; color: var(--muted); width: 18px; font-weight: 600; }
+.B .lb-name { font-size: 13px; font-weight: 500; flex: 1; }
+.B .lb-pct { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Home-B */
+.B .home-meta { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; font-weight: 600; }
+.B .home-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 4px; }
+.B .home-day { font-size: 12px; color: var(--muted); margin-bottom: 24px; }
+.B .ring-wrap { display: flex; justify-content: center; padding: 12px 0 24px; }
+.B .ring { width: 160px; height: 160px; border-radius: 50%; background: conic-gradient(var(--green) 0deg 252deg, var(--line) 252deg); display: flex; align-items: center; justify-content: center; }
+.B .ring-inner { width: 130px; height: 130px; background: var(--paper); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.B .ring-inner .big { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+.B .ring-inner .sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.B .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--line); }
+.B .metric-cell { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.B .metric-cell.r-border { border-right: 1px solid var(--line); padding-right: 12px; }
+.B .metric-cell.l-pad { padding-left: 12px; }
+.B .metric-cell .l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 4px; }
+.B .metric-cell .v { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+
+/* Create-B */
+.B .wizard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.B .wizard-step { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+.B .wizard-skip { font-size: 11px; color: var(--muted); }
+.B .wiz-q { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 20px; line-height: 1.2; }
+.B .field-input { width: 100%; padding: 12px 0; border: none; border-bottom: 1px solid var(--line); font-size: 16px; background: transparent; font-family: inherit; color: var(--ink-pure); margin-bottom: 18px; outline: none; }
+.B .field-input::placeholder { color: var(--muted); opacity: 0.5; }
+.B .option-row-B { padding: 14px 0; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
+.B .option-row-B.sel .o-text { color: var(--green); }
+.B .option-row-B .o-text { flex: 1; }
+.B .option-row-B .o-t { font-size: 14px; font-weight: 500; }
+.B .option-row-B .o-b { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.B .option-row-B .o-check { font-size: 14px; color: var(--green); }
+.B .option-row-B:not(.sel) .o-check { color: var(--line); }
+
+/* ───────── STYLE C — HYBRID ───────── */
+.C .screen { background: var(--paper); color: var(--ink-pure); font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", sans-serif; }
+.C .status-bar { color: var(--ink-pure); }
+.C .body { padding: 18px 22px; }
+.C .h-eyebrow { color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-size: 10px; font-weight: 600; margin-bottom: 4px; }
+.C .h-title { font-size: 30px; font-weight: 700; margin: 0 0 20px; letter-spacing: -0.03em; line-height: 1.1; }
+.C .chip-row { display: flex; gap: 6px; overflow-x: auto; margin: 0 -22px 20px; padding: 0 22px 6px; }
+.C .chip { padding: 7px 13px; border-radius: 99px; border: 1px solid var(--line); background: transparent; font-size: 11px; font-weight: 500; white-space: nowrap; flex-shrink: 0; color: var(--ink-pure); }
+.C .chip.active { background: var(--green); border-color: var(--green); color: #fff; }
+.C .card-C { padding: 14px 0 18px; border-bottom: 1px solid var(--line); }
+.C .card-C:last-child { border-bottom: none; }
+.C .card-meta-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+.C .cat-badge { font-size: 10px; color: var(--muted); }
+.C .format-pill-C { padding: 2px 8px; border-radius: 99px; background: var(--mint); color: var(--green-dark); font-size: 10px; font-weight: 700; }
+.C .card-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; }
+.C .card-desc { font-size: 13px; color: var(--muted); line-height: 1.5; margin: 0 0 12px; }
+.C .pool-strip { background: var(--green); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; }
+.C .pool-strip .l { font-size: 10px; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+.C .pool-strip .v { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+.C .pool-strip .who { font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 500; text-align: right; }
+.C .pill-cta { background: var(--green); color: #fff; padding: 16px; border-radius: 99px; font-weight: 700; font-size: 14px; text-align: center; }
+.C .tab-bar { background: var(--paper); color: var(--muted); border-top-color: var(--line); }
+.C .tab-bar .t.active { color: var(--green); }
+
+/* Detail-C */
+.C .detail-cat { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 6px; }
+.C .detail-title { font-size: 30px; font-weight: 700; letter-spacing: -0.03em; margin: 0 0 18px; line-height: 1.1; }
+.C .pool-hero {
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+  border-radius: 22px;
+  padding: 24px 22px;
+  margin-bottom: 20px;
+  color: #fff;
+}
+.C .pool-hero .l { font-size: 10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+.C .pool-hero .big { font-size: 48px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; margin: 6px 0; }
+.C .pool-hero .sub { font-size: 12px; opacity: 0.9; font-weight: 500; }
+.C .stat-line { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; }
+.C .stat-line .l { font-size: 12px; color: var(--muted); }
+.C .stat-line .v { font-size: 13px; font-weight: 600; color: var(--ink-pure); }
+.C .sect-title { font-size: 14px; font-weight: 700; margin: 22px 0 12px; }
+.C .step-row { display: flex; gap: 12px; padding: 10px 0; align-items: flex-start; }
+.C .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--green); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.C .step-text .t { font-size: 13px; font-weight: 600; color: var(--ink-pure); }
+.C .step-text .b { font-size: 11px; color: var(--muted); line-height: 1.45; margin-top: 2px; }
+.C .lb-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.C .lb-row.me { padding: 10px 12px; border: 1.5px solid var(--green); border-radius: 12px; background: var(--mint); margin: 4px -12px; }
+.C .avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--line); font-size: 10px; font-weight: 700; color: var(--ink-pure); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.C .lb-row.me .avatar { background: var(--green); color: #fff; }
+.C .lb-name { font-size: 13px; font-weight: 600; flex: 1; }
+.C .lb-pct { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Home-C */
+.C .home-meta { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; font-weight: 600; }
+.C .home-title { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 4px; }
+.C .home-day { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+.C .ring-card { background: var(--green); border-radius: 22px; padding: 20px; color: #fff; text-align: center; }
+.C .ring-wrap { display: flex; justify-content: center; padding: 4px 0 12px; }
+.C .ring { width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(#fff 0deg 252deg, rgba(255,255,255,0.25) 252deg); display: flex; align-items: center; justify-content: center; }
+.C .ring-inner { width: 120px; height: 120px; background: var(--green); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.C .ring-inner .big { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+.C .ring-inner .sub { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+.C .ring-card .countdown { font-size: 11px; opacity: 0.9; margin-top: 4px; }
+.C .metric-row { display: flex; gap: 10px; margin-top: 16px; }
+.C .metric { flex: 1; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; }
+.C .metric .l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+.C .metric .v { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-top: 2px; }
+
+/* Create-C */
+.C .wizard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.C .wizard-back { font-size: 16px; color: var(--ink-pure); }
+.C .wizard-step { font-size: 11px; color: var(--muted); font-weight: 600; }
+.C .progress-bar { height: 4px; background: var(--line); border-radius: 2px; margin-bottom: 22px; overflow: hidden; }
+.C .progress-bar .fill { height: 100%; background: var(--green); width: 50%; }
+.C .wiz-q { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; line-height: 1.2; }
+.C .wiz-hint { font-size: 12px; color: var(--muted); margin-bottom: 22px; line-height: 1.4; }
+.C .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.C .chip-grid .chip-c { padding: 10px 14px; border-radius: 99px; border: 1.5px solid var(--line); background: var(--paper); font-size: 13px; font-weight: 500; color: var(--ink-pure); }
+.C .chip-grid .chip-c.sel { background: var(--green); border-color: var(--green); color: #fff; }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>Do-and-Earn — Design Concepts</h1>
+  <p>Three style directions × four key screens. Scroll to compare. Pick your winner.</p>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     STYLE A — VIBRANT GAMIFIED
+═══════════════════════════════════════════════════════════════════ -->
+<section class="style-block A">
+  <div class="style-header">
+    <span class="pill">Style A</span>
+    <h2 style="display:inline">Vibrant Gamified</h2>
+    <p>StepBet-inspired. Green primary (#3FA84E), mint backdrops, pill CTAs, hero gradients, big numbers. Friendly, approachable, gamified. Best for consumer fitness/habit feel.</p>
+  </div>
+  <div class="phones-row">
+    <!-- Discover A -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div class="h-eyebrow">Discover</div>
+            <h1 class="h-title">Browse</h1>
+            <div class="chip-row">
+              <div class="chip active">All</div>
+              <div class="chip">🏃 Fitness</div>
+              <div class="chip">🧘 Mindful</div>
+              <div class="chip">📚 Reading</div>
+              <div class="chip">💰 Money</div>
+            </div>
+            <div class="card-A">
+              <div class="hero-img reading">
+                <div class="badge">📚 Reading</div>
+                <div class="emo">📖</div>
+              </div>
+              <div class="card-title">Reader's Club</div>
+              <div class="card-meta">May 22 – Jun 20 · <span class="format-pill">25 of 30 days</span></div>
+              <div class="pool-block">
+                <div>
+                  <div class="label">Prize pool</div>
+                  <div class="val">$625</div>
+                </div>
+                <div class="stats">$25 · 25 in</div>
+              </div>
+            </div>
+            <div class="card-A">
+              <div class="hero-img meditate">
+                <div class="badge">🧘 Mindful</div>
+                <div class="emo">🌙</div>
+              </div>
+              <div class="card-title">Morning Meditate</div>
+              <div class="card-meta">21 days · <span class="format-pill">18 of 21</span></div>
+              <div class="pool-block">
+                <div><div class="label">Pool</div><div class="val">$315</div></div>
+                <div class="stats">$15 · 21 in</div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-bar">
+            <div class="t"><span class="ic">●</span>Home</div>
+            <div class="t active"><span class="ic">◇</span>Discover</div>
+            <div class="t"><span class="ic">▤</span>Activity</div>
+            <div class="t"><span class="ic">◉</span>Profile</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Discover</div>
+    </div>
+
+    <!-- Detail A -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div style="display:flex;gap:6px;margin-bottom:10px"><div class="format-pill" style="background:#fef3c7;color:#854d0e">🟡 OPEN</div><div class="format-pill">📚 Reading</div></div>
+            <h1 class="h-title" style="margin-bottom:8px">Reader's Club</h1>
+            <div class="card-meta" style="margin-bottom:14px">May 22 – Jun 20 · 30 days</div>
+            <div class="detail-hero">
+              <div class="label">Prize pool</div>
+              <div class="big">$625</div>
+              <div class="sub">25 readers in · Hit 25 of 30 days to share the pot</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat"><div class="v">$25</div><div class="l">Stake</div></div>
+              <div class="stat"><div class="v">25</div><div class="l">Players</div></div>
+              <div class="stat"><div class="v">30d</div><div class="l">Length</div></div>
+            </div>
+            <div class="sect-title">How it works</div>
+            <div class="step-row"><div class="step-num">1</div><div class="step-text"><div class="t">Commit $25</div><div class="b">Held on your card. Joins the pot.</div></div></div>
+            <div class="step-row"><div class="step-num">2</div><div class="step-text"><div class="t">Read 30 min daily</div><div class="b">Snap a photo of the page each day.</div></div></div>
+            <div class="step-row"><div class="step-num">3</div><div class="step-text"><div class="t">Hit 25 days, split the pot</div><div class="b">Survivors get equal share at end.</div></div></div>
+            <div class="sect-title">Leaderboard</div>
+            <div class="lb-row me"><div class="avatar">Y</div><div class="lb-name">YOU</div><div class="lb-pct">12/30</div></div>
+            <div class="lb-row"><div class="avatar">A</div><div class="lb-name">Aisha</div><div class="lb-pct">15/30</div></div>
+            <div class="lb-row"><div class="avatar">M</div><div class="lb-name">Marcus</div><div class="lb-pct">11/30</div></div>
+            <div style="height:12px"></div>
+            <div class="pill-cta">Join — $25</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Detail</div>
+    </div>
+
+    <!-- Home A -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div class="h-eyebrow">Today</div>
+            <h1 class="h-title">Active Challenges</h1>
+            <div class="home-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <div class="card-title" style="margin:0">6-Week Active Game</div>
+                <div style="font-size:11px;color:#666">Week 2/6</div>
+              </div>
+              <div class="ring-wrap">
+                <div class="ring">
+                  <div class="ring-inner">
+                    <div class="big">8,420</div>
+                    <div class="sub">of 10,000 · ⚡14k</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;margin-bottom:10px">
+                <div class="stat" style="border-color:#7BBF52;background:#F4FBEF"><div class="v" style="color:#7BBF52">1/2</div><div class="l">⚡ Power</div></div>
+                <div class="stat" style="border-color:#3FA84E;background:#E8F5EC"><div class="v" style="color:#3FA84E">3/4</div><div class="l">✓ Active</div></div>
+                <div class="stat"><div class="v">1/1</div><div class="l">🌙 Free</div></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric"><div class="l">Pool</div><div class="v">$480</div></div>
+                <div class="metric"><div class="l">Stake</div><div class="v">$40</div></div>
+                <div class="metric"><div class="l">Left</div><div class="v">14h</div></div>
+              </div>
+            </div>
+            <div style="height:14px"></div>
+            <div class="pill-cta" style="background:#0F2A1A">Sync now</div>
+          </div>
+          <div class="tab-bar">
+            <div class="t active"><span class="ic">●</span>Home</div>
+            <div class="t"><span class="ic">◇</span>Discover</div>
+            <div class="t"><span class="ic">▤</span>Activity</div>
+            <div class="t"><span class="ic">◉</span>Profile</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Home (active card)</div>
+    </div>
+
+    <!-- Create A -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+              <div style="font-size:18px">←</div>
+              <div style="font-size:14px;font-weight:700;flex:1">New challenge</div>
+              <div style="font-size:11px;color:#888">Step 2 / 4</div>
+            </div>
+            <div class="step-pip-row">
+              <div class="step-pip done"></div>
+              <div class="step-pip active"></div>
+              <div class="step-pip"></div>
+              <div class="step-pip"></div>
+            </div>
+            <h2 style="font-size:22px;font-weight:800;margin:0 0 6px;letter-spacing:-0.02em">Pick a category</h2>
+            <div style="font-size:12px;color:#777;margin-bottom:16px">We'll suggest the right verification method.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px">
+              <div class="chip">🏃 Fitness</div>
+              <div class="chip active">📚 Reading</div>
+              <div class="chip">🧘 Mindfulness</div>
+              <div class="chip">🎓 Learning</div>
+              <div class="chip">⚡ Productivity</div>
+              <div class="chip">🎨 Creative</div>
+              <div class="chip">🌙 Wellness</div>
+              <div class="chip">💰 Money</div>
+              <div class="chip">👥 Social</div>
+              <div class="chip">🌳 Outdoors</div>
+            </div>
+            <div class="field-label">Verification method</div>
+            <div class="option-row sel">
+              <div class="o-em">📸</div>
+              <div class="o-text"><div class="o-t">Photo proof</div><div class="o-b">Daily photo upload</div></div>
+              <div class="o-check">✓</div>
+            </div>
+            <div class="option-row">
+              <div class="o-em">✋</div>
+              <div class="o-text"><div class="o-t">Honor tap</div><div class="o-b">Tap "done"</div></div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="pill-cta">Continue →</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Create — step 2/4</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     STYLE B — MINIMALIST EDITORIAL
+═══════════════════════════════════════════════════════════════════ -->
+<section class="style-block B">
+  <div class="style-header">
+    <span class="pill" style="background:#FAFAF7;color:#000">Style B</span>
+    <h2 style="display:inline">Minimalist Editorial</h2>
+    <p>Warm monochrome (off-white #FAFAF7, dark ink). Big weighted serif-ish headlines, no shadows, thin dividers. Green ONLY on key stats + accents. Looks quiet and expensive — Things 3, Linear, premium Substack.</p>
+  </div>
+  <div class="phones-row">
+    <!-- Discover B -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div class="h-eyebrow">Discover</div>
+            <h1 class="h-title">Browse challenges.</h1>
+            <div class="chip-row">
+              <div class="chip active">All</div>
+              <div class="chip">Fitness</div>
+              <div class="chip">Mindfulness</div>
+              <div class="chip">Reading</div>
+              <div class="chip">Money</div>
+              <div class="chip">Social</div>
+            </div>
+            <div class="card-B">
+              <div class="card-meta-row">Reading <span class="dot"></span> 30 days <span class="dot"></span> Photo proof</div>
+              <h3 class="card-title">Reader's Club</h3>
+              <p class="card-desc">Read for 30 minutes a day. Snap the page. Complete 25 of 30 days.</p>
+              <div class="card-pool"><span class="label">Pool · 25 in</span><span class="val">$625</span></div>
+            </div>
+            <div class="card-B">
+              <div class="card-meta-row">Mindfulness <span class="dot"></span> 21 days <span class="dot"></span> Honor tap</div>
+              <h3 class="card-title">Morning Meditate</h3>
+              <p class="card-desc">21 days of meditation. Just tap done. Hit 18 of 21.</p>
+              <div class="card-pool"><span class="label">Pool · 21 in</span><span class="val">$315</span></div>
+            </div>
+            <div class="card-B">
+              <div class="card-meta-row">Money <span class="dot"></span> 30 days <span class="dot"></span> Honor tap</div>
+              <h3 class="card-title">No-Spend Month</h3>
+              <p class="card-desc">30 days no discretionary purchases. Honor system.</p>
+              <div class="card-pool"><span class="label">Pool · 12 in</span><span class="val">$600</span></div>
+            </div>
+          </div>
+          <div class="tab-bar">
+            <div class="t">Home</div>
+            <div class="t active">Discover</div>
+            <div class="t">Activity</div>
+            <div class="t">Profile</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Discover</div>
+    </div>
+
+    <!-- Detail B -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div class="detail-meta">Reading · 30 days · Open</div>
+            <h1 class="detail-title">Reader's Club</h1>
+            <div class="pool-line">
+              <div class="l">Prize pool</div>
+              <div class="v">$625</div>
+            </div>
+            <div class="stat-line"><span class="l">Commitment</span><span class="v">$25</span></div>
+            <div class="stat-line"><span class="l">Players</span><span class="v">25</span></div>
+            <div class="stat-line"><span class="l">Length</span><span class="v">30 days</span></div>
+            <div class="stat-line"><span class="l">Target</span><span class="v">25 days to qualify</span></div>
+            <div class="sect-title">How it works</div>
+            <div class="step-row"><div class="step-num">01</div><div class="step-text"><div class="t">Commit $25</div><div class="b">Held on your card.</div></div></div>
+            <div class="step-row"><div class="step-num">02</div><div class="step-text"><div class="t">Read 30 minutes daily, photo proof</div><div class="b">Submit anytime during the challenge.</div></div></div>
+            <div class="step-row"><div class="step-num">03</div><div class="step-text"><div class="t">Hit 25 days, split the pot</div><div class="b">Equal share among everyone who qualifies.</div></div></div>
+            <div class="sect-title">Leaderboard</div>
+            <div class="lb-row me"><div class="rank">3.</div><div class="lb-name">You</div><div class="lb-pct">12/30</div></div>
+            <div class="lb-row"><div class="rank">1.</div><div class="lb-name">Aisha</div><div class="lb-pct">15/30</div></div>
+            <div class="lb-row"><div class="rank">2.</div><div class="lb-name">Marcus</div><div class="lb-pct">13/30</div></div>
+            <div style="height:20px"></div>
+            <div class="pill-cta">Join — $25</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Detail</div>
+    </div>
+
+    <!-- Home B -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div class="home-meta">Today · Wed, May 21</div>
+            <h1 class="home-title">6-Week Active Game</h1>
+            <div class="home-day">Week 2 of 6 · 14h until reset</div>
+            <div class="ring-wrap">
+              <div class="ring">
+                <div class="ring-inner">
+                  <div class="big">8,420</div>
+                  <div class="sub">of 10,000 steps</div>
+                </div>
+              </div>
+            </div>
+            <div class="metric-grid">
+              <div class="metric-cell r-border"><div class="l">Power days</div><div class="v">1 / 2</div></div>
+              <div class="metric-cell l-pad"><div class="l">Active days</div><div class="v">3 / 4</div></div>
+              <div class="metric-cell r-border"><div class="l">Prize pool</div><div class="v" style="color:var(--green)">$480</div></div>
+              <div class="metric-cell l-pad"><div class="l">Your stake</div><div class="v">$40</div></div>
+            </div>
+            <div style="height:18px"></div>
+            <div class="pill-cta">Sync steps</div>
+          </div>
+          <div class="tab-bar">
+            <div class="t active">Home</div>
+            <div class="t">Discover</div>
+            <div class="t">Activity</div>
+            <div class="t">Profile</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Home</div>
+    </div>
+
+    <!-- Create B -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div class="wizard-header">
+              <span class="wizard-step">Step 1 of 4</span>
+              <span class="wizard-skip">Cancel</span>
+            </div>
+            <h1 class="wiz-q">Name your challenge.</h1>
+            <input class="field-input" placeholder="e.g. Reader's Club" value="Reader's Club">
+            <input class="field-input" placeholder="One-line description (optional)">
+            <div class="sect-title" style="margin-top:24px">Suggested categories</div>
+            <div class="option-row-B sel">
+              <div class="o-text">
+                <div class="o-t">📚 Reading</div>
+                <div class="o-b">Suggests photo proof</div>
+              </div>
+              <div class="o-check">✓</div>
+            </div>
+            <div class="option-row-B">
+              <div class="o-text">
+                <div class="o-t">🧘 Mindfulness</div>
+                <div class="o-b">Honor tap</div>
+              </div>
+              <div class="o-check">○</div>
+            </div>
+            <div class="option-row-B">
+              <div class="o-text">
+                <div class="o-t">🎓 Learning</div>
+                <div class="o-b">Photo proof</div>
+              </div>
+              <div class="o-check">○</div>
+            </div>
+            <div style="position:absolute;bottom:80px;left:22px;right:22px">
+              <div class="pill-cta">Continue</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Create — step 1/4</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     STYLE C — HYBRID
+═══════════════════════════════════════════════════════════════════ -->
+<section class="style-block C">
+  <div class="style-header">
+    <span class="pill" style="background:#3FA84E;color:#fff">Style C</span>
+    <h2 style="display:inline">Hybrid (Minimalist + Vibrant)</h2>
+    <p>Editorial discipline (whitespace, typography hierarchy, thin dividers) but the prize-pool hero block and primary CTAs go full vibrant green. Like Headspace or modern Strava — restrained, but with conviction in the moments that matter.</p>
+  </div>
+  <div class="phones-row">
+    <!-- Discover C -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div class="h-eyebrow">Discover</div>
+            <h1 class="h-title">What's open<br>this week.</h1>
+            <div class="chip-row">
+              <div class="chip active">All</div>
+              <div class="chip">🏃 Fitness</div>
+              <div class="chip">📚 Reading</div>
+              <div class="chip">🧘 Mindfulness</div>
+              <div class="chip">💰 Money</div>
+            </div>
+            <div class="card-C">
+              <div class="card-meta-row">
+                <span class="cat-badge">📚 Reading</span>
+                <span class="format-pill-C">30-day game</span>
+              </div>
+              <h3 class="card-title">Reader's Club</h3>
+              <p class="card-desc">30 days, 30 min/day. Photo proof. Hit 25 days to qualify.</p>
+              <div class="pool-strip">
+                <div><div class="l">Prize pool</div><div class="v">$625</div></div>
+                <div class="who">25 readers in · $25 stake</div>
+              </div>
+            </div>
+            <div class="card-C">
+              <div class="card-meta-row">
+                <span class="cat-badge">🧘 Mindfulness</span>
+                <span class="format-pill-C">21-day game</span>
+              </div>
+              <h3 class="card-title">Morning Meditate</h3>
+              <p class="card-desc">21 days of meditation. Tap done. Honor system.</p>
+              <div class="pool-strip">
+                <div><div class="l">Pool</div><div class="v">$315</div></div>
+                <div class="who">21 in · $15</div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-bar">
+            <div class="t">Home</div>
+            <div class="t active">Discover</div>
+            <div class="t">Activity</div>
+            <div class="t">Profile</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Discover</div>
+    </div>
+
+    <!-- Detail C -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div class="detail-cat">📚 Reading · 30 days · Open to join</div>
+            <h1 class="detail-title">Reader's Club</h1>
+            <div class="pool-hero">
+              <div class="l">Prize pool</div>
+              <div class="big">$625</div>
+              <div class="sub">25 readers in · Hit 25 of 30 to share</div>
+            </div>
+            <div class="stat-line"><span class="l">Stake</span><span class="v">$25</span></div>
+            <div class="stat-line"><span class="l">Length</span><span class="v">May 22 – Jun 20</span></div>
+            <div class="stat-line"><span class="l">Target</span><span class="v">25 of 30 days</span></div>
+            <div class="sect-title">How it works</div>
+            <div class="step-row"><div class="step-num">1</div><div class="step-text"><div class="t">Commit $25</div><div class="b">Held on your card.</div></div></div>
+            <div class="step-row"><div class="step-num">2</div><div class="step-text"><div class="t">Read daily, snap a photo</div><div class="b">Backfill anytime during the challenge.</div></div></div>
+            <div class="step-row"><div class="step-num">3</div><div class="step-text"><div class="t">Hit 25 days, split the pot</div><div class="b">Equal share among everyone who qualifies.</div></div></div>
+            <div class="sect-title">Leaderboard</div>
+            <div class="lb-row me"><div class="avatar">Y</div><div class="lb-name">YOU</div><div class="lb-pct">12/30</div></div>
+            <div class="lb-row"><div class="avatar">A</div><div class="lb-name">Aisha</div><div class="lb-pct">15/30</div></div>
+            <div class="lb-row"><div class="avatar">M</div><div class="lb-name">Marcus</div><div class="lb-pct">13/30</div></div>
+            <div style="height:16px"></div>
+            <div class="pill-cta">Join — $25</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Detail</div>
+    </div>
+
+    <!-- Home C -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div class="home-meta">Today · Wed, May 21</div>
+            <h1 class="home-title">6-Week Active Game</h1>
+            <div class="home-day">Week 2 of 6</div>
+            <div class="ring-card">
+              <div class="ring-wrap">
+                <div class="ring">
+                  <div class="ring-inner">
+                    <div class="big">8,420</div>
+                    <div class="sub">of 10,000 · ⚡14k</div>
+                  </div>
+                </div>
+              </div>
+              <div class="countdown">14h until reset</div>
+            </div>
+            <div class="metric-row">
+              <div class="metric"><div class="l">⚡ Power</div><div class="v" style="color:var(--power)">1/2</div></div>
+              <div class="metric"><div class="l">✓ Active</div><div class="v" style="color:var(--green)">3/4</div></div>
+              <div class="metric"><div class="l">🌙 Free</div><div class="v">1/1</div></div>
+            </div>
+            <div class="metric-row">
+              <div class="metric"><div class="l">Pool</div><div class="v">$480</div></div>
+              <div class="metric"><div class="l">Stake</div><div class="v">$40</div></div>
+            </div>
+            <div style="height:16px"></div>
+            <div class="pill-cta">Sync steps</div>
+          </div>
+          <div class="tab-bar">
+            <div class="t active">Home</div>
+            <div class="t">Discover</div>
+            <div class="t">Activity</div>
+            <div class="t">Profile</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Home</div>
+    </div>
+
+    <!-- Create C -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+          <div class="body">
+            <div class="wizard-header">
+              <div class="wizard-back">←</div>
+              <div class="wizard-step">Step 2 of 4</div>
+              <div></div>
+            </div>
+            <div class="progress-bar"><div class="fill"></div></div>
+            <h1 class="wiz-q">Pick a category.</h1>
+            <p class="wiz-hint">This decides the default verification method.</p>
+            <div class="chip-grid">
+              <div class="chip-c">🏃 Fitness</div>
+              <div class="chip-c sel">📚 Reading</div>
+              <div class="chip-c">🧘 Mindfulness</div>
+              <div class="chip-c">🎓 Learning</div>
+              <div class="chip-c">⚡ Productivity</div>
+              <div class="chip-c">🎨 Creative</div>
+              <div class="chip-c">🌙 Wellness</div>
+              <div class="chip-c">💰 Money</div>
+            </div>
+            <div class="sect-title">Verification (suggested)</div>
+            <div class="stat-line" style="padding:14px 16px;background:var(--mint);border-radius:12px;border-bottom:none;margin-bottom:12px">
+              <span style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">📸</span><span><span style="font-size:13px;font-weight:600;display:block">Photo proof</span><span style="font-size:11px;color:var(--green-dark)">Recommended for Reading</span></span></span>
+              <span class="o-check" style="color:var(--green)">✓</span>
+            </div>
+            <div style="position:absolute;bottom:80px;left:22px;right:22px">
+              <div class="pill-cta">Continue →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">Create — step 2/4</div>
+    </div>
+  </div>
+</section>
+
+<footer style="padding:48px 32px;text-align:center;opacity:0.5;font-size:13px">
+  Pick a style → I'll redesign the real React Native screens to match.
+</footer>
+
+</body>
+</html>

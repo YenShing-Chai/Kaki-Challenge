@@ -1,0 +1,20 @@
+{
+  "name": "steppa",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "app",
+    "server"
+  ],
+  "scripts": {
+    "app": "npm run start --workspace app",
+    "server": "npm run dev --workspace server",
+    "db:studio": "npm run db:studio --workspace server",
+    "db:push": "npm run db:push --workspace server",
+    "db:generate": "npm run db:generate --workspace server"
+  },
+  "overrides": {
+    "expo-crypto": "~14.0.2",
+    "expo-auth-session": "~6.0.0"
+  }
+}

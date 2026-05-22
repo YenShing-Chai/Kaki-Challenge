@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Do-and-Earn — Onboarding redesign</title>
+<style>
+  :root {
+    --primary: #3FA84E;
+    --primary-dark: #2E7D3A;
+    --power: #7BBF52;
+    --mint: #E8F5EC;
+    --mint-dark: #CDEAD4;
+    --ink: #0F2A1A;
+    --muted: #666;
+    --faint: #999;
+    --micro: #888;
+    --bg: #FFFFFF;
+    --bg-soft: #FAFAFA;
+    --border: #EEEEEE;
+    --border-strong: #E5E7EB;
+    --shadow: 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-hero: 0 8px 16px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #F4F5F6;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    padding: 56px 24px 96px;
+  }
+  .doc-header {
+    max-width: 1280px;
+    margin: 0 auto 40px;
+    padding: 0 20px;
+  }
+  .doc-header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .doc-header .sub {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 12px;
+  }
+  .doc-header .pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .doc-pill {
+    background: var(--mint);
+    color: var(--primary-dark);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .deck {
+    display: flex;
+    gap: 32px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow-x: auto;
+    padding: 16px 0 48px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  /* Phone mockup */
+  .phone {
+    flex: 0 0 auto;
+    width: 320px;
+    background: #111;
+    border-radius: 44px;
+    padding: 12px;
+    box-shadow: 0 24px 48px -16px rgba(0,0,0,0.25), 0 8px 16px -8px rgba(0,0,0,0.15);
+    position: relative;
+  }
+  .phone::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 26px;
+    background: #111;
+    border-radius: 14px;
+    z-index: 2;
+  }
+  .phone-screen {
+    width: 100%;
+    height: 660px;
+    background: var(--bg);
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .status-bar .right {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    position: relative;
+  }
+  .progress-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--primary);
+  }
+
+  .content {
+    flex: 1 1 auto;
+    padding: 24px 22px 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .mascot {
+    font-size: 88px;
+    text-align: center;
+    line-height: 1;
+    margin: 16px 0 0;
+  }
+  .mini-icon {
+    font-size: 52px;
+    text-align: center;
+    margin-top: 8px;
+  }
+  .h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1.15;
+    margin: 6px 0 0;
+  }
+  .h1 .accent {
+    color: var(--primary);
+  }
+  .lead {
+    font-size: 15px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.45;
+    margin: 0 6px;
+  }
+  .lead strong { color: var(--ink); }
+
+  .label-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+  }
+  .step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 800;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-body { flex: 1; }
+  .step-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+  }
+  .step-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+    margin-top: 2px;
+  }
+
+  /* Categories grid (screen 2) */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .cat-card {
+    border-radius: 18px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    overflow: hidden;
+    position: relative;
+    min-height: 76px;
+    color: #fff;
+  }
+  .cat-card .emo { font-size: 22px; line-height: 1; }
+  .cat-card .ttl {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: -0.1px;
+  }
+  .cat-card .sub-l {
+    font-size: 10px;
+    font-weight: 700;
+    opacity: 0.85;
+  }
+  .cat-fit  { background: linear-gradient(135deg, #7BBF52, #3FA84E); }
+  .cat-read { background: linear-gradient(135deg, #C77F33, #8B4513); }
+  .cat-mind { background: linear-gradient(135deg, #A78BFA, #7C3AED); }
+  .cat-learn{ background: linear-gradient(135deg, #60A5FA, #1D4ED8); }
+  .cat-prod { background: linear-gradient(135deg, #FBBF24, #D97706); }
+  .cat-crea { background: linear-gradient(135deg, #F472B6, #BE185D); }
+  .cat-well { background: linear-gradient(135deg, #818CF8, #4338CA); }
+  .cat-money{ background: linear-gradient(135deg, #FCD34D, #F59E0B); }
+  .cat-overflow {
+    font-size: 11px;
+    color: var(--micro);
+    text-align: center;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  /* Mint stat card (payment screen) */
+  .mint-card {
+    background: var(--mint);
+    border-radius: 18px;
+    padding: 18px;
+    text-align: center;
+  }
+  .mint-card .big {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.6px;
+  }
+  .mint-card .sub-l {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--primary-dark);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-top: 2px;
+  }
+
+  /* Notification card */
+  .reminder-card {
+    background: var(--bg-soft);
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    border: 1px solid var(--border);
+  }
+  .reminder-card .em {
+    font-size: 20px;
+    background: var(--mint);
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .reminder-card .ttl {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .reminder-card .body {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+    margin-top: 2px;
+  }
+
+  /* Bottom sticky CTA */
+  .cta-area {
+    padding: 0 22px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--bg);
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    padding: 16px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 15px;
+    text-align: center;
+  }
+  .btn-secondary {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 13px;
+    text-align: center;
+    padding: 6px;
+  }
+
+  .home-indicator {
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg);
+  }
+  .home-indicator::after {
+    content: '';
+    width: 134px;
+    height: 5px;
+    border-radius: 3px;
+    background: #111;
+  }
+
+  /* Caption under each phone */
+  .caption {
+    color: #555;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+  }
+  .caption .num {
+    color: var(--primary);
+    margin-right: 4px;
+  }
+
+  /* Compare section */
+  .compare-block {
+    max-width: 1280px;
+    margin: 80px auto 0;
+    padding: 0 20px;
+  }
+  .compare-block h2 {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 0 8px;
+    letter-spacing: -0.3px;
+  }
+  .compare-block .lead-l {
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .compare-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .compare-row .col h3 {
+    font-size: 12px;
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--micro);
+    font-weight: 800;
+  }
+  .compare-row .col p {
+    font-size: 15px;
+    line-height: 1.4;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+  .compare-row .col .stale {
+    text-decoration: line-through;
+    color: #b91c1c;
+  }
+  .compare-row .col .new {
+    color: var(--primary-dark);
+    font-weight: 600;
+  }
+
+  .footer-note {
+    max-width: 1280px;
+    margin: 64px auto 0;
+    padding: 24px;
+    background: var(--mint);
+    border-radius: 18px;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .footer-note strong { color: var(--primary-dark); }
+
+  /* The first screen's hero variation (welcome) — pull mascot down a bit */
+  .welcome-hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+  }
+  .welcome-hero .mascot { margin-top: -40px; }
+  .brand-mark {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--primary-dark);
+    text-transform: uppercase;
+  }
+
+  .pill-row {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .pill-row .pill {
+    background: var(--mint);
+    border: 1px solid var(--mint-dark);
+    color: var(--primary-dark);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+  <div class="doc-header">
+    <h1>Do-and-Earn — Onboarding redesign</h1>
+    <p class="sub">Post-fitness-pivot direction. New tagline. New categories screen. Old "Health permission" screen removed (will appear contextually when joining an AUTO_STEPS challenge).</p>
+    <div class="pills">
+      <span class="doc-pill">6 screens (same count as today)</span>
+      <span class="doc-pill">Style A palette · unchanged</span>
+      <span class="doc-pill">Mascot 🦘 · unchanged</span>
+      <span class="doc-pill">Tagline · NEW</span>
+      <span class="doc-pill">Categories screen · NEW</span>
+    </div>
+  </div>
+
+  <div class="deck">
+    <!-- ============ SCREEN 1 — WELCOME ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:16.6%"></div></div>
+          <div class="content">
+            <div class="welcome-hero">
+              <div class="brand-mark">Do-and-Earn</div>
+              <div class="mascot">🦘</div>
+              <div class="h1">Show up.<br><span class="accent">Or pay up.</span></div>
+              <p class="lead">The challenge app that uses money to make habits stick.</p>
+            </div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Get started</div>
+            <div style="text-align:center;font-size:12px;color:var(--faint)">Already have an account? <span style="color:var(--primary);font-weight:700">Sign in</span></div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">01</span>Welcome</div>
+    </div>
+
+    <!-- ============ SCREEN 2 — WHAT KINDS ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:33.3%"></div></div>
+          <div class="content">
+            <div class="mini-icon">🎯</div>
+            <div class="h1">Any habit. Any goal.</div>
+            <p class="lead">Fitness. Reading. Meditation. Saving money.<br>If you can do it daily, you can stake on it.</p>
+            <div class="cat-grid">
+              <div class="cat-card cat-fit"><div class="emo">🏃</div><div class="ttl">Fitness</div><div class="sub-l">Steps · workouts</div></div>
+              <div class="cat-card cat-read"><div class="emo">📚</div><div class="ttl">Reading</div><div class="sub-l">Books · articles</div></div>
+              <div class="cat-card cat-mind"><div class="emo">🧘</div><div class="ttl">Mindfulness</div><div class="sub-l">Meditation · journal</div></div>
+              <div class="cat-card cat-learn"><div class="emo">🎓</div><div class="ttl">Learning</div><div class="sub-l">Lessons · skills</div></div>
+              <div class="cat-card cat-prod"><div class="emo">⚡</div><div class="ttl">Productivity</div><div class="sub-l">Focus · routine</div></div>
+              <div class="cat-card cat-crea"><div class="emo">🎨</div><div class="ttl">Creative</div><div class="sub-l">Write · draw · build</div></div>
+              <div class="cat-card cat-well"><div class="emo">🌙</div><div class="ttl">Wellness</div><div class="sub-l">Sleep · hydration</div></div>
+              <div class="cat-card cat-money"><div class="emo">💰</div><div class="ttl">Money</div><div class="sub-l">No-spend · save</div></div>
+            </div>
+            <div class="cat-overflow">+2 more · or create your own</div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Sounds good</div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">02</span>Categories · NEW</div>
+    </div>
+
+    <!-- ============ SCREEN 3 — HOW IT WORKS ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+          <div class="content">
+            <div class="mini-icon">⚙️</div>
+            <div class="h1">How it works</div>
+            <div style="margin-top:8px;">
+              <div class="label-row">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                  <div class="step-title">Pick a challenge</div>
+                  <div class="step-desc">Browse open challenges or create your own. Set your stake.</div>
+                </div>
+              </div>
+              <div class="label-row">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                  <div class="step-title">Show up daily</div>
+                  <div class="step-desc">Tracked auto (steps), photo proof, or honor tap — each challenge picks its method.</div>
+                </div>
+              </div>
+              <div class="label-row">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                  <div class="step-title">Survivors split the pot</div>
+                  <div class="step-desc">Miss a day? Your stake funds the people who didn't.</div>
+                </div>
+              </div>
+            </div>
+            <div class="pill-row">
+              <div class="pill">🏃 Auto-tracked</div>
+              <div class="pill">📷 Photo proof</div>
+              <div class="pill">✋ Honor tap</div>
+            </div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Sounds painful. I'm in.</div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">03</span>How it works</div>
+    </div>
+
+    <!-- ============ SCREEN 4 — PAYMENT ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:66.6%"></div></div>
+          <div class="content">
+            <div class="mini-icon">💳</div>
+            <div class="h1">Money makes you mean&nbsp;it.</div>
+            <p class="lead">We only charge if you miss. Stripe holds the funds — we never see them.</p>
+            <div class="mint-card">
+              <div class="big">$0</div>
+              <div class="sub-l">Charged today · always</div>
+            </div>
+            <div class="reminder-card">
+              <div class="em">🔒</div>
+              <div>
+                <div class="ttl">Card on file = commitment</div>
+                <div class="body">No commitment, no challenge. You can replace or remove it any time in Profile.</div>
+              </div>
+            </div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Add a card</div>
+            <div class="btn-secondary">I'll do this later</div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">04</span>Payment</div>
+    </div>
+
+    <!-- ============ SCREEN 5 — NOTIFICATIONS ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:83.3%"></div></div>
+          <div class="content">
+            <div class="mini-icon">🔔</div>
+            <div class="h1">Don't miss the deadline.</div>
+            <p class="lead">We ping you when you're running out of time<br>and money.</p>
+            <div class="reminder-card">
+              <div class="em">☀️</div>
+              <div>
+                <div class="ttl">Morning kickoff</div>
+                <div class="body">"Day 3 of 7 — let's go."</div>
+              </div>
+            </div>
+            <div class="reminder-card">
+              <div class="em">⚠️</div>
+              <div>
+                <div class="ttl">Danger-zone warning</div>
+                <div class="body">"You're 2,400 steps short. 3h 12m left."</div>
+              </div>
+            </div>
+            <div class="reminder-card">
+              <div class="em">😱</div>
+              <div>
+                <div class="ttl">Last-hour panic</div>
+                <div class="body">"$10 about to disappear."</div>
+              </div>
+            </div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Turn on notifications</div>
+            <div class="btn-secondary">Skip</div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">05</span>Notifications</div>
+    </div>
+
+    <!-- ============ SCREEN 6 — DONE ============ -->
+    <div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span class="right">●●●● ▮▮▮ 99%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+          <div class="content">
+            <div class="welcome-hero">
+              <div class="mascot">🎉</div>
+              <div class="h1">You're in.</div>
+              <p class="lead">Find a challenge and<br><strong>bet on yourself.</strong></p>
+              <div class="pill-row" style="margin-top:8px">
+                <div class="pill">🏃 Walk 10k/day</div>
+                <div class="pill">📚 Read 30 min</div>
+                <div class="pill">🧘 Meditate daily</div>
+              </div>
+            </div>
+          </div>
+          <div class="cta-area">
+            <div class="btn-primary">Browse challenges →</div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div class="caption"><span class="num">06</span>Done</div>
+    </div>
+  </div>
+
+  <!-- ============ COMPARE ============ -->
+  <div class="compare-block">
+    <h2>Copy diff — old vs new</h2>
+    <p class="lead-l">Side-by-side of what the user sees today vs the proposal.</p>
+
+    <div class="compare-row">
+      <div class="col">
+        <h3>Old · screen 1</h3>
+        <p class="stale">"Walk or pay."</p>
+        <p class="stale">"The fitness app that uses financial fear to keep you moving."</p>
+      </div>
+      <div class="col">
+        <h3>New · screen 1</h3>
+        <p class="new"><strong>"Show up. Or pay up."</strong></p>
+        <p class="new">"The challenge app that uses money to make habits stick."</p>
+      </div>
+    </div>
+
+    <div class="compare-row">
+      <div class="col">
+        <h3>Old · screen 3 (Health)</h3>
+        <p class="stale">"Do-and-Earn needs to read your steps"</p>
+        <p class="stale">"iPhone uses HealthKit. Android uses Health Connect. We only read step counts."</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px">Irrelevant for reading / meditation / no-spend challenges.</p>
+      </div>
+      <div class="col">
+        <h3>New · screen 2 (Categories)</h3>
+        <p class="new"><strong>"Any habit. Any goal."</strong></p>
+        <p class="new">"Fitness. Reading. Meditation. Saving money. If you can do it daily, you can stake on it."</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px">Health permission becomes contextual — appears when joining an AUTO_STEPS challenge.</p>
+      </div>
+    </div>
+
+    <div class="compare-row">
+      <div class="col">
+        <h3>Old · screen 6 (Done)</h3>
+        <p class="stale">"Find an open challenge and put your money where your steps are."</p>
+      </div>
+      <div class="col">
+        <h3>New · screen 6 (Done)</h3>
+        <p class="new"><strong>"Bet on yourself."</strong></p>
+        <p class="new">+ chip examples for non-fitness habits (Read 30 min · Meditate daily · etc.)</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <strong>What I need from you:</strong>
+    Tell me if the tagline lands, if the categories grid feels right, and if you want me to keep the Health permission flow somewhere (e.g. as a contextual sheet that opens when you join an AUTO_STEPS challenge for the first time). Once you green-light, I'll do the actual app implementation — about 30–45 min of focused work.
+  </div>
+</body>
+</html>
