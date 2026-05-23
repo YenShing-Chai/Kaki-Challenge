@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kaki · Winner Pool sub-flow · Direction B</title>
+<style>
+  :root {
+    --bg: #fef4e2;
+    --bg-warm: #fbe8c8;
+    --ink: #1c1410;
+    --ink-soft: #5a4a3e;
+    --ink-faint: #a89887;
+    --paper: #fffaf0;
+    --line: #f0d9b3;
+    --orange: #ff5a1f;
+    --orange-soft: #ffe0d0;
+    --orange-deep: #c43d10;
+    --green: #5d8a5a;
+    --green-soft: #d1e5cf;
+    --pink: #e88a8a;
+    --pink-soft: #fbdbdb;
+    --blue: #2d5d8b;
+    --blue-soft: #cee0f0;
+    --yellow: #f4c443;
+    --yellow-deep: #c89a2a;
+    --rounded: 'Nunito', 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  body {
+    background: #fde4b2;
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(255,90,31,0.10), transparent 40%),
+      radial-gradient(circle at 90% 100%, rgba(93,138,90,0.12), transparent 40%);
+    font-family: var(--rounded);
+    color: var(--ink);
+    padding: 60px 40px 100px;
+    min-height: 100vh;
+  }
+  .page-title {
+    max-width: 1400px;
+    margin: 0 auto 50px;
+    text-align: center;
+  }
+  .page-title h1 {
+    font-size: 50px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
+  }
+  .page-title h1 .accent { color: var(--orange); }
+  .page-title h1 .scribble {
+    display: inline-block;
+    position: relative;
+  }
+  .page-title h1 .scribble::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -2px;
+    height: 8px;
+    background: var(--yellow);
+    z-index: -1;
+    border-radius: 4px;
+    transform: rotate(-1deg);
+  }
+  .page-title p { color: var(--ink-soft); font-size: 16px; max-width: 700px; margin: 0 auto; line-height: 1.6; font-weight: 500; }
+
+  .section-header {
+    max-width: 1400px;
+    margin: 60px auto 28px;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    padding: 24px 32px;
+    box-shadow: 6px 6px 0 var(--ink);
+    display: flex; gap: 24px; align-items: center;
+  }
+  .section-header .badge {
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .section-header p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .phone-row {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 60px 24px;
+    justify-items: center;
+  }
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .step-label {
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 800;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .step-label .num {
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+  }
+  .step-label .num.join {
+    background: var(--orange);
+    color: var(--paper);
+  }
+  .phone {
+    width: 300px;
+    height: 620px;
+    border-radius: 42px;
+    background: var(--bg);
+    border: 9px solid #1c1410;
+    box-shadow: 0 25px 50px -20px rgba(28, 20, 16, 0.4),
+                12px 12px 0 var(--orange);
+    position: relative;
+    overflow: hidden;
+    font-family: var(--rounded);
+  }
+  .notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 95px; height: 22px; background: #1c1410;
+    border-radius: 0 0 14px 14px; z-index: 100;
+  }
+  .status-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 38px;
+    padding: 12px 22px 0;
+    display: flex; justify-content: space-between;
+    font-size: 11px; font-weight: 800;
+    color: var(--ink);
+    z-index: 50;
+  }
+  .screen {
+    padding: 50px 20px 24px;
+    height: 100%;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .top-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .back-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+  }
+  .progress {
+    display: flex; gap: 4px;
+    flex: 1; margin: 0 12px;
+  }
+  .progress span {
+    flex: 1; height: 5px; background: rgba(28,20,16,0.12);
+    border-radius: 3px;
+  }
+  .progress span.done { background: var(--green); }
+  .progress span.now { background: var(--orange); }
+
+  .pill-counter {
+    background: var(--ink); color: var(--bg-warm);
+    font-size: 10.5px; font-weight: 800;
+    padding: 5px 10px;
+    border-radius: 100px;
+  }
+  .pill-counter.pool {
+    background: var(--orange); color: var(--paper);
+  }
+
+  .title {
+    font-size: 26px;
+    line-height: 1.1;
+    letter-spacing: -0.6px;
+    margin-bottom: 6px;
+    font-weight: 900;
+  }
+  .title .hl {
+    background: var(--yellow);
+    padding: 0 6px;
+    border-radius: 6px;
+    display: inline-block;
+    transform: rotate(-1deg);
+  }
+  .lead {
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .body-scroll { flex: 1; overflow: hidden; }
+
+  /* === STEP 6a — Entry contribution === */
+  .money-hero {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 20px;
+    padding: 16px 18px 18px;
+    margin-bottom: 10px;
+    box-shadow: 4px 4px 0 var(--orange);
+    text-align: center;
+  }
+  .money-hero .h-lab {
+    font-size: 10.5px; letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .money-hero .h-amount {
+    font-size: 54px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    display: flex; align-items: baseline; justify-content: center; gap: 4px;
+  }
+  .money-hero .h-amount .cur {
+    font-size: 22px;
+    color: var(--ink-soft);
+    font-weight: 800;
+  }
+  .money-hero .h-steppers {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 10px;
+  }
+  .money-hero .step-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-size: 18px;
+    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .preset-chips {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .preset-chips .chip {
+    flex: 1;
+    padding: 9px 0;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    text-align: center;
+    font-size: 11.5px;
+    font-weight: 800;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .preset-chips .chip.on {
+    background: var(--orange);
+    color: var(--paper);
+  }
+  .preset-chips .chip.cap {
+    background: var(--pink-soft);
+  }
+  .projection-card {
+    background: var(--green-soft);
+    border: 2px solid var(--green);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    box-shadow: 2px 2px 0 var(--green);
+  }
+  .projection-card .pj-lab {
+    font-size: 10px;
+    font-weight: 800;
+    color: #2a4a28;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .projection-card .pj-val {
+    font-size: 22px;
+    font-weight: 900;
+    color: #1f3a1d;
+    letter-spacing: -0.5px;
+  }
+  .projection-card .pj-sub {
+    font-size: 11px;
+    color: #2a4a28;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .warn-callout {
+    background: var(--orange-soft);
+    border: 2px solid var(--orange);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 11px;
+    color: var(--orange-deep);
+    font-weight: 700;
+    line-height: 1.4;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+
+  /* === STEP 6b — Distribution method === */
+  .dist-card {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    box-shadow: 3px 3px 0 var(--ink);
+    position: relative;
+  }
+  .dist-card.active {
+    background: var(--green-soft);
+    border-color: var(--green);
+  }
+  .dist-card.locked {
+    opacity: 0.45;
+  }
+  .dist-card .d-row {
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .dist-card .d-emoji {
+    width: 38px; height: 38px;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+  }
+  .dist-card .d-name { font-size: 13.5px; font-weight: 900; }
+  .dist-card .d-desc { font-size: 10.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.4; font-weight: 600; }
+  .dist-card .d-example {
+    font-size: 10px;
+    margin-top: 7px;
+    padding: 5px 9px;
+    background: var(--ink);
+    color: var(--bg-warm);
+    border-radius: 8px;
+    font-weight: 700;
+    display: inline-block;
+  }
+  .rec-sticker {
+    position: absolute;
+    top: -8px; right: 12px;
+    background: var(--orange);
+    color: var(--paper);
+    font-size: 9px;
+    font-weight: 900;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 2px solid var(--ink);
+    letter-spacing: 0.5px;
+    transform: rotate(2deg);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+  .locked-pill {
+    font-size: 9px;
+    background: var(--pink);
+    color: var(--paper);
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-weight: 800;
+    margin-left: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  /* === STEP 6c — Terms === */
+  .terms-banner {
+    background: var(--orange);
+    color: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 16px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    box-shadow: 3px 3px 0 var(--ink);
+    display: flex; gap: 10px; align-items: center;
+  }
+  .terms-banner .tb-icon {
+    width: 32px; height: 32px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .terms-banner .tb-msg {
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+  .terms-banner .tb-sub {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--orange-soft);
+    margin-top: 2px;
+  }
+  .terms-list {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .terms-list .t-head {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .terms-list ul { list-style: none; padding: 0; }
+  .terms-list li {
+    font-size: 11px;
+    line-height: 1.45;
+    padding: 4px 0;
+    padding-left: 18px;
+    position: relative;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .terms-list li::before {
+    content: '•';
+    position: absolute;
+    left: 6px;
+    color: var(--orange);
+    font-weight: 900;
+  }
+  .terms-list li strong { font-weight: 800; }
+  .check-row {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 12px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    margin-bottom: 6px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .check-row .box {
+    width: 22px; height: 22px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+  }
+  .check-row.checked .box { background: var(--green); color: var(--paper); border-color: var(--green); }
+  .check-row .ct { font-size: 11.5px; font-weight: 700; line-height: 1.35; }
+  .check-row .ct .small { font-size: 10px; font-weight: 600; color: var(--ink-soft); display: block; margin-top: 1px; }
+
+  /* === Updated Step 8 — Review (Winner Pool variant) === */
+  .pool-hero {
+    background: var(--orange);
+    color: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 20px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .pool-hero .ph-tag {
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    font-weight: 800;
+    margin-bottom: 4px;
+    opacity: 0.85;
+  }
+  .pool-hero .ph-title { font-size: 18px; font-weight: 900; letter-spacing: -0.3px; line-height: 1.15; margin-bottom: 8px; }
+  .pool-hero .ph-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+  .pool-hero .ph-meta span {
+    background: rgba(255,255,255,0.2);
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .pool-hero .ph-pool-line {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding-top: 10px;
+    border-top: 1.5px dashed rgba(255,255,255,0.3);
+  }
+  .pool-hero .pl-lab { font-size: 11px; font-weight: 700; opacity: 0.85; }
+  .pool-hero .pl-val {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.6px;
+  }
+  .review-banner {
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 11px 13px;
+    margin-bottom: 10px;
+    display: flex; gap: 10px; align-items: flex-start;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .review-banner .rb-icon {
+    width: 28px; height: 28px;
+    background: var(--ink);
+    color: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    font-weight: 900;
+  }
+  .review-banner .rb-text {
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .review-banner strong { font-weight: 900; }
+  .review-banner .rb-text .sub { font-weight: 600; opacity: 0.75; display: block; margin-top: 2px; font-size: 10.5px; }
+  .disclosure {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 10px 14px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .disclosure .d-line {
+    display: flex; justify-content: space-between;
+    font-size: 10.5px;
+    padding: 4px 0;
+    font-weight: 600;
+  }
+  .disclosure .d-l { color: var(--ink-soft); }
+  .disclosure .d-r { font-weight: 800; }
+
+  /* === Join flow specific === */
+  .join-banner {
+    background: var(--orange);
+    color: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    padding: 6px 12px;
+    font-size: 10px;
+    font-weight: 800;
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .join-hero {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 18px;
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: 4px 4px 0 var(--orange);
+  }
+  .join-hero .invite-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .join-hero .invite-row .av {
+    width: 24px; height: 24px;
+    background: var(--green);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    color: var(--paper);
+    font-size: 11px;
+    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .join-hero .invite-row .by { font-size: 11px; font-weight: 700; color: var(--ink-soft); }
+  .join-hero .ch-name { font-size: 18px; font-weight: 900; letter-spacing: -0.4px; margin-bottom: 6px; line-height: 1.15; }
+  .join-hero .ch-meta { display: flex; flex-wrap: wrap; gap: 4px; }
+  .join-hero .ch-meta span {
+    background: var(--bg-warm);
+    border: 1.5px solid var(--ink);
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 800;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .stat-tile {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    padding: 9px 11px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .stat-tile .st-lab {
+    font-size: 9.5px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 800;
+    margin-bottom: 2px;
+  }
+  .stat-tile .st-val { font-size: 16px; font-weight: 900; letter-spacing: -0.4px; }
+  .stat-tile .st-sub { font-size: 9px; color: var(--ink-soft); margin-top: 1px; font-weight: 600; }
+
+  .what-block {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 11px 14px;
+    margin-bottom: 8px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .what-block .wb-head {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .what-block.win .wb-head { color: var(--green); }
+  .what-block.risk .wb-head { color: var(--orange-deep); }
+  .what-block ul { list-style: none; padding: 0; }
+  .what-block li {
+    font-size: 11px;
+    padding: 3px 0;
+    padding-left: 16px;
+    position: relative;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .what-block li::before {
+    content: '';
+    position: absolute;
+    left: 4px; top: 9px;
+    width: 5px; height: 5px;
+    background: var(--ink);
+    border-radius: 50%;
+  }
+  .what-block.win li::before { background: var(--green); }
+  .what-block.risk li::before { background: var(--orange); }
+
+  /* Payment screen */
+  .pay-summary {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .pay-summary .ps-line {
+    display: flex; justify-content: space-between;
+    font-size: 12px;
+    padding: 5px 0;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .pay-summary .ps-line.total {
+    padding-top: 9px;
+    margin-top: 5px;
+    border-top: 2px dashed var(--line);
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--ink);
+  }
+  .pay-summary .ps-line .v { color: var(--ink); font-weight: 800; }
+  .pay-method {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .pay-method .card-icon {
+    width: 36px; height: 26px;
+    background: var(--ink);
+    color: var(--yellow);
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .pay-method .pm-name { font-size: 12.5px; font-weight: 800; }
+  .pay-method .pm-sub { font-size: 10px; color: var(--ink-soft); font-weight: 600; }
+  .secure-note {
+    text-align: center;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .secure-note::before { content: '🔒'; }
+
+  /* Held confirmation */
+  .celebration {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .celebration .big-emoji {
+    font-size: 72px;
+    margin-bottom: 4px;
+    display: block;
+    animation: pop 0.4s ease;
+  }
+  .celebration .ce-title {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .celebration .ce-sub {
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-weight: 700;
+  }
+  .held-card {
+    background: var(--green);
+    color: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 16px;
+    padding: 13px 16px;
+    margin-bottom: 10px;
+    text-align: center;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .held-card .hc-lab { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.85; margin-bottom: 2px; }
+  .held-card .hc-amt { font-size: 30px; font-weight: 900; letter-spacing: -0.8px; }
+  .held-card .hc-status { font-size: 10.5px; font-weight: 700; opacity: 0.9; margin-top: 4px; }
+  .squad-status {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 11px 13px;
+    margin-bottom: 10px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .squad-status .ss-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .squad-status .ss-row .sub { font-size: 10px; color: var(--ink-soft); font-weight: 600; }
+  .avatar-row { display: flex; gap: -4px; }
+  .avatar-row .av {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--paper);
+    background: var(--orange);
+    color: var(--paper);
+    font-size: 11px;
+    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    margin-left: -6px;
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+  .avatar-row .av:first-child { margin-left: 0; }
+  .avatar-row .av.pending { background: var(--bg-warm); color: var(--ink-faint); }
+  .progress-pill {
+    background: var(--green-soft);
+    border: 2px solid var(--green);
+    color: #1f3a1d;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 9px;
+    border-radius: 100px;
+  }
+
+  .next-steps {
+    background: var(--bg-warm);
+    border: 2px dashed var(--ink);
+    border-radius: 12px;
+    padding: 10px 13px;
+    margin-bottom: 10px;
+  }
+  .next-steps .ns-head {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+  }
+  .next-steps ul { list-style: none; padding: 0; }
+  .next-steps li {
+    font-size: 11px;
+    padding: 2px 0;
+    padding-left: 16px;
+    position: relative;
+    font-weight: 700;
+  }
+  .next-steps li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--orange);
+    font-weight: 900;
+  }
+
+  /* CTA */
+  .cta {
+    margin-top: 12px;
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 14px;
+    border-radius: 16px;
+    text-align: center;
+    font-size: 13.5px;
+    font-weight: 900;
+    letter-spacing: 0.3px;
+    border: 2px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--orange);
+  }
+  .cta.green {
+    background: var(--green);
+    color: var(--paper);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .cta.pay {
+    background: var(--orange);
+    color: var(--paper);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .secondary-cta {
+    text-align: center; margin-top: 8px;
+    font-size: 11px; color: var(--ink-soft); font-weight: 700;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>Direction B <span class="accent">·</span> <span class="scribble">Winner Pool</span> flows</h1>
+  <p>Three sub-screens after Step 6 when the creator picks Cash Pool, one updated Step 8 Review, and a 4-screen Join flow for the friend on the receiving end. All in the same Playful Buddy visual language you picked.</p>
+</div>
+
+<!-- =================== SECTION A: WINNER POOL SUB-FLOW =================== -->
+
+<div class="section-header">
+  <div class="badge">A · CREATOR SUB-FLOW</div>
+  <div>
+    <h2>After "Cash Pool" is picked at Step 6</h2>
+    <p>The flow branches into 3 sub-screens that capture: contribution amount → distribution method → terms acceptance. Then continues to Step 7 (Schedule) as normal.</p>
+  </div>
+</div>
+
+<div class="phone-row">
+
+  <!-- ============== STEP 6a — Entry Contribution ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span></div>
+          <div class="pill-counter pool">💸 6a / 8</div>
+        </div>
+        <div class="title">How much <span class="hl">each?</span></div>
+        <div class="lead">Set the buy-in for everyone joining the pool.</div>
+        <div class="body-scroll">
+          <div class="money-hero">
+            <div class="h-lab">Entry per person</div>
+            <div class="h-amount"><span class="cur">RM</span>10</div>
+            <div class="h-steppers">
+              <button class="step-btn">−</button>
+              <button class="step-btn">+</button>
+            </div>
+          </div>
+          <div class="preset-chips">
+            <div class="chip">RM 1</div>
+            <div class="chip">RM 5</div>
+            <div class="chip on">RM 10</div>
+            <div class="chip">RM 25</div>
+            <div class="chip cap">RM 50</div>
+          </div>
+          <div class="projection-card">
+            <div class="pj-lab">Estimated total pool</div>
+            <div class="pj-val">Up to RM 80</div>
+            <div class="pj-sub">8 friends × RM 10 entry · max 20 people</div>
+          </div>
+          <div class="warn-callout">
+            <span>⚠️</span>
+            <div>RM 50 max per person in MVP. Higher buy-ins need legal approval.</div>
+          </div>
+        </div>
+        <div class="cta">Set buy-in →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">6a</span>Entry contribution</div>
+  </div>
+
+  <!-- ============== STEP 6b — Distribution method ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span></div>
+          <div class="pill-counter pool">💸 6b / 8</div>
+        </div>
+        <div class="title">How to <span class="hl">split?</span></div>
+        <div class="lead">Who gets paid when the challenge ends.</div>
+        <div class="body-scroll">
+          <div class="dist-card active">
+            <div class="rec-sticker">✨ SAFEST</div>
+            <div class="d-row">
+              <div class="d-emoji">🤝</div>
+              <div>
+                <div class="d-name">All Completers Split</div>
+                <div class="d-desc">Everyone who finishes gets equal share.</div>
+                <span class="d-example">5 of 8 finish → RM 16 each</span>
+              </div>
+            </div>
+          </div>
+          <div class="dist-card">
+            <div class="d-row">
+              <div class="d-emoji">🏆</div>
+              <div>
+                <div class="d-name">Top N Winners</div>
+                <div class="d-desc">Only the top N split it.</div>
+                <span class="d-example">Top 3 → RM 26 each</span>
+              </div>
+            </div>
+          </div>
+          <div class="dist-card">
+            <div class="d-row">
+              <div class="d-emoji">🥇</div>
+              <div>
+                <div class="d-name">Ranked %</div>
+                <div class="d-desc">1st 50%, 2nd 30%, 3rd 20%.</div>
+                <span class="d-example">RM 40 / RM 24 / RM 16</span>
+              </div>
+            </div>
+          </div>
+          <div class="dist-card">
+            <div class="d-row">
+              <div class="d-emoji">📊</div>
+              <div>
+                <div class="d-name">Proportional</div>
+                <div class="d-desc">Higher verified score = bigger share.</div>
+              </div>
+            </div>
+          </div>
+          <div class="dist-card locked">
+            <div class="d-row">
+              <div class="d-emoji">👑</div>
+              <div>
+                <div class="d-name">Winner Takes All <span class="locked-pill">PHASE 2</span></div>
+                <div class="d-desc">One winner, full pool. Needs legal sign-off.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cta">Use this →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">6b</span>Distribution method</div>
+  </div>
+
+  <!-- ============== STEP 6c — Terms ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span></div>
+          <div class="pill-counter pool">💸 6c / 8</div>
+        </div>
+        <div class="title">Quick <span class="hl">legal bit</span></div>
+        <div class="lead">Read before you publish — real money is involved.</div>
+        <div class="body-scroll">
+          <div class="terms-banner">
+            <div class="tb-icon">🔒</div>
+            <div>
+              <div class="tb-msg">Private / invite-only</div>
+              <div class="tb-sub">Public cash pools coming in Phase 2</div>
+            </div>
+          </div>
+          <div class="terms-list">
+            <div class="t-head">What you're agreeing to</div>
+            <ul>
+              <li>Money <strong>held by Stripe</strong> until challenge ends</li>
+              <li>Kaki admins review every pool before it goes live</li>
+              <li><strong>24h dispute window</strong> after results</li>
+              <li>Payout 1–3 days after dispute closes</li>
+              <li>Full refund if you cancel before start</li>
+              <li>No cancel after the challenge starts</li>
+            </ul>
+          </div>
+          <div class="check-row checked">
+            <div class="box">✓</div>
+            <div class="ct">I've read Kaki's <strong>Winner Pool Terms</strong><span class="small">Terms · Refund · Dispute policy</span></div>
+          </div>
+          <div class="check-row checked">
+            <div class="box">✓</div>
+            <div class="ct">I'm 18+ and not in a restricted region<span class="small">Malaysia · Singapore · most of SEA OK</span></div>
+          </div>
+        </div>
+        <div class="cta">Continue to schedule →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">6c</span>Terms &amp; acceptance</div>
+  </div>
+
+  <!-- spacer for grid -->
+  <div></div>
+
+</div>
+
+<!-- =================== SECTION B: UPDATED REVIEW =================== -->
+
+<div class="section-header">
+  <div class="badge">B · UPDATED REVIEW</div>
+  <div>
+    <h2>Step 8 — when reward is Winner Pool</h2>
+    <p>Replaces the "All clear · auto-approve" green banner with a "Pending admin review" amber treatment. Adds total pool projection and inline refund/dispute disclosures.</p>
+  </div>
+</div>
+
+<div class="phone-row">
+
+  <!-- ============== STEP 8 — Winner Pool Review ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span></div>
+          <div class="pill-counter pool">💸 8 / 8</div>
+        </div>
+        <div class="title">Submit for <span class="hl">review</span></div>
+        <div class="lead">Admins will check &amp; publish — usually within 1–2 hours.</div>
+        <div class="body-scroll">
+          <div class="pool-hero">
+            <div class="ph-tag">YOUR CASH POOL</div>
+            <div class="ph-title">Family Step Streak 🔥</div>
+            <div class="ph-meta">
+              <span>👯 Friends</span><span>💪 8k × 7d</span><span>⌚ Auto</span><span>🤝 All split</span>
+            </div>
+            <div class="ph-pool-line">
+              <div class="pl-lab">Max total pool</div>
+              <div class="pl-val">RM 80</div>
+            </div>
+          </div>
+          <div class="review-banner">
+            <div class="rb-icon">⏱</div>
+            <div class="rb-text">
+              <strong>Pending admin review</strong>
+              <span class="sub">We'll notify your squad once approved (1–2h)</span>
+            </div>
+          </div>
+          <div class="disclosure">
+            <div class="d-line"><span class="d-l">Refund</span><span class="d-r">Full · before start</span></div>
+            <div class="d-line"><span class="d-l">Dispute window</span><span class="d-r">24 hrs after results</span></div>
+            <div class="d-line"><span class="d-l">Payout</span><span class="d-r">1–3 days after lock</span></div>
+            <div class="d-line"><span class="d-l">Min participants</span><span class="d-r">3 to activate</span></div>
+          </div>
+        </div>
+        <div class="cta">Submit for review →</div>
+        <div class="secondary-cta">save as draft</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">8</span>Review &amp; submit</div>
+  </div>
+
+  <div></div><div></div><div></div>
+
+</div>
+
+<!-- =================== SECTION C: JOIN FLOW =================== -->
+
+<div class="section-header">
+  <div class="badge">C · JOIN FLOW</div>
+  <div>
+    <h2>When a friend taps "Join" on a cash pool</h2>
+    <p>Four screens covering the receiving side: see the challenge → accept terms → pay via Stripe → contribution-held confirmation.</p>
+  </div>
+</div>
+
+<div class="phone-row">
+
+  <!-- ============== JOIN 1 — Challenge preview ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">✕</div>
+          <span style="font-size:11px;font-weight:800;color:var(--ink-soft);">CHALLENGE INVITE</span>
+          <div style="width:32px;"></div>
+        </div>
+        <div class="join-banner">💸 CASH POOL CHALLENGE</div>
+        <div class="body-scroll">
+          <div class="join-hero">
+            <div class="invite-row">
+              <div class="av">A</div>
+              <div class="by"><strong>Albert</strong> invited you</div>
+            </div>
+            <div class="ch-name">Family Step Streak 🔥</div>
+            <div class="ch-meta">
+              <span>💪 Fitness</span><span>8k/day × 7d</span><span>⌚ Auto</span>
+            </div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-tile">
+              <div class="st-lab">Entry</div>
+              <div class="st-val">RM 10</div>
+              <div class="st-sub">held until end</div>
+            </div>
+            <div class="stat-tile">
+              <div class="st-lab">Pool so far</div>
+              <div class="st-val">RM 30</div>
+              <div class="st-sub">3 of 8 joined</div>
+            </div>
+            <div class="stat-tile">
+              <div class="st-lab">Max prize</div>
+              <div class="st-val">RM 80</div>
+              <div class="st-sub">if all join</div>
+            </div>
+            <div class="stat-tile">
+              <div class="st-lab">Split</div>
+              <div class="st-val">🤝 All</div>
+              <div class="st-sub">completers split</div>
+            </div>
+          </div>
+          <div style="background:var(--paper);border:2px solid var(--ink);border-radius:12px;padding:10px 13px;font-size:11px;font-weight:700;color:var(--ink-soft);box-shadow:2px 2px 0 var(--ink);text-align:center;">
+            Starts <strong style="color:var(--ink)">Sat 23 May · 7 days</strong>
+          </div>
+        </div>
+        <div class="cta pay">Join the pool · RM 10 →</div>
+        <div class="secondary-cta">see full rules</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num join">J1</span>Challenge preview</div>
+  </div>
+
+  <!-- ============== JOIN 2 — Terms accept ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <span style="font-size:11px;font-weight:800;color:var(--ink-soft);">QUICK CHECK</span>
+          <div style="width:32px;"></div>
+        </div>
+        <div class="title">Before you <span class="hl">join</span></div>
+        <div class="lead">Real money — make sure you're in.</div>
+        <div class="body-scroll">
+          <div class="terms-banner">
+            <div class="tb-icon">💸</div>
+            <div>
+              <div class="tb-msg">RM 10 will be charged now</div>
+              <div class="tb-sub">Held by Stripe · refunded if you win or it's cancelled</div>
+            </div>
+          </div>
+          <div class="what-block win">
+            <div class="wb-head">✓ You win if you</div>
+            <ul>
+              <li>Hit 8,000 steps every day for 7 days</li>
+              <li>Have 1 free skip-day if you need it</li>
+              <li>Share the pool with everyone who finishes</li>
+            </ul>
+          </div>
+          <div class="what-block risk">
+            <div class="wb-head">⚠️ You lose if you</div>
+            <ul>
+              <li>Miss more than 1 day during the streak</li>
+              <li>Cancel after the challenge starts</li>
+              <li>Get disqualified for cheating</li>
+            </ul>
+          </div>
+          <div class="check-row checked">
+            <div class="box">✓</div>
+            <div class="ct">I'm 18+ &amp; understand this is real money</div>
+          </div>
+          <div class="check-row checked">
+            <div class="box">✓</div>
+            <div class="ct">I've read the <strong>Winner Pool Terms</strong></div>
+          </div>
+        </div>
+        <div class="cta pay">Continue to payment →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num join">J2</span>Terms acceptance</div>
+  </div>
+
+  <!-- ============== JOIN 3 — Payment ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <span style="font-size:11px;font-weight:800;color:var(--ink-soft);">PAY ENTRY</span>
+          <div style="width:32px;"></div>
+        </div>
+        <div class="title">Pay <span class="hl">RM 10</span> to join</div>
+        <div class="lead">Held by Stripe until the challenge ends.</div>
+        <div class="body-scroll">
+          <div class="pay-summary">
+            <div class="ps-line"><span>Pool entry</span><span class="v">RM 10.00</span></div>
+            <div class="ps-line"><span>Platform fee</span><span class="v">RM 0.00</span></div>
+            <div class="ps-line total"><span>Total today</span><span>RM 10.00</span></div>
+          </div>
+          <div style="font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ink-soft);margin:0 2px 6px;">Payment method</div>
+          <div class="pay-method">
+            <div class="card-icon">VISA</div>
+            <div style="flex:1">
+              <div class="pm-name">•••• 4242</div>
+              <div class="pm-sub">Default · exp 12/27</div>
+            </div>
+            <div style="font-size:18px;font-weight:900;color:var(--orange);">●</div>
+          </div>
+          <div class="pay-method" style="opacity:0.7;">
+            <div class="card-icon" style="background:var(--bg-warm);color:var(--ink);">+</div>
+            <div style="flex:1">
+              <div class="pm-name">Add new card</div>
+              <div class="pm-sub">Apple Pay · Google Pay</div>
+            </div>
+          </div>
+          <div class="secure-note">256-bit secured · held by Stripe</div>
+        </div>
+        <div class="cta pay">Pay &amp; join →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num join">J3</span>Stripe payment</div>
+  </div>
+
+  <!-- ============== JOIN 4 — Held confirmation ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div style="width:32px;"></div>
+          <span style="font-size:11px;font-weight:800;color:var(--green);">✓ YOU'RE IN</span>
+          <div style="width:32px;"></div>
+        </div>
+        <div class="body-scroll" style="display:flex;flex-direction:column;">
+          <div class="celebration">
+            <span class="big-emoji">🎉</span>
+            <div class="ce-title">You're in!</div>
+            <div class="ce-sub">Family Step Streak 🔥</div>
+          </div>
+          <div class="held-card">
+            <div class="hc-lab">Your entry</div>
+            <div class="hc-amt">RM 10.00</div>
+            <div class="hc-status">held by Stripe</div>
+          </div>
+          <div class="squad-status">
+            <div class="ss-row">
+              <span>Squad <span class="sub">4 of min 5</span></span>
+              <span class="progress-pill">need 1 more</span>
+            </div>
+            <div class="avatar-row">
+              <div class="av" style="background:var(--green);">A</div>
+              <div class="av" style="background:var(--orange);">Y</div>
+              <div class="av" style="background:var(--blue);">J</div>
+              <div class="av" style="background:var(--pink);">M</div>
+              <div class="av pending">?</div>
+            </div>
+          </div>
+          <div class="next-steps">
+            <div class="ns-head">What's next</div>
+            <ul>
+              <li>1h heads-up before Sat 9am</li>
+              <li>Daily nudges during the streak</li>
+              <li>Results &amp; payout within 24h of finish</li>
+            </ul>
+          </div>
+        </div>
+        <div class="cta">Invite more friends →</div>
+        <div class="secondary-cta">view challenge</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num join">J4</span>Held confirmation</div>
+  </div>
+
+</div>
+
+</body>
+</html>

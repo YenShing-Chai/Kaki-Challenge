@@ -1,3 +1,11 @@
+/**
+ * Profile — Direction B reskin.
+ *
+ * Cream bg, chunky offset cards, orange avatar, heatmap recoloured
+ * to the orange/green ladder. Logic (delete account, creator apply,
+ * test-card attach) is unchanged from legacy build.
+ */
+
 import { useAuth, useUser } from '../../lib/auth';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -15,8 +23,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import {
+  BButton,
+  BCard,
+  BPill,
+  BRow,
+  BSection,
+  ScreenHeader,
+} from '../../components/themeB/screen';
 import { apiRequest } from '../../lib/api';
-import { colors, radius, shadow } from '../../lib/theme';
+import { colorsB, radiusB, shadowsB, spacingB, typeB } from '../../lib/themeB';
 
 type ProfileData = {
   user: {
@@ -142,7 +158,7 @@ export default function ProfileTab() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.center}>
-          <ActivityIndicator />
+          <ActivityIndicator color={colorsB.orange} />
         </View>
       </SafeAreaView>
     );
@@ -161,156 +177,172 @@ export default function ProfileTab() {
   const winRate = entered > 0 ? Math.round((data.stats.won / entered) * 100) : 0;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.eyebrow}>Profile</Text>
+        <ScreenHeader eyebrow="Profile" highlight="You" after="✦" />
 
-        <View style={styles.identityCard}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initial}</Text>
-          </View>
-          <View style={{ flex: 1, gap: 4 }}>
-            <Text style={styles.name}>{user?.name ?? email}</Text>
-            <Text style={styles.email}>{email}</Text>
-            <Text style={styles.memberSince}>Member since {memberSince}</Text>
-          </View>
-        </View>
+        <View style={{ paddingHorizontal: spacingB.lg, gap: spacingB.lg }}>
+          {/* Identity card */}
+          <BCard large style={styles.identityCard}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{initial}</Text>
+            </View>
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={styles.name}>{user?.name ?? email}</Text>
+              <Text style={styles.email}>{email}</Text>
+              <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
+                <BPill label={`Member since ${memberSince}`} tone="neutral" size="sm" />
+                {data.isAdmin ? <BPill label="ADMIN" tone="ink" size="sm" /> : null}
+              </View>
+            </View>
+          </BCard>
 
-        {data.heatmap ? <Heatmap data={data.heatmap} /> : null}
+          {data.heatmap ? <Heatmap data={data.heatmap} /> : null}
 
-        {data.achievements ? <Achievements data={data.achievements} /> : null}
+          {data.achievements ? <Achievements data={data.achievements} /> : null}
 
-        <Section title="Challenge Stats">
-          <Row label="Challenges entered" value={String(entered)} />
-          <Row label="Challenges won" value={`${data.stats.won}  (${winRate}%)`} />
-          <Row label="Current streak" value={`${user?.currentStreak ?? 0}${(user?.currentStreak ?? 0) > 0 ? ' 🔥' : ''}`} />
-          <Row label="Longest streak" value={`${user?.longestStreak ?? 0} 🔥`} />
-          <Row label="Total earned" value={`$${totalWon.toFixed(2)}`} />
-          <Row label="Total lost" value={`$${totalLost.toFixed(2)}`} />
-          <Row label="Net" value={`${net >= 0 ? '+' : ''}$${net.toFixed(2)}`} bold />
-        </Section>
+          {/* Challenge stats */}
+          <BSection title="Challenge stats">
+            <BCard>
+              <BRow label="Challenges entered" value={String(entered)} />
+              <BRow label="Challenges won" value={`${data.stats.won} (${winRate}%)`} />
+              <BRow
+                label="Current streak"
+                value={`${user?.currentStreak ?? 0}${(user?.currentStreak ?? 0) > 0 ? ' 🔥' : ''}`}
+              />
+              <BRow label="Longest streak" value={`${user?.longestStreak ?? 0} 🔥`} />
+              <BRow label="Total earned" value={`$${totalWon.toFixed(2)}`} />
+              <BRow label="Total lost" value={`$${totalLost.toFixed(2)}`} />
+              <BRow label="Net" value={`${net >= 0 ? '+' : ''}$${net.toFixed(2)}`} bold />
+            </BCard>
+          </BSection>
 
-        <Section title="Settings">
-          <Row label="Timezone" value={user?.timezone ?? '—'} />
-          <Toggle
-            label="Morning kickoff"
-            value={notif.morning}
-            onChange={(v) => setNotif((n) => ({ ...n, morning: v }))}
-          />
-          <Toggle
-            label="Danger zone warning"
-            value={notif.danger}
-            onChange={(v) => setNotif((n) => ({ ...n, danger: v }))}
-          />
-          <Toggle
-            label="Last hour panic"
-            value={notif.panic}
-            onChange={(v) => setNotif((n) => ({ ...n, panic: v }))}
-          />
-          <Toggle
-            label="Social join alerts"
-            value={notif.social}
-            onChange={(v) => setNotif((n) => ({ ...n, social: v }))}
-          />
-          <Text style={styles.note}>Notification toggles are local for now — server-side preferences land in v1.1.</Text>
-        </Section>
-
-        <Section title="Payment">
-          {data.method ? (
-            <Row
-              label="Card on file"
-              value={`${data.method.brand.toUpperCase()} •••• ${data.method.last4}  Exp ${String(data.method.expMonth).padStart(2, '0')}/${String(data.method.expYear).slice(-2)}`}
-            />
-          ) : (
-            <Row label="Card on file" value="None" />
-          )}
-          <Pressable
-            onPress={async () => {
-              try {
-                const token = await getToken();
-                await apiRequest('/payments/dev-attach-test-card', { method: 'POST', token });
-                await load();
-                Alert.alert('Updated', 'Test card attached.');
-              } catch (err) {
-                Alert.alert('Error', err instanceof Error ? err.message : 'Failed');
-              }
-            }}
-            style={({ pressed }) => [styles.linkBtn, pressed && { opacity: 0.7 }]}
-          >
-            <Text style={styles.linkText}>{data.method ? 'Replace test card (dev)' : 'Attach test card (dev)'}</Text>
-          </Pressable>
-        </Section>
-
-        <Section title="Legal">
-          <Pressable onPress={() => router.push('/(legal)/privacy')} style={styles.linkRow}>
-            <Text style={styles.linkRowText}>Privacy Policy</Text>
-            <Text style={styles.chev}>›</Text>
-          </Pressable>
-          <Pressable onPress={() => router.push('/(legal)/terms')} style={styles.linkRow}>
-            <Text style={styles.linkRowText}>Terms of Service</Text>
-            <Text style={styles.chev}>›</Text>
-          </Pressable>
-        </Section>
-
-        <Section title="Creator">
-          {data.canCreateChallenges ? (
-            <Pressable
-              onPress={() => router.push('/admin/create-challenge')}
-              style={styles.linkRow}
-            >
-              <Text style={styles.linkRowText}>
-                {data.isAdmin ? '⚡ Create challenge (admin)' : '⚡ Create challenge'}
+          {/* Settings */}
+          <BSection title="Settings">
+            <BCard>
+              <BRow label="Timezone" value={user?.timezone ?? '—'} />
+              <ToggleRow
+                label="Morning kickoff"
+                value={notif.morning}
+                onChange={(v) => setNotif((n) => ({ ...n, morning: v }))}
+              />
+              <ToggleRow
+                label="Danger zone warning"
+                value={notif.danger}
+                onChange={(v) => setNotif((n) => ({ ...n, danger: v }))}
+              />
+              <ToggleRow
+                label="Last hour panic"
+                value={notif.panic}
+                onChange={(v) => setNotif((n) => ({ ...n, panic: v }))}
+              />
+              <ToggleRow
+                label="Social join alerts"
+                value={notif.social}
+                onChange={(v) => setNotif((n) => ({ ...n, social: v }))}
+              />
+              <Text style={styles.note}>
+                Notification toggles are local for now — server-side preferences land in v1.1.
               </Text>
-              <Text style={styles.chev}>›</Text>
-            </Pressable>
-          ) : data.user?.creatorStatus === 'APPLIED' ? (
-            <Row label="Application status" value="Pending review" />
-          ) : data.user?.creatorStatus === 'REJECTED' ? (
-            <Row label="Application status" value="Rejected" />
-          ) : (
-            <Pressable
-              onPress={async () => {
-                try {
-                  const token = await getToken();
-                  await apiRequest('/users/me/apply-creator', {
-                    method: 'POST',
-                    token,
-                    body: {},
-                  });
-                  await load();
-                  Alert.alert('Submitted', 'Your application is under review.');
-                } catch (err) {
-                  Alert.alert('Error', err instanceof Error ? err.message : 'Failed');
-                }
-              }}
-              style={styles.linkRow}
-            >
-              <Text style={styles.linkRowText}>Become a creator</Text>
-              <Text style={styles.chev}>›</Text>
-            </Pressable>
-          )}
-        </Section>
+            </BCard>
+          </BSection>
 
-        <Section title="Account">
-          <Pressable onPress={() => signOut()} style={styles.linkRow}>
-            <Text style={styles.linkRowText}>Sign out</Text>
-            <Text style={styles.chev}>›</Text>
-          </Pressable>
-          <Pressable onPress={() => setShowDelete(true)} style={styles.linkRow}>
-            <Text style={[styles.linkRowText, { color: '#b91c1c' }]}>Delete account</Text>
-            <Text style={styles.chev}>›</Text>
-          </Pressable>
-        </Section>
+          {/* Payment */}
+          <BSection title="Payment">
+            <BCard>
+              <BRow
+                label="Card on file"
+                value={
+                  data.method
+                    ? `${data.method.brand.toUpperCase()} •••• ${data.method.last4}  Exp ${String(
+                        data.method.expMonth,
+                      ).padStart(2, '0')}/${String(data.method.expYear).slice(-2)}`
+                    : 'None'
+                }
+              />
+              <BButton
+                label={data.method ? 'Replace test card (dev)' : 'Attach test card (dev)'}
+                tone="paper"
+                small
+                onPress={async () => {
+                  try {
+                    const token = await getToken();
+                    await apiRequest('/payments/dev-attach-test-card', { method: 'POST', token });
+                    await load();
+                    Alert.alert('Updated', 'Test card attached.');
+                  } catch (err) {
+                    Alert.alert('Error', err instanceof Error ? err.message : 'Failed');
+                  }
+                }}
+                style={{ marginTop: spacingB.md, alignSelf: 'flex-start' }}
+              />
+            </BCard>
+          </BSection>
+
+          {/* Legal */}
+          <BSection title="Legal">
+            <BCard>
+              <BRow label="Privacy Policy" onPress={() => router.push('/(legal)/privacy')} />
+              <BRow label="Terms of Service" onPress={() => router.push('/(legal)/terms')} />
+            </BCard>
+          </BSection>
+
+          {/* Creator */}
+          <BSection title="Creator">
+            <BCard>
+              {data.canCreateChallenges ? (
+                <BRow
+                  label={data.isAdmin ? '⚡ Create challenge (admin)' : '⚡ Create challenge'}
+                  onPress={() => router.push('/admin/create-challenge')}
+                />
+              ) : data.user?.creatorStatus === 'APPLIED' ? (
+                <BRow label="Application status" value="Pending review" />
+              ) : data.user?.creatorStatus === 'REJECTED' ? (
+                <BRow label="Application status" value="Rejected" />
+              ) : (
+                <BRow
+                  label="Become a creator"
+                  onPress={async () => {
+                    try {
+                      const token = await getToken();
+                      await apiRequest('/users/me/apply-creator', {
+                        method: 'POST',
+                        token,
+                        body: {},
+                      });
+                      await load();
+                      Alert.alert('Submitted', 'Your application is under review.');
+                    } catch (err) {
+                      Alert.alert('Error', err instanceof Error ? err.message : 'Failed');
+                    }
+                  }}
+                />
+              )}
+            </BCard>
+          </BSection>
+
+          {/* Account */}
+          <BSection title="Account">
+            <BCard>
+              <BRow label="Sign out" onPress={() => signOut()} />
+              <BRow label="Delete account" danger onPress={() => setShowDelete(true)} />
+            </BCard>
+          </BSection>
+        </View>
       </ScrollView>
 
-      <Modal visible={showDelete} transparent animationType="fade" onRequestClose={() => setShowDelete(false)}>
+      <Modal
+        visible={showDelete}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowDelete(false)}
+      >
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Delete account?</Text>
             <Text style={styles.modalBody}>
               This will delete your user record, step logs, transactions, and Stripe customer. You
-              can't undo this. Type{' '}
-              <Text style={{ fontWeight: '700' }}>DELETE</Text> below to confirm.
+              can't undo this. Type <Text style={{ fontWeight: '900' }}>DELETE</Text> below to confirm.
             </Text>
             <TextInput
               placeholder="DELETE"
@@ -318,36 +350,37 @@ export default function ProfileTab() {
               value={deleteConfirm}
               onChangeText={setDeleteConfirm}
               style={styles.input}
+              placeholderTextColor={colorsB.inkFaint}
             />
-            {deleteError ? <Text style={styles.error}>{deleteError}</Text> : null}
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <Pressable
+            {deleteError ? (
+              <Text style={[typeB.body, { color: colorsB.orangeDeep }]}>{deleteError}</Text>
+            ) : null}
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: spacingB.sm }}>
+              <BButton
+                label="Cancel"
+                tone="paper"
                 onPress={() => {
                   setShowDelete(false);
                   setDeleteConfirm('');
                   setDeleteError(null);
                 }}
-                style={({ pressed }) => [
-                  styles.modalBtn,
-                  styles.modalBtnSecondary,
-                  pressed && { opacity: 0.85 },
-                ]}
-              >
-                <Text style={styles.modalBtnSecondaryText}>Cancel</Text>
-              </Pressable>
+                style={{ flex: 1 }}
+              />
               <Pressable
                 onPress={onDelete}
                 disabled={deleting}
                 style={({ pressed }) => [
-                  styles.modalBtn,
-                  styles.modalBtnDanger,
-                  (pressed || deleting) && { opacity: 0.85 },
+                  styles.deleteBtn,
+                  (pressed || deleting) && {
+                    transform: [{ translateX: 2 }, { translateY: 2 }],
+                    shadowOpacity: 0,
+                  },
                 ]}
               >
                 {deleting ? (
-                  <ActivityIndicator color="#fff" />
+                  <ActivityIndicator color={colorsB.paper} />
                 ) : (
-                  <Text style={styles.modalBtnDangerText}>Delete forever</Text>
+                  <Text style={styles.deleteBtnText}>Delete forever</Text>
                 )}
               </Pressable>
             </View>
@@ -358,14 +391,14 @@ export default function ProfileTab() {
   );
 }
 
+// ─── Heatmap (recoloured to B palette) ────────────────────────────────────
+
 function Heatmap({ data }: { data: HeatmapData }) {
-  // Group days into weeks. The grid reads top→bottom = Sun..Sat, left→right = oldest..newest.
-  // We pad the front so column 0 starts on a Sunday.
   const weeks = useMemo(() => {
     const firstDay = data.days[0];
     if (!firstDay) return [] as Array<Array<{ date: string; count: number } | null>>;
     const first = new Date(`${firstDay.date}T00:00:00Z`);
-    const firstDow = first.getUTCDay(); // 0..6
+    const firstDow = first.getUTCDay();
     const padded: Array<{ date: string; count: number } | null> = [];
     for (let i = 0; i < firstDow; i++) padded.push(null);
     padded.push(...data.days);
@@ -375,7 +408,6 @@ function Heatmap({ data }: { data: HeatmapData }) {
     return cols;
   }, [data.days]);
 
-  // Find month label positions: show label at the column where a new month starts.
   const monthLabels = useMemo(() => {
     const labels: Array<{ col: number; label: string }> = [];
     let lastMonth = -1;
@@ -401,28 +433,30 @@ function Heatmap({ data }: { data: HeatmapData }) {
   const cellGap = 3;
 
   return (
-    <View style={hmStyles.wrap}>
-      <View style={hmStyles.heroRow}>
-        <View style={hmStyles.heroItem}>
-          <Text style={hmStyles.heroValue}>
+    <BCard large>
+      <View style={styles.hmHeroRow}>
+        <View style={styles.hmHeroItem}>
+          <Text style={styles.hmHeroValue}>
             {data.crossStreak}
             {data.crossStreak > 0 ? ' 🔥' : ''}
           </Text>
-          <Text style={hmStyles.heroLabel}>Day streak</Text>
+          <Text style={styles.hmHeroLabel}>Day streak</Text>
         </View>
-        <View style={hmStyles.heroDivider} />
-        <View style={hmStyles.heroItem}>
-          <Text style={hmStyles.heroValue}>{data.totalActiveDays}</Text>
-          <Text style={hmStyles.heroLabel}>Active days</Text>
+        <View style={styles.hmDivider} />
+        <View style={styles.hmHeroItem}>
+          <Text style={styles.hmHeroValue}>{data.totalActiveDays}</Text>
+          <Text style={styles.hmHeroLabel}>Active days</Text>
         </View>
-        <View style={hmStyles.heroDivider} />
-        <View style={hmStyles.heroItem}>
-          <Text style={hmStyles.heroValue}>{data.longestCrossStreak}</Text>
-          <Text style={hmStyles.heroLabel}>Longest</Text>
+        <View style={styles.hmDivider} />
+        <View style={styles.hmHeroItem}>
+          <Text style={styles.hmHeroValue}>{data.longestCrossStreak}</Text>
+          <Text style={styles.hmHeroLabel}>Longest</Text>
         </View>
       </View>
 
-      <Text style={hmStyles.sectionTitle}>Activity (past year)</Text>
+      <Text style={[typeB.eyebrow, { marginTop: spacingB.lg, marginBottom: spacingB.sm }]}>
+        Activity · past year
+      </Text>
 
       <ScrollView
         horizontal
@@ -430,21 +464,16 @@ function Heatmap({ data }: { data: HeatmapData }) {
         contentContainerStyle={{ paddingRight: 8 }}
       >
         <View>
-          {/* Month labels */}
           <View style={{ height: 14, flexDirection: 'row' }}>
             {weeks.map((_, idx) => {
               const ml = monthLabels.find((l) => l.col === idx);
               return (
-                <View
-                  key={`m${idx}`}
-                  style={{ width: cellSize + cellGap, alignItems: 'flex-start' }}
-                >
-                  {ml ? <Text style={hmStyles.monthLabel}>{ml.label}</Text> : null}
+                <View key={`m${idx}`} style={{ width: cellSize + cellGap, alignItems: 'flex-start' }}>
+                  {ml ? <Text style={styles.hmMonthLabel}>{ml.label}</Text> : null}
                 </View>
               );
             })}
           </View>
-          {/* Grid */}
           <View style={{ flexDirection: 'row' }}>
             {weeks.map((col, idx) => (
               <View key={`c${idx}`} style={{ marginRight: cellGap }}>
@@ -466,75 +495,30 @@ function Heatmap({ data }: { data: HeatmapData }) {
         </View>
       </ScrollView>
 
-      <View style={hmStyles.legendRow}>
-        <Text style={hmStyles.legendLabel}>Less</Text>
+      <View style={styles.hmLegendRow}>
+        <Text style={styles.hmLegendLabel}>Less</Text>
         {[0, 1, 2, 3].map((lvl) => (
           <View
             key={lvl}
-            style={[hmStyles.legendCell, { backgroundColor: cellColor(lvl === 0 ? 0 : lvl) }]}
+            style={[styles.hmLegendCell, { backgroundColor: cellColor(lvl === 0 ? 0 : lvl) }]}
           />
         ))}
-        <Text style={hmStyles.legendLabel}>More</Text>
+        <Text style={styles.hmLegendLabel}>More</Text>
       </View>
-    </View>
+    </BCard>
   );
 }
 
 function cellColor(count: number) {
-  if (count <= 0) return '#EDEDED';
-  if (count === 1) return '#A7E0AF';
-  if (count === 2) return '#5FBB6D';
-  return colors.primary;
+  if (count <= 0) return colorsB.bgWarm;
+  if (count === 1) return '#fbd5b0'; // light orange
+  if (count === 2) return '#ff8c5a'; // medium orange
+  return colorsB.orange;
 }
 
-const hmStyles = StyleSheet.create({
-  wrap: {
-    backgroundColor: colors.bg,
-    borderRadius: radius.cardLg,
-    padding: 16,
-    gap: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadow.card,
-  },
-  heroRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.mint,
-    borderRadius: radius.card,
-    paddingVertical: 14,
-    paddingHorizontal: 8,
-  },
-  heroItem: { flex: 1, alignItems: 'center', gap: 2 },
-  heroDivider: { width: 1, height: 32, backgroundColor: colors.mintDark },
-  heroValue: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: colors.ink,
-    letterSpacing: -0.3,
-  },
-  heroLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: colors.primaryDark,
-    textTransform: 'uppercase',
-    letterSpacing: 1.2,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: colors.textMicro,
-    textTransform: 'uppercase',
-    letterSpacing: 1.2,
-  },
-  monthLabel: { fontSize: 9, color: colors.textFaint, fontWeight: '600' },
-  legendRow: { flexDirection: 'row', alignItems: 'center', gap: 4, justifyContent: 'flex-end' },
-  legendCell: { width: 11, height: 11, borderRadius: 2 },
-  legendLabel: { fontSize: 10, color: colors.textFaint, marginHorizontal: 2 },
-});
+// ─── Achievements grid ────────────────────────────────────────────────────
 
 function Achievements({ data }: { data: AchievementsResponse }) {
-  // Show unlocked first, then locked but in-progress (current > 0), then locked-zero.
   const sorted = useMemo(() => {
     const unlocked = data.achievements.filter((a) => a.unlocked);
     const inProgress = data.achievements
@@ -545,46 +529,47 @@ function Achievements({ data }: { data: AchievementsResponse }) {
   }, [data.achievements]);
 
   return (
-    <View style={achStyles.wrap}>
-      <View style={achStyles.headerRow}>
-        <Text style={achStyles.sectionTitle}>Achievements</Text>
-        <Text style={achStyles.count}>
+    <BSection
+      title="Achievements"
+      right={
+        <Text style={styles.achCount}>
           {data.unlockedCount} / {data.totalCount}
         </Text>
-      </View>
-      <View style={achStyles.grid}>
+      }
+    >
+      <View style={styles.achGrid}>
         {sorted.map((a) => (
           <AchievementCard key={a.id} a={a} />
         ))}
       </View>
-    </View>
+    </BSection>
   );
 }
 
 function AchievementCard({ a }: { a: Achievement }) {
   const pct = a.target > 0 ? Math.min(1, a.current / a.target) : 0;
   return (
-    <View style={[achStyles.card, !a.unlocked && achStyles.cardLocked]}>
-      <Text style={[achStyles.emoji, !a.unlocked && achStyles.emojiLocked]}>{a.emoji}</Text>
+    <View style={[styles.achCard, !a.unlocked && styles.achCardLocked]}>
+      <Text style={[styles.achEmoji, !a.unlocked && styles.achEmojiLocked]}>{a.emoji}</Text>
       <Text
-        style={[achStyles.title, !a.unlocked && achStyles.titleLocked]}
+        style={[styles.achTitle, !a.unlocked && styles.achTitleLocked]}
         numberOfLines={1}
       >
         {a.title}
       </Text>
-      <Text style={achStyles.desc} numberOfLines={2}>
+      <Text style={styles.achDesc} numberOfLines={2}>
         {a.description}
       </Text>
       {a.unlocked ? (
-        <View style={achStyles.unlockedBadge}>
-          <Text style={achStyles.unlockedBadgeText}>UNLOCKED</Text>
+        <View style={styles.achUnlockedBadge}>
+          <Text style={styles.achUnlockedText}>UNLOCKED</Text>
         </View>
       ) : (
         <View style={{ width: '100%', gap: 4 }}>
-          <View style={achStyles.progressTrack}>
-            <View style={[achStyles.progressFill, { width: `${pct * 100}%` }]} />
+          <View style={styles.achProgressTrack}>
+            <View style={[styles.achProgressFill, { width: `${pct * 100}%` }]} />
           </View>
-          <Text style={achStyles.progressText}>
+          <Text style={styles.achProgressText}>
             {a.current} / {a.target}
           </Text>
         </View>
@@ -593,114 +578,9 @@ function AchievementCard({ a }: { a: Achievement }) {
   );
 }
 
-const achStyles = StyleSheet.create({
-  wrap: { gap: 12 },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-  },
-  sectionTitle: {
-    fontWeight: '700',
-    fontSize: 14,
-    color: '#444',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  count: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: colors.primary,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  card: {
-    width: '31%',
-    backgroundColor: colors.bg,
-    borderRadius: radius.card,
-    paddingVertical: 14,
-    paddingHorizontal: 8,
-    gap: 6,
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    ...shadow.card,
-  },
-  cardLocked: {
-    backgroundColor: colors.bgSoft,
-    borderColor: colors.border,
-    borderWidth: 1,
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  emoji: { fontSize: 28 },
-  emojiLocked: { opacity: 0.35 },
-  title: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: colors.ink,
-    textAlign: 'center',
-    letterSpacing: -0.1,
-  },
-  titleLocked: { color: colors.textMuted },
-  desc: {
-    fontSize: 10,
-    color: colors.textFaint,
-    textAlign: 'center',
-    lineHeight: 13,
-    minHeight: 26,
-  },
-  unlockedBadge: {
-    marginTop: 2,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 999,
-    backgroundColor: colors.mint,
-  },
-  unlockedBadgeText: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: colors.primaryDark,
-    letterSpacing: 0.8,
-  },
-  progressTrack: {
-    width: '100%',
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.border,
-    overflow: 'hidden',
-  },
-  progressFill: { height: '100%', backgroundColor: colors.primary },
-  progressText: {
-    fontSize: 9,
-    color: colors.textFaint,
-    textAlign: 'center',
-    fontWeight: '700',
-  },
-});
+// ─── Local helpers ────────────────────────────────────────────────────────
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <View style={{ gap: 8 }}>{children}</View>
-    </View>
-  );
-}
-
-function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
-  return (
-    <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={[styles.rowValue, bold && { fontWeight: '800' }]}>{value}</Text>
-    </View>
-  );
-}
-
-function Toggle({
+function ToggleRow({
   label,
   value,
   onChange,
@@ -710,95 +590,198 @@ function Toggle({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
-      <Switch value={value} onValueChange={onChange} />
-    </View>
+    <BRow
+      label={label}
+      right={
+        <Switch
+          value={value}
+          onValueChange={onChange}
+          trackColor={{ true: colorsB.orange, false: colorsB.line }}
+          thumbColor={colorsB.paper}
+        />
+      }
+    />
   );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────
+
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#fff' },
+  safe: { flex: 1, backgroundColor: colorsB.bg },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  scroll: { padding: 24, gap: 20, paddingBottom: 60 },
-  eyebrow: { color: '#888', textTransform: 'uppercase', letterSpacing: 1, fontSize: 12 },
+  scroll: { paddingTop: 4, paddingBottom: 40 },
+
   identityCard: {
     flexDirection: 'row',
-    gap: 16,
+    gap: spacingB.lg,
     alignItems: 'center',
-    backgroundColor: '#fafafa',
-    borderRadius: 12,
-    padding: 16,
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#3FA84E',
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: colorsB.orange,
+    borderWidth: 2,
+    borderColor: colorsB.ink,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadowsB.card,
   },
-  avatarText: { color: '#fff', fontWeight: '700', fontSize: 22 },
-  name: { fontWeight: '700', fontSize: 18 },
-  email: { color: '#666', fontSize: 13 },
-  memberSince: { color: '#888', fontSize: 12 },
+  avatarText: { color: colorsB.paper, fontWeight: '900', fontSize: 24 },
+  name: { fontWeight: '900', fontSize: 18, color: colorsB.ink, letterSpacing: -0.3 },
+  email: { color: colorsB.inkSoft, fontSize: 12, fontWeight: '700' },
 
-  section: { gap: 10 },
-  sectionTitle: {
-    fontWeight: '700',
-    fontSize: 14,
-    color: '#444',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+  note: {
+    color: colorsB.inkFaint,
+    fontSize: 11,
+    fontStyle: 'italic',
+    paddingTop: spacingB.sm,
+    fontWeight: '600',
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  rowLabel: { color: '#555', fontSize: 14, flex: 1 },
-  rowValue: { color: '#111', fontWeight: '600', fontSize: 14 },
-  note: { color: '#888', fontSize: 12, fontStyle: 'italic', paddingTop: 4 },
 
-  linkBtn: { paddingVertical: 10, alignItems: 'flex-start' },
-  linkText: { color: '#0066cc', fontWeight: '600' },
-  linkRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  linkRowText: { fontSize: 15, fontWeight: '500' },
-  chev: { color: '#bbb', fontSize: 24, fontWeight: '300' },
-
+  // Delete modal
   modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: 'rgba(28,20,16,0.55)',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: spacingB.xl,
   },
-  modalCard: { backgroundColor: '#fff', borderRadius: 16, padding: 20, gap: 14, width: '100%' },
-  modalTitle: { fontSize: 20, fontWeight: '700' },
-  modalBody: { color: '#444', lineHeight: 20 },
+  modalCard: {
+    backgroundColor: colorsB.paper,
+    borderWidth: 2,
+    borderColor: colorsB.ink,
+    borderRadius: radiusB.cardLg,
+    padding: spacingB.xl,
+    gap: spacingB.md,
+    width: '100%',
+    ...shadowsB.cardLg,
+  },
+  modalTitle: { fontSize: 20, fontWeight: '900', color: colorsB.ink, letterSpacing: -0.3 },
+  modalBody: { color: colorsB.inkSoft, lineHeight: 20, fontSize: 13, fontWeight: '600' },
   input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    paddingHorizontal: 14,
+    borderWidth: 2,
+    borderColor: colorsB.ink,
+    borderRadius: radiusB.control,
+    paddingHorizontal: spacingB.lg,
     paddingVertical: 12,
     fontSize: 16,
     letterSpacing: 2,
+    fontWeight: '900',
+    color: colorsB.ink,
+    backgroundColor: colorsB.bg,
   },
-  modalBtn: { flex: 1, paddingVertical: 14, borderRadius: 10, alignItems: 'center' },
-  modalBtnSecondary: { backgroundColor: '#f0f0f0' },
-  modalBtnSecondaryText: { color: '#111', fontWeight: '600' },
-  modalBtnDanger: { backgroundColor: '#b91c1c' },
-  modalBtnDangerText: { color: '#fff', fontWeight: '700' },
-  error: { color: '#b91c1c' },
+  deleteBtn: {
+    flex: 1,
+    backgroundColor: colorsB.orangeDeep,
+    borderWidth: 2,
+    borderColor: colorsB.ink,
+    borderRadius: radiusB.control,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadowsB.card,
+  },
+  deleteBtnText: { color: colorsB.paper, fontWeight: '900', fontSize: 14, letterSpacing: 0.3 },
+
+  // Heatmap styles
+  hmHeroRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colorsB.orangeSoft,
+    borderRadius: radiusB.card,
+    borderWidth: 2,
+    borderColor: colorsB.ink,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+  },
+  hmHeroItem: { flex: 1, alignItems: 'center', gap: 2 },
+  hmDivider: { width: 1.5, height: 32, backgroundColor: colorsB.ink, opacity: 0.18 },
+  hmHeroValue: { fontSize: 22, fontWeight: '900', color: colorsB.ink, letterSpacing: -0.3 },
+  hmHeroLabel: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: colorsB.orangeDeep,
+    textTransform: 'uppercase',
+    letterSpacing: 1.3,
+  },
+  hmMonthLabel: { fontSize: 9, color: colorsB.inkFaint, fontWeight: '700' },
+  hmLegendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    justifyContent: 'flex-end',
+    marginTop: spacingB.sm,
+  },
+  hmLegendCell: { width: 11, height: 11, borderRadius: 2 },
+  hmLegendLabel: { fontSize: 10, color: colorsB.inkFaint, marginHorizontal: 2, fontWeight: '700' },
+
+  // Achievement card
+  achCount: { fontSize: 12, fontWeight: '900', color: colorsB.orange },
+  achGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  achCard: {
+    width: '31%',
+    backgroundColor: colorsB.paper,
+    borderRadius: radiusB.card,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    gap: 6,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colorsB.orange,
+    ...shadowsB.card,
+  },
+  achCardLocked: {
+    backgroundColor: colorsB.bgWarm,
+    borderColor: colorsB.line,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  achEmoji: { fontSize: 28 },
+  achEmojiLocked: { opacity: 0.4 },
+  achTitle: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: colorsB.ink,
+    textAlign: 'center',
+    letterSpacing: -0.1,
+  },
+  achTitleLocked: { color: colorsB.inkSoft },
+  achDesc: {
+    fontSize: 10,
+    color: colorsB.inkFaint,
+    textAlign: 'center',
+    lineHeight: 13,
+    minHeight: 26,
+    fontWeight: '600',
+  },
+  achUnlockedBadge: {
+    marginTop: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+    backgroundColor: colorsB.greenSoft,
+    borderWidth: 1,
+    borderColor: colorsB.green,
+  },
+  achUnlockedText: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: colorsB.green,
+    letterSpacing: 0.8,
+  },
+  achProgressTrack: {
+    width: '100%',
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colorsB.line,
+    overflow: 'hidden',
+  },
+  achProgressFill: { height: '100%', backgroundColor: colorsB.orange },
+  achProgressText: {
+    fontSize: 9,
+    color: colorsB.inkFaint,
+    textAlign: 'center',
+    fontWeight: '900',
+  },
 });

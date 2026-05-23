@@ -1,9 +1,15 @@
+/**
+ * Activity — Direction B reskin.
+ *
+ * Stats hero on cream → ink, day-dot strips on paper offset cards,
+ * outcome banners in green/orange/yellow tones.
+ */
+
 import { useAuth } from '../../lib/auth';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -12,9 +18,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import {
+  BCard,
+  BEmpty,
+  BHero,
+  BPill,
+  ScreenHeader,
+} from '../../components/themeB/screen';
 import { apiRequest } from '../../lib/api';
+import { colorsB, radiusB, spacingB, typeB } from '../../lib/themeB';
 import { formatDateRange } from '../../lib/time';
-import { colors, radius, shadow } from '../../lib/theme';
 
 type Stats = {
   won: number;
@@ -90,14 +103,14 @@ export default function ActivityTab() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.center}>
-          <ActivityIndicator />
+          <ActivityIndicator color={colorsB.orange} />
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         refreshControl={
@@ -107,51 +120,67 @@ export default function ActivityTab() {
               setRefreshing(true);
               void load();
             }}
+            tintColor={colorsB.orange}
           />
         }
       >
-        <Text style={styles.eyebrow}>Activity</Text>
-        <Text style={styles.title}>Your History</Text>
+        <ScreenHeader eyebrow="Activity" before="Your" highlight="history" />
 
-        {stats ? (
-          <View style={styles.statsCard}>
-            <View style={styles.statsRow}>
-              <Stat label="Won" value={String(stats.won)} />
-              <Stat label="Lost" value={String(stats.lost)} />
-              <Stat label="Streak" value={`${stats.currentStreak}${stats.currentStreak > 0 ? ' 🔥' : ''}`} />
-              <Stat label="Earned" value={`$${stats.earned.toFixed(2)}`} />
+        <View style={{ paddingHorizontal: spacingB.lg, gap: spacingB.lg }}>
+          {stats ? (
+            <BHero tint={colorsB.ink}>
+              <View style={styles.statsRow}>
+                <StatNum value={String(stats.won)} label="Won" />
+                <Divider />
+                <StatNum value={String(stats.lost)} label="Lost" />
+                <Divider />
+                <StatNum
+                  value={`${stats.currentStreak}${stats.currentStreak > 0 ? '🔥' : ''}`}
+                  label="Streak"
+                />
+                <Divider />
+                <StatNum value={`$${stats.earned.toFixed(0)}`} label="Earned" />
+              </View>
+            </BHero>
+          ) : null}
+
+          {error ? (
+            <Text style={[typeB.body, { color: colorsB.orangeDeep }]}>{error}</Text>
+          ) : null}
+
+          {parts.length === 0 ? (
+            <BEmpty
+              emoji="📋"
+              title="No challenges yet"
+              body="Your wins, losses, and progress will live here."
+              cta={{ label: 'Find one →', onPress: () => router.push('/(tabs)/discover') }}
+            />
+          ) : (
+            <View style={{ gap: spacingB.lg }}>
+              {parts.map((p) => (
+                <BCard
+                  key={p.id}
+                  onPress={() => router.push(`/challenge/${p.challenge.id}`)}
+                  style={{ gap: spacingB.md }}
+                >
+                  <ChallengeCardHeader part={p} />
+                  <DayDots
+                    progress={p.dailyProgress}
+                    status={p.status}
+                    duration={p.challenge.durationDays}
+                  />
+                  <OutcomeLine part={p} />
+                </BCard>
+              ))}
             </View>
-          </View>
-        ) : null}
-
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-
-        {parts.length === 0 ? (
-          <View style={styles.emptyCard}>
-            <Text style={styles.emptyTitle}>No challenges yet</Text>
-            <Text style={styles.emptyBody}>
-              Your wins, losses, and progress will live here.
-            </Text>
-          </View>
-        ) : (
-          parts.map((p) => (
-            <Pressable
-              key={p.id}
-              onPress={() => router.push(`/challenge/${p.challenge.id}`)}
-              style={({ pressed }) => [styles.card, pressed && { opacity: 0.9 }]}
-            >
-              <ChallengeCardHeader part={p} />
-              <DayDots progress={p.dailyProgress} status={p.status} duration={p.challenge.durationDays} />
-              <OutcomeLine part={p} />
-            </Pressable>
-          ))
-        )}
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function StatNum({ value, label }: { value: string; label: string }) {
   return (
     <View style={styles.statItem}>
       <Text style={styles.statValue}>{value}</Text>
@@ -160,15 +189,28 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
+function Divider() {
+  return <View style={styles.divider} />;
+}
+
 function ChallengeCardHeader({ part }: { part: Participation }) {
-  const icon = part.status === 'QUALIFIED' ? '🏆' : part.status === 'ELIMINATED' ? '💀' : '🏃';
+  const tone = part.status === 'QUALIFIED' ? 'green' : part.status === 'ELIMINATED' ? 'orange' : 'yellow';
+  const label =
+    part.status === 'QUALIFIED'
+      ? '🏆 WON'
+      : part.status === 'ELIMINATED'
+        ? '💀 OUT'
+        : '🏃 ACTIVE';
   return (
-    <View style={styles.cardHeader}>
-      <Text style={styles.cardTitle}>
-        {icon}  {part.challenge.title}
-      </Text>
-      <Text style={styles.cardDates}>
-        {formatDateRange(part.challenge.startDate, part.challenge.endDate)}
+    <View style={{ gap: 6 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <BPill label={label} tone={tone} />
+        <Text style={styles.dates}>
+          {formatDateRange(part.challenge.startDate, part.challenge.endDate)}
+        </Text>
+      </View>
+      <Text style={styles.cardTitle} numberOfLines={1}>
+        {part.challenge.title}
       </Text>
     </View>
   );
@@ -187,18 +229,13 @@ function DayDots({
   let metFailure = false;
   for (let i = 0; i < duration; i++) {
     const d = progress[i];
-    if (!d) {
-      dots.push({ kind: 'pending' });
-    } else if (d.completed) {
-      dots.push({ kind: 'done' });
-    } else if (status === 'ELIMINATED' && !metFailure) {
+    if (!d) dots.push({ kind: 'pending' });
+    else if (d.completed) dots.push({ kind: 'done' });
+    else if (status === 'ELIMINATED' && !metFailure) {
       dots.push({ kind: 'miss' });
       metFailure = true;
-    } else if (metFailure) {
-      dots.push({ kind: 'pending' });
-    } else {
-      dots.push({ kind: 'pending' });
-    }
+    } else if (metFailure) dots.push({ kind: 'pending' });
+    else dots.push({ kind: 'pending' });
   }
   const missedDay = dots.findIndex((d) => d.kind === 'miss');
   const summary =
@@ -208,7 +245,7 @@ function DayDots({
         ? `Out on day ${missedDay >= 0 ? missedDay + 1 : '?'}`
         : `Day ${dots.filter((d) => d.kind === 'done').length} of ${duration} — In progress`;
   return (
-    <View style={{ gap: 8 }}>
+    <View style={{ gap: 6 }}>
       <Text style={styles.summary}>{summary}</Text>
       <View style={styles.dotsRow}>
         {dots.map((d, i) => (
@@ -229,80 +266,79 @@ function DayDots({
 
 function OutcomeLine({ part }: { part: Participation }) {
   if (part.status === 'QUALIFIED') {
-    return <Text style={styles.outcomeWin}>+${part.wonAmount.toFixed(2)} won</Text>;
+    return (
+      <View style={[styles.outcomeBox, { backgroundColor: colorsB.greenSoft, borderColor: colorsB.green }]}>
+        <Text style={[styles.outcomeText, { color: colorsB.green }]}>
+          +${part.wonAmount.toFixed(2)} won
+        </Text>
+      </View>
+    );
   }
   if (part.status === 'ELIMINATED') {
     return (
-      <Text style={styles.outcomeLoss}>
-        −${part.lostAmount.toFixed(2)} lost
-        {part.paymentFailed ? '  (payment failed)' : ''}
-      </Text>
+      <View style={[styles.outcomeBox, { backgroundColor: colorsB.orangeSoft, borderColor: colorsB.orangeDeep }]}>
+        <Text style={[styles.outcomeText, { color: colorsB.orangeDeep }]}>
+          −${part.lostAmount.toFixed(2)} lost
+          {part.paymentFailed ? '  (payment failed)' : ''}
+        </Text>
+      </View>
     );
   }
-  return <Text style={styles.outcomeActive}>${part.commitmentFee.toFixed(2)} at risk</Text>;
+  return (
+    <View style={[styles.outcomeBox, { backgroundColor: colorsB.bgWarm, borderColor: colorsB.ink }]}>
+      <Text style={[styles.outcomeText, { color: colorsB.ink }]}>
+        ${part.commitmentFee.toFixed(2)} at risk
+      </Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.bg },
+  safe: { flex: 1, backgroundColor: colorsB.bg },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  scroll: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, gap: 14 },
-  eyebrow: {
-    color: colors.textMicro,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    fontSize: 10,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-  title: { fontSize: 30, fontWeight: '800', color: colors.ink, letterSpacing: -0.5, marginBottom: 6 },
-  error: { color: colors.danger },
+  scroll: { paddingTop: 4, paddingBottom: 40 },
 
-  statsCard: {
-    backgroundColor: colors.mint,
-    borderRadius: radius.cardLg,
-    padding: 18,
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  statsRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  statItem: { alignItems: 'center', flex: 1, gap: 2 },
-  statValue: { fontSize: 20, fontWeight: '800', color: colors.ink, letterSpacing: -0.3 },
+  statItem: { flex: 1, alignItems: 'center', gap: 4 },
+  statValue: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: colorsB.paper,
+    letterSpacing: -0.4,
+  },
   statLabel: {
-    color: colors.primaryDark,
-    fontSize: 10,
+    color: colorsB.yellow,
+    fontSize: 9,
     textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    fontWeight: '700',
+    letterSpacing: 1.4,
+    fontWeight: '900',
   },
+  divider: { width: 1, height: 32, backgroundColor: 'rgba(255,255,255,0.18)' },
 
-  emptyCard: {
-    backgroundColor: colors.bgSoft,
-    borderRadius: radius.card,
-    padding: 24,
-    gap: 6,
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: colorsB.ink,
+    letterSpacing: -0.2,
+  },
+  dates: { color: colorsB.inkFaint, fontSize: 11, fontWeight: '700' },
+  summary: { fontWeight: '700', fontSize: 12, color: colorsB.inkSoft },
+  dotsRow: { flexDirection: 'row', gap: 4, flexWrap: 'wrap' },
+  dot: { width: 14, height: 14, borderRadius: 4, borderWidth: 1.5 },
+  dotDone: { backgroundColor: colorsB.green, borderColor: colorsB.ink },
+  dotMiss: { backgroundColor: colorsB.orange, borderColor: colorsB.ink },
+  dotPending: { backgroundColor: colorsB.bgWarm, borderColor: colorsB.line },
+
+  outcomeBox: {
+    borderRadius: radiusB.control,
+    borderWidth: 2,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     alignItems: 'center',
   },
-  emptyTitle: { fontSize: 17, fontWeight: '800', color: colors.ink },
-  emptyBody: { color: colors.textMuted, fontSize: 13, textAlign: 'center' },
-
-  card: {
-    backgroundColor: colors.bg,
-    borderRadius: radius.card,
-    padding: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadow.card,
-  },
-  cardHeader: { gap: 4 },
-  cardTitle: { fontSize: 17, fontWeight: '800', color: colors.ink, letterSpacing: -0.2 },
-  cardDates: { color: colors.textFaint, fontSize: 12 },
-  summary: { fontWeight: '600', fontSize: 12, color: colors.textMuted },
-  dotsRow: { flexDirection: 'row', gap: 4, flexWrap: 'wrap' },
-  dot: { width: 12, height: 12, borderRadius: 3 },
-  dotDone: { backgroundColor: colors.primary },
-  dotMiss: { backgroundColor: '#EF4444' },
-  dotPending: { backgroundColor: '#E5E5E5' },
-
-  outcomeWin: { color: colors.success, fontWeight: '800', fontSize: 15 },
-  outcomeLoss: { color: '#7F1D1D', fontWeight: '800', fontSize: 15 },
-  outcomeActive: { color: colors.ink, fontWeight: '700', fontSize: 14 },
+  outcomeText: { fontWeight: '900', fontSize: 14, letterSpacing: 0.2 },
 });

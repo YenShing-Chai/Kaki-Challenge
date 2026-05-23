@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kaki · Create Challenge · Compare Directions</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    background: #f4f0e8;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(184,90,58,0.06), transparent 50%),
+      radial-gradient(circle at 80% 90%, rgba(93,138,90,0.08), transparent 50%);
+    min-height: 100vh;
+    color: #1a1815;
+    padding: 80px 40px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 60px; }
+  .header .eyebrow {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #5a564f;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .header h1 {
+    font-size: 56px;
+    font-weight: 600;
+    letter-spacing: -1.5px;
+    line-height: 1.05;
+    margin-bottom: 18px;
+    font-family: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  }
+  .header h1 em { font-style: italic; color: #b85a3a; }
+  .header p {
+    color: #5a564f;
+    font-size: 16px;
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  .options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 60px;
+  }
+  .option {
+    background: #fff;
+    border: 1px solid #e8e1d5;
+    border-radius: 6px;
+    padding: 32px 28px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    min-height: 360px;
+  }
+  .option:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px -20px rgba(26, 24, 21, 0.25);
+  }
+  .option .badge {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #b85a3a;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .option.b .badge { color: #ff5a1f; }
+  .option.c .badge { color: #6a8a1c; }
+  .option h2 {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    font-family: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  }
+  .option.b h2 { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font-weight: 900; letter-spacing: -1px; }
+  .option.c h2 { font-family: 'Inter', sans-serif; font-weight: 700; }
+  .option p {
+    color: #5a564f;
+    font-size: 14px;
+    line-height: 1.65;
+    flex: 1;
+    margin-bottom: 24px;
+  }
+  .swatches {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 22px;
+  }
+  .swatches span {
+    width: 34px;
+    height: 34px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .option.b .swatches span { border-radius: 8px; border: 1.5px solid #1c1410; }
+  .cta {
+    background: #1a1815;
+    color: #f4f0e8;
+    padding: 12px 18px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .option.b .cta { background: #ff5a1f; color: #fff; border-radius: 12px; box-shadow: 3px 3px 0 #1c1410; }
+  .option.c .cta { background: #0d0d10; color: #c8ff3a; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
+  .compare-note {
+    background: #fff;
+    border: 1px solid #e8e1d5;
+    border-radius: 6px;
+    padding: 32px 36px;
+    margin-bottom: 32px;
+  }
+  .compare-note h3 {
+    font-size: 22px;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+  .compare-note ul {
+    list-style: none;
+    padding: 0;
+  }
+  .compare-note li {
+    padding: 12px 0;
+    border-bottom: 1px solid #f0e9dc;
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr 1fr;
+    gap: 24px;
+    align-items: center;
+    font-size: 13px;
+  }
+  .compare-note li:last-child { border: none; }
+  .compare-note li .axis { font-weight: 600; color: #1a1815; }
+  .compare-note li .vA { color: #b85a3a; }
+  .compare-note li .vB { color: #ff5a1f; font-weight: 600; }
+  .compare-note li .vC { color: #6a8a1c; font-weight: 600; }
+  .compare-note li .head { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #5a564f; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="header">
+    <div class="eyebrow">KAKI · CREATE CHALLENGE ENGINE</div>
+    <h1>Three design <em>directions</em></h1>
+    <p>Same 8-step flow, same content, three visual languages. Open each to see all 8 screens side by side, then pick one to build.</p>
+  </div>
+
+  <div class="options">
+
+    <a href="create-challenge-v1-editorial.html" class="option a">
+      <div class="badge">DIRECTION A</div>
+      <h2>Editorial Calm</h2>
+      <p>Cream paper, charcoal serif, terracotta accent. Generous whitespace, single focal point per screen. Premium magazine feel — slows the user down to make each decision feel intentional.</p>
+      <div class="swatches">
+        <span style="background:#f5f0e8"></span>
+        <span style="background:#1a1815"></span>
+        <span style="background:#b85a3a"></span>
+        <span style="background:#f1d8cd"></span>
+        <span style="background:#c89b3c"></span>
+      </div>
+      <div class="cta">View all 8 screens →</div>
+    </a>
+
+    <a href="create-challenge-v2-playful.html" class="option b">
+      <div class="badge">DIRECTION B · PICKED ✓</div>
+      <h2>Playful Buddy</h2>
+      <p>Warm cream, vivid orange, chunky rounded type. Sticker accents and hard offset shadows. Closest match for Kaki's "friends &amp; family" positioning — feels like a buddy app, not a fintech tool.</p>
+      <div class="swatches">
+        <span style="background:#fef4e2"></span>
+        <span style="background:#1c1410"></span>
+        <span style="background:#ff5a1f"></span>
+        <span style="background:#5d8a5a"></span>
+        <span style="background:#f4c443"></span>
+      </div>
+      <div class="cta">View all 8 screens →</div>
+    </a>
+
+    <a href="create-challenge-v3-prostudio.html" class="option c">
+      <div class="badge">DIRECTION C</div>
+      <h2>Pro Studio</h2>
+      <p>Dark-mode-first, technical aesthetic. Monospaced labels, sharp 4px corners, electric lime accent. Builds trust for the workplace/merchant audiences that benefit from a serious power-tool feel.</p>
+      <div class="swatches">
+        <span style="background:#0d0d10"></span>
+        <span style="background:#18181d"></span>
+        <span style="background:#c8ff3a"></span>
+        <span style="background:#ffb547"></span>
+        <span style="background:#ff5fa2"></span>
+      </div>
+      <div class="cta">View all 8 screens →</div>
+    </a>
+
+  </div>
+
+  <div class="compare-note">
+    <h3>Quick comparison</h3>
+    <ul>
+      <li><span class="axis head">Trade-off</span><span class="head vA">Direction A</span><span class="head vB">Direction B</span><span class="head vC">Direction C</span></li>
+      <li><span class="axis">Feel</span><span class="vA">Premium · considered</span><span class="vB">Fun · social</span><span class="vC">Technical · pro</span></li>
+      <li><span class="axis">Best for</span><span class="vA">Personal / Friends</span><span class="vB">Friends / Event / Community</span><span class="vC">Workplace / Merchant / Public</span></li>
+      <li><span class="axis">Typography</span><span class="vA">Cormorant serif + sans</span><span class="vB">Bold rounded sans</span><span class="vC">Inter + JetBrains Mono</span></li>
+      <li><span class="axis">Surfaces</span><span class="vA">Cream paper · hairlines</span><span class="vB">Chunky cards · drop-shadows</span><span class="vC">Dark surfaces · sharp edges</span></li>
+      <li><span class="axis">Risk</span><span class="vA">May feel slow / formal</span><span class="vB">May feel too cute for merchants</span><span class="vC">May feel cold for friends &amp; family</span></li>
+    </ul>
+  </div>
+
+  <div style="background:#fef4e2;border:2px solid #1c1410;border-radius:18px;padding:28px 32px;margin-bottom:32px;box-shadow:6px 6px 0 #ff5a1f;">
+    <div style="display:flex;align-items:flex-start;gap:20px;">
+      <div style="background:#ff5a1f;color:#fff;padding:8px 16px;border-radius:100px;font-size:11px;font-weight:800;letter-spacing:1.5px;border:2px solid #1c1410;flex-shrink:0;">NEW</div>
+      <div style="flex:1">
+        <h3 style="font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Winner Pool sub-flow + Join flow</h3>
+        <p style="font-size:14px;color:#5a4a3e;line-height:1.55;margin-bottom:16px;font-weight:500;">After the Winner Pool PRD landed, cash pool moved from "Phase 2" back into MVP scope. Eight new screens in the same Direction B language: 3 creator sub-screens (entry amount → distribution method → terms), 1 updated Step 8 review with pending-admin-review state, and 4 join-flow screens for the friend on the receiving end.</p>
+        <a href="create-challenge-v2-playful-winnerpool.html" style="display:inline-block;background:#1c1410;color:#f4c443;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:900;letter-spacing:0.3px;text-decoration:none;box-shadow:3px 3px 0 #ff5a1f;">View Winner Pool flows →</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;color:#5a564f;font-size:13px;line-height:1.7;max-width:560px;margin:0 auto;">
+    Direction <strong>B</strong> is locked. Next: confirm the Winner Pool flow above before we start building.
+  </div>
+
+</div>
+
+</body>
+</html>

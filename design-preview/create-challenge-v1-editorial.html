@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kaki · Create Challenge · Direction A — Editorial Calm</title>
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --ink: #1a1815;
+    --ink-soft: #5a564f;
+    --ink-faint: #a8a39a;
+    --paper: #ffffff;
+    --line: #e8e1d5;
+    --line-strong: #d4cabb;
+    --accent: #b85a3a;
+    --accent-soft: #f1d8cd;
+    --gold: #c89b3c;
+    --serif: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  body {
+    background: #ebe5da;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(184,90,58,0.08), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(200,155,60,0.06), transparent 40%);
+    font-family: var(--sans);
+    color: var(--ink);
+    padding: 60px 40px 100px;
+    min-height: 100vh;
+  }
+  .page-title {
+    max-width: 1400px;
+    margin: 0 auto 50px;
+    text-align: center;
+  }
+  .page-title h1 {
+    font-family: var(--serif);
+    font-size: 52px;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+  }
+  .page-title h1 em { font-style: italic; color: var(--accent); }
+  .page-title p { color: var(--ink-soft); font-size: 16px; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+  .direction-card {
+    max-width: 1400px;
+    margin: 0 auto 40px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 36px 44px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: center;
+  }
+  .direction-card .meta-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .direction-card h2 {
+    font-family: var(--serif);
+    font-size: 38px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .direction-card p {
+    color: var(--ink-soft);
+    line-height: 1.7;
+    font-size: 15px;
+    max-width: 620px;
+  }
+  .palette { display: flex; gap: 10px; }
+  .palette span {
+    width: 56px; height: 56px; border-radius: 50%;
+    border: 1px solid var(--line);
+    display: flex; align-items: flex-end; justify-content: center;
+    font-size: 9px; padding-bottom: 4px; color: var(--ink-soft);
+  }
+
+  .phone-row {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px 24px;
+    justify-items: center;
+  }
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .step-label {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+  }
+  .step-label .num {
+    display: inline-block;
+    font-family: var(--sans);
+    font-style: normal;
+    background: var(--ink);
+    color: var(--bg);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 22px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 8px;
+    vertical-align: 1px;
+  }
+  .phone {
+    width: 300px;
+    height: 620px;
+    border-radius: 42px;
+    background: var(--bg);
+    border: 9px solid #1a1815;
+    box-shadow: 0 30px 50px -25px rgba(26, 24, 21, 0.35),
+                0 8px 20px -10px rgba(26, 24, 21, 0.2);
+    position: relative;
+    overflow: hidden;
+    font-family: var(--sans);
+  }
+  .notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 95px; height: 22px; background: #1a1815;
+    border-radius: 0 0 14px 14px; z-index: 100;
+  }
+  .status-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 38px;
+    padding: 12px 22px 0;
+    display: flex; justify-content: space-between;
+    font-size: 11px; font-weight: 600;
+    color: var(--ink);
+    z-index: 50;
+  }
+  .screen {
+    padding: 50px 22px 28px;
+    height: 100%;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .top-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 22px;
+    color: var(--ink-soft);
+    font-size: 12px;
+  }
+  .back-x { font-size: 18px; cursor: pointer; }
+  .progress {
+    display: flex; gap: 4px;
+    flex: 1; margin: 0 14px;
+  }
+  .progress span {
+    flex: 1; height: 2px; background: var(--line);
+  }
+  .progress span.done { background: var(--accent); }
+  .progress span.now { background: var(--ink); }
+
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 2.4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .title {
+    font-family: var(--serif);
+    font-size: 26px;
+    line-height: 1.15;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .title em { font-style: italic; color: var(--accent); }
+  .lead {
+    color: var(--ink-soft);
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  .body-scroll { flex: 1; overflow: hidden; }
+
+  /* Step 1 — Creator intent cards */
+  .intent-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    margin-bottom: 7px;
+    background: var(--paper);
+  }
+  .intent-card.active { border-color: var(--ink); background: var(--bg); }
+  .intent-card .icon-circle {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .intent-card .name { font-size: 12.5px; font-weight: 600; }
+  .intent-card .sub { font-size: 10.5px; color: var(--ink-soft); margin-top: 1px; }
+
+  /* Step 2 — Category grid */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+  }
+  .cat-tile {
+    padding: 12px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper);
+    text-align: left;
+  }
+  .cat-tile.active { border: 1.5px solid var(--ink); background: var(--accent-soft); }
+  .cat-tile .symbol { font-size: 18px; margin-bottom: 6px; display: block; }
+  .cat-tile .label { font-size: 11px; font-weight: 600; }
+  .cat-tile .meta { font-size: 9px; color: var(--ink-soft); margin-top: 2px; letter-spacing: 0.5px; }
+
+  /* Step 3 — Template */
+  .template-card {
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper);
+    margin-bottom: 8px;
+  }
+  .template-card.active { border: 1.5px solid var(--ink); background: var(--bg); }
+  .template-card .t-label { font-family: var(--serif); font-size: 16px; font-weight: 500; }
+  .template-card .t-desc { font-size: 10.5px; color: var(--ink-soft); margin-top: 4px; line-height: 1.4; }
+  .template-card .t-meta { display: flex; gap: 10px; margin-top: 8px; font-size: 9.5px; color: var(--ink-faint); }
+  .template-card .t-meta span::before { content: '— '; }
+
+  /* Step 4 — Win condition */
+  .input-group {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .input-label { font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
+  .input-value { font-family: var(--serif); font-size: 22px; font-weight: 500; }
+  .input-row { display: flex; gap: 8px; }
+  .input-row .input-group { flex: 1; margin-bottom: 0; }
+  .stepper { display: flex; align-items: center; gap: 10px; }
+  .stepper button {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 1px solid var(--line-strong); background: var(--paper);
+    font-size: 13px; cursor: pointer;
+  }
+  .stepper .val { flex: 1; text-align: center; font-family: var(--serif); font-size: 24px; }
+
+  /* Step 5 — Verification ladder */
+  .verify-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 12px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .verify-row.active { border: 1.5px solid var(--ink); background: var(--accent-soft); }
+  .verify-row .lvl {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-style: italic;
+    width: 22px;
+    color: var(--ink-soft);
+  }
+  .verify-row .v-name { font-size: 12px; font-weight: 600; }
+  .verify-row .v-trust { font-size: 9.5px; color: var(--ink-soft); margin-top: 1px; }
+  .trust-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+    display: inline-block; margin-left: 5px;
+  }
+
+  /* Step 6 — Reward */
+  .reward-card {
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper);
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .reward-card.active { border: 1.5px solid var(--ink); background: var(--accent-soft); }
+  .reward-card.locked { opacity: 0.55; }
+  .reward-card .r-row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .reward-card .r-name { font-family: var(--serif); font-size: 16px; font-weight: 500; }
+  .reward-card .r-desc { font-size: 10.5px; color: var(--ink-soft); margin-top: 3px; line-height: 1.4; }
+  .reward-card .r-tag { font-size: 9px; padding: 2px 7px; background: var(--bg); border: 1px solid var(--line); border-radius: 2px; letter-spacing: 0.5px; }
+  .reward-card .lock-tag { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* Step 7 — Schedule */
+  .field-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .field-row .f-label { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.8px; }
+  .field-row .f-value { font-family: var(--serif); font-size: 15px; font-weight: 500; }
+  .seg-pills { display: flex; gap: 4px; margin-top: 4px; }
+  .seg-pills span { font-size: 10.5px; padding: 5px 10px; border: 1px solid var(--line-strong); border-radius: 100px; color: var(--ink-soft); }
+  .seg-pills span.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* Step 8 — Review */
+  .summary-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .summary-card .s-eye { font-size: 9.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 4px; }
+  .summary-card .s-title { font-family: var(--serif); font-size: 19px; margin-bottom: 10px; line-height: 1.2; }
+  .summary-line { display: flex; justify-content: space-between; padding: 5px 0; font-size: 11px; }
+  .summary-line .l { color: var(--ink-soft); }
+  .summary-line .r { font-weight: 600; }
+  .risk-banner {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    padding: 10px 12px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    font-size: 10.5px;
+    color: #6b3320;
+    line-height: 1.5;
+  }
+  .risk-banner strong { display: block; margin-bottom: 2px; font-family: var(--serif); font-size: 13px; }
+
+  /* CTA */
+  .cta {
+    margin-top: auto;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 14px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .cta.outline {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    margin-top: 8px;
+  }
+  .cta-row { display: flex; flex-direction: column; gap: 0; margin-top: 14px; }
+  .skip { text-align: center; color: var(--ink-soft); font-size: 11px; margin-top: 12px; font-family: var(--serif); font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>Direction A · <em>Editorial Calm</em></h1>
+  <p>Serif headlines, generous whitespace, single-action focus per screen. iOS-leaning premium. Feels like a thoughtful magazine — slows the user down at each decision point so the choice feels intentional.</p>
+</div>
+
+<div class="direction-card">
+  <div>
+    <span class="meta-tag">Direction A</span>
+    <h2>Editorial Calm</h2>
+    <p>Inspired by long-form publication design. Quiet palette of cream, charcoal, and warm terracotta. Cormorant serif paired with a clean sans for body. Cards are flat with thin hairlines — no heavy shadows or gradients. Best for users who want the create flow to feel premium and considered rather than gamified.</p>
+  </div>
+  <div class="palette">
+    <span style="background:#f5f0e8">cream</span>
+    <span style="background:#1a1815;color:#fff">ink</span>
+    <span style="background:#b85a3a;color:#fff">accent</span>
+    <span style="background:#f1d8cd">soft</span>
+    <span style="background:#c89b3c">gold</span>
+  </div>
+</div>
+
+<div class="phone-row">
+
+  <!-- ============== STEP 1: CREATOR INTENT ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <span class="back-x">✕</span>
+          <div class="progress">
+            <span class="now"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span>1 / 8</span>
+        </div>
+        <div class="eyebrow">Step One</div>
+        <div class="title">Who is this challenge <em>for?</em></div>
+        <div class="lead">We tailor templates, verification, and visibility based on your audience.</div>
+        <div class="body-scroll">
+          <div class="intent-card">
+            <div class="icon-circle">◐</div>
+            <div><div class="name">Just me</div><div class="sub">Personal goal &amp; accountability</div></div>
+          </div>
+          <div class="intent-card active">
+            <div class="icon-circle">◍</div>
+            <div><div class="name">Friends or family</div><div class="sub">Private group · invite-only</div></div>
+          </div>
+          <div class="intent-card">
+            <div class="icon-circle">◑</div>
+            <div><div class="name">Workplace</div><div class="sub">Team bonding · wellness</div></div>
+          </div>
+          <div class="intent-card">
+            <div class="icon-circle">◒</div>
+            <div><div class="name">My business</div><div class="sub">Customer loyalty · stamps</div></div>
+          </div>
+          <div class="intent-card">
+            <div class="icon-circle">◓</div>
+            <div><div class="name">Event or trip</div><div class="sub">Camp · scavenger hunt</div></div>
+          </div>
+          <div class="intent-card">
+            <div class="icon-circle">◔</div>
+            <div><div class="name">Community / Club</div><div class="sub">Charity · school · hobby</div></div>
+          </div>
+        </div>
+        <div class="cta">Continue</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">1</span>Creator intent</div>
+  </div>
+
+  <!-- ============== STEP 2: CATEGORY ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <span class="back-x">←</span>
+          <div class="progress">
+            <span class="done"></span><span class="now"></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span>2 / 8</span>
+        </div>
+        <div class="eyebrow">Step Two</div>
+        <div class="title">A <em>category</em><br>for the challenge</div>
+        <div class="lead">Pick what best fits — this shapes templates and safety rules.</div>
+        <div class="body-scroll">
+          <div class="category-grid">
+            <div class="cat-tile"><span class="symbol">✦</span><div class="label">Habit</div><div class="meta">DAILY · MED</div></div>
+            <div class="cat-tile active"><span class="symbol">⟶</span><div class="label">Fitness</div><div class="meta">ACTIVE · MED</div></div>
+            <div class="cat-tile"><span class="symbol">◉</span><div class="label">Money</div><div class="meta">SAVE · MED</div></div>
+            <div class="cat-tile"><span class="symbol">⊙</span><div class="label">Learning</div><div class="meta">SKILLS · LOW</div></div>
+            <div class="cat-tile"><span class="symbol">◧</span><div class="label">Work</div><div class="meta">TEAM · LOW</div></div>
+            <div class="cat-tile"><span class="symbol">⌘</span><div class="label">Social</div><div class="meta">GROUP · MED</div></div>
+            <div class="cat-tile"><span class="symbol">⟁</span><div class="label">Travel</div><div class="meta">TRIP · MED</div></div>
+            <div class="cat-tile"><span class="symbol">◐</span><div class="label">Food</div><div class="meta">LIFE · LOW</div></div>
+            <div class="cat-tile"><span class="symbol">⊕</span><div class="label">Retail</div><div class="meta">SHOP · MED</div></div>
+            <div class="cat-tile"><span class="symbol">✺</span><div class="label">Creative</div><div class="meta">MAKE · LOW</div></div>
+            <div class="cat-tile"><span class="symbol">♡</span><div class="label">Community</div><div class="meta">HELP · MED</div></div>
+            <div class="cat-tile"><span class="symbol">▣</span><div class="label">Event</div><div class="meta">VISIT · MED</div></div>
+          </div>
+        </div>
+        <div class="cta">Continue</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">2</span>Category</div>
+  </div>
+
+  <!-- ============== STEP 3: TEMPLATE ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <span class="back-x">←</span>
+          <div class="progress">
+            <span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span>3 / 8</span>
+        </div>
+        <div class="eyebrow">Step Three</div>
+        <div class="title">How does someone <em>win?</em></div>
+        <div class="lead">These templates work well for Friends · Fitness.</div>
+        <div class="body-scroll">
+          <div class="template-card active">
+            <div class="t-label">Daily streak</div>
+            <div class="t-desc">Check in every day for a set number of days. Missed day breaks the streak.</div>
+            <div class="t-meta"><span>Reach Target</span><span>Photo or Steps</span></div>
+          </div>
+          <div class="template-card">
+            <div class="t-label">Reach a target</div>
+            <div class="t-desc">Hit a numeric goal by the end date (steps, workouts, kms).</div>
+            <div class="t-meta"><span>Reach Target</span><span>Auto-tracked</span></div>
+          </div>
+          <div class="template-card">
+            <div class="t-label">Stay under a limit</div>
+            <div class="t-desc">Keep something below a ceiling — calories, screen time, spend.</div>
+            <div class="t-meta"><span>Below Limit</span><span>Self / Photo</span></div>
+          </div>
+          <div class="template-card">
+            <div class="t-label">Best submission</div>
+            <div class="t-desc">Everyone uploads one entry; group votes the winner.</div>
+            <div class="t-meta"><span>Judged Best</span><span>Photo + Vote</span></div>
+          </div>
+        </div>
+        <div class="cta">Continue</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">3</span>Template &amp; win condition</div>
+  </div>
+
+  <!-- ============== STEP 4: TARGET / RULES ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <span class="back-x">←</span>
+          <div class="progress">
+            <span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span>4 / 8</span>
+        </div>
+        <div class="eyebrow">Step Four</div>
+        <div class="title">Set the <em>target</em></div>
+        <div class="lead">Daily streak · Friends · Fitness</div>
+        <div class="body-scroll">
+          <div class="input-group">
+            <div class="input-label">Challenge title</div>
+            <div class="input-value">Family 7-day step streak</div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <div class="input-label">Daily steps</div>
+              <div class="stepper"><button>−</button><span class="val">8,000</span><button>+</button></div>
+            </div>
+            <div class="input-group">
+              <div class="input-label">Days</div>
+              <div class="stepper"><button>−</button><span class="val">7</span><button>+</button></div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">Grace — allowed misses</div>
+            <div class="stepper" style="justify-content:flex-start;gap:14px;">
+              <span class="val" style="font-size:18px;color:var(--ink-soft);text-align:left;flex:none;">0</span>
+              <span class="val" style="font-size:24px;flex:none;">1</span>
+              <span class="val" style="font-size:18px;color:var(--ink-soft);text-align:left;flex:none;">2</span>
+              <span class="val" style="font-size:18px;color:var(--ink-soft);text-align:left;flex:none;">3</span>
+            </div>
+          </div>
+        </div>
+        <div class="cta">Continue</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">4</span>Target &amp; rules</div>
+  </div>
+
+  <!-- ============== STEP 5: VERIFICATION ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <span class="back-x">←</span>
+          <div class="progress">
+            <span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span><span></span>
+          </div>
+          <span>5 / 8</span>
+        </div>
+        <div class="eyebrow">Step Five</div>
+        <div class="title">How do we <em>verify</em> it?</div>
+        <div class="lead">Stronger proof unlocks bigger rewards.</div>
+        <div class="body-scroll">
+          <div class="verify-row">
+            <span class="lvl">i</span>
+            <div style="flex:1"><div class="v-name">Self-check</div><div class="v-trust">Honor system · low trust<span class="trust-dot" style="background:#d4cabb"></span></div></div>
+          </div>
+          <div class="verify-row">
+            <span class="lvl">ii</span>
+            <div style="flex:1"><div class="v-name">Photo proof</div><div class="v-trust">Upload daily · medium trust<span class="trust-dot" style="background:#c89b3c"></span></div></div>
+          </div>
+          <div class="verify-row">
+            <span class="lvl">iii</span>
+            <div style="flex:1"><div class="v-name">Peer approval</div><div class="v-trust">2 friends confirm · medium trust<span class="trust-dot" style="background:#c89b3c"></span></div></div>
+          </div>
+          <div class="verify-row active">
+            <span class="lvl">iv</span>
+            <div style="flex:1"><div class="v-name">Auto from Health</div><div class="v-trust">Steps from device · high trust<span class="trust-dot" style="background:#b85a3a"></span></div></div>
+          </div>
+          <div class="verify-row">
+            <span class="lvl">v</span>
+            <div style="flex:1"><div class="v-name">QR check-in</div><div class="v-trust">Scan at location · high trust<span class="trust-dot" style="background:#b85a3a"></span></div></div>
+          </div>
+          <div class="verify-row">
+            <span class="lvl">vi</span>
+            <div style="flex:1"><div class="v-name">Receipt / POS</div><div class="v-trust">Merchant data · high trust<span class="trust-dot" style="background:#b85a3a"></span></div></div>
+          </div>
+        </div>
+        <div class="cta">Continue</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">5</span>Verification</div>
+  </div>
+
+  <!-- ============== STEP 6: REWARD ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <span class="back-x">←</span>
+          <div class="progress">
+            <span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span>
+          </div>
+          <span>6 / 8</span>
+        </div>
+        <div class="eyebrow">Step Six</div>
+        <div class="title">What do winners <em>get?</em></div>
+        <div class="lead">We start with safer rewards. Cash stakes return in a later phase.</div>
+        <div class="body-scroll">
+          <div class="reward-card">
+            <div class="r-row"><div class="r-name">No reward</div><span class="r-tag">FREE</span></div>
+            <div class="r-desc">Just bragging rights and a streak in your profile.</div>
+          </div>
+          <div class="reward-card active">
+            <div class="r-row"><div class="r-name">Badge</div><span class="r-tag">SAFE</span></div>
+            <div class="r-desc">Custom badge added to your profile when you win.</div>
+          </div>
+          <div class="reward-card">
+            <div class="r-row"><div class="r-name">Points</div><span class="r-tag">SAFE</span></div>
+            <div class="r-desc">In-app points redeemable for Kaki swag &amp; perks.</div>
+          </div>
+          <div class="reward-card">
+            <div class="r-row"><div class="r-name">Voucher</div><span class="r-tag">REVIEW</span></div>
+            <div class="r-desc">Sponsored gift card or merchant credit.</div>
+          </div>
+          <div class="reward-card locked">
+            <div class="r-row"><div class="r-name">Cash pool</div><span class="r-tag lock-tag">PHASE 2</span></div>
+            <div class="r-desc">Real-money stakes — pending legal &amp; payment review.</div>
+          </div>
+        </div>
+        <div class="cta">Continue</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">6</span>Reward</div>
+  </div>
+
+  <!-- ============== STEP 7: SCHEDULE ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <span class="back-x">←</span>
+          <div class="progress">
+            <span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span>
+          </div>
+          <span>7 / 8</span>
+        </div>
+        <div class="eyebrow">Step Seven</div>
+        <div class="title">When does it <em>run?</em></div>
+        <div class="lead">And who can join the challenge.</div>
+        <div class="body-scroll">
+          <div class="field-row"><span class="f-label">Starts</span><span class="f-value">Sat, 23 May</span></div>
+          <div class="field-row"><span class="f-label">Ends</span><span class="f-value">Fri, 29 May</span></div>
+          <div class="field-row"><span class="f-label">Timezone</span><span class="f-value">GMT+8 KL</span></div>
+          <div class="field-row" style="flex-direction:column;align-items:flex-start;gap:6px;">
+            <span class="f-label">Visibility</span>
+            <div class="seg-pills">
+              <span class="on">Invite</span><span>Group</span><span>Public</span>
+            </div>
+          </div>
+          <div class="field-row"><span class="f-label">Max participants</span><span class="f-value">8</span></div>
+          <div class="field-row" style="border:none;"><span class="f-label">Dispute window</span><span class="f-value">24 hrs</span></div>
+        </div>
+        <div class="cta">Review</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">7</span>Schedule &amp; visibility</div>
+  </div>
+
+  <!-- ============== STEP 8: REVIEW ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <span class="back-x">←</span>
+          <div class="progress">
+            <span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span>
+          </div>
+          <span>8 / 8</span>
+        </div>
+        <div class="eyebrow">Final Review</div>
+        <div class="title">Almost <em>there.</em></div>
+        <div class="lead">Confirm everything looks right.</div>
+        <div class="body-scroll">
+          <div class="summary-card">
+            <div class="s-eye">Challenge</div>
+            <div class="s-title">Family 7-day step streak</div>
+            <div class="summary-line"><span class="l">Audience</span><span class="r">Friends / Family</span></div>
+            <div class="summary-line"><span class="l">Category</span><span class="r">Fitness</span></div>
+            <div class="summary-line"><span class="l">Win when</span><span class="r">8k steps × 7 days</span></div>
+            <div class="summary-line"><span class="l">Verified by</span><span class="r">Auto Health</span></div>
+            <div class="summary-line"><span class="l">Reward</span><span class="r">Badge</span></div>
+            <div class="summary-line"><span class="l">Risk</span><span class="r" style="color:var(--accent)">LOW · auto-approve</span></div>
+          </div>
+          <div class="risk-banner">
+            <strong>Looks safe to go.</strong>
+            Your challenge passes our automated review. It'll publish straight to your invited group.
+          </div>
+        </div>
+        <div class="cta">Publish challenge</div>
+        <div class="skip">— save as draft —</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">8</span>Review &amp; publish</div>
+  </div>
+
+</div>
+
+</body>
+</html>

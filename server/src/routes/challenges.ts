@@ -194,6 +194,8 @@ challengesRouter.get('/:id', async (req, res, next) => {
             user: { columns: { id: true, name: true, avatarUrl: true } },
           },
         },
+        winnerPool: true,
+        createdBy: { columns: { id: true, name: true, avatarUrl: true } },
       },
     });
     if (!challenge) {
@@ -270,6 +272,7 @@ challengesRouter.get('/:id', async (req, res, next) => {
         status: challenge.status,
         prizePool: Number(challenge.prizePool),
         maxParticipants: challenge.maxParticipants,
+        minParticipants: challenge.minParticipants,
         participantCount: challenge.participants.length,
         qualifiedCount,
         heroImageUrl: challenge.heroImageUrl,
@@ -282,6 +285,31 @@ challengesRouter.get('/:id', async (req, res, next) => {
         category: challenge.category,
         verificationMethod: challenge.verificationMethod,
         targetDaysComplete: challenge.targetDaysComplete,
+        // ── New PRD v2 fields ─────────────────────────────────────────
+        creatorIntent: challenge.creatorIntent,
+        categoryV2: challenge.categoryV2,
+        visibility: challenge.visibility,
+        lifecycle: challenge.lifecycle,
+        rewardType: challenge.rewardType,
+        riskLevel: challenge.riskLevel,
+        moderationStatus: challenge.moderationStatus,
+        startAt: challenge.startAt?.toISOString() ?? null,
+        endAt: challenge.endAt?.toISOString() ?? null,
+        createdByName: challenge.createdBy?.name ?? null,
+        createdByAvatar: challenge.createdBy?.avatarUrl ?? null,
+        winnerPool: challenge.winnerPool
+          ? {
+              entryContributionAmount: Number(challenge.winnerPool.entryContributionAmount),
+              currency: challenge.winnerPool.currency,
+              distributionMethod: challenge.winnerPool.distributionMethod,
+              participantMinimum: challenge.winnerPool.participantMinimum,
+              participantMaximum: challenge.winnerPool.participantMaximum,
+              totalPoolAmount: Number(challenge.winnerPool.totalPoolAmount),
+              netPoolAmount: Number(challenge.winnerPool.netPoolAmount),
+              payoutStatus: challenge.winnerPool.payoutStatus,
+              manualApprovalRequired: challenge.winnerPool.manualApprovalRequired,
+            }
+          : null,
         participants: challenge.participants.slice(0, 4).map((p) => ({
           userId: p.userId,
           name: p.user.name,

@@ -1,5 +1,12 @@
+/**
+ * Discover — Direction B reskin.
+ *
+ * Cream bg, chunky paper cards with hard offset shadows, orange/yellow
+ * accent pills. The "Create your own challenge" CTA was already on
+ * Direction B; the rest of the screen now matches.
+ */
+
 import { useAuth } from '../../lib/auth';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import {
@@ -13,17 +20,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { apiRequest } from '../../lib/api';
-import { formatDateRange } from '../../lib/time';
 import {
-  CategoryKey,
-  categoryEmoji,
-  categoryGradient,
-  categoryLabel,
-  colors,
-  radius,
-  shadow,
-} from '../../lib/theme';
+  BCard,
+  BEmpty,
+  BPill,
+  ScreenHeader,
+} from '../../components/themeB/screen';
+import { apiRequest } from '../../lib/api';
+import { CategoryKey, categoryEmoji, categoryLabel } from '../../lib/theme';
+import { colorsB, radiusB, shadowsB, spacingB, typeB } from '../../lib/themeB';
+import { formatDateRange } from '../../lib/time';
 
 type Category = { key: CategoryKey; label: string; emoji: string };
 
@@ -83,7 +89,11 @@ export default function DiscoverTab() {
 
   const loadRef = useRef(load);
   loadRef.current = load;
-  useFocusEffect(useCallback(() => { void loadRef.current(); }, []));
+  useFocusEffect(
+    useCallback(() => {
+      void loadRef.current();
+    }, []),
+  );
 
   const visible = selectedCategory
     ? challenges.filter((c) => c.category === selectedCategory)
@@ -93,7 +103,7 @@ export default function DiscoverTab() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.center}>
-          <ActivityIndicator />
+          <ActivityIndicator color={colorsB.orange} />
         </View>
       </SafeAreaView>
     );
@@ -106,12 +116,35 @@ export default function DiscoverTab() {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={() => { setRefreshing(true); void load(); }}
+            onRefresh={() => {
+              setRefreshing(true);
+              void load();
+            }}
+            tintColor={colorsB.orange}
           />
         }
       >
-        <Text style={styles.eyebrow}>Discover</Text>
-        <Text style={styles.title}>Browse</Text>
+        <ScreenHeader eyebrow="Discover" highlight="Browse" after="↓" />
+
+        <View style={{ paddingHorizontal: spacingB.lg }}>
+          {/* Create your own challenge — already on Direction B, kept consistent */}
+          <Pressable
+            onPress={() => router.push('/create' as never)}
+            style={({ pressed }) => [
+              styles.createCta,
+              pressed && { transform: [{ translateX: 2 }, { translateY: 2 }], shadowOpacity: 0 },
+            ]}
+          >
+            <Text style={styles.createEmoji}>💸</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.createTitle}>Create your own challenge</Text>
+              <Text style={styles.createSub}>
+                8-step builder · cash pools · friends & teams
+              </Text>
+            </View>
+            <Text style={styles.createArrow}>→</Text>
+          </Pressable>
+        </View>
 
         {/* Category chips */}
         {categories.length > 0 ? (
@@ -119,66 +152,92 @@ export default function DiscoverTab() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.chipRow}
-            style={styles.chipScroller}
           >
-            <Pressable
+            <Chip
+              label="All"
+              active={selectedCategory === null}
               onPress={() => setSelectedCategory(null)}
-              style={[styles.chip, selectedCategory === null && styles.chipActive]}
-            >
-              <Text style={[styles.chipText, selectedCategory === null && styles.chipTextActive]}>
-                All
-              </Text>
-            </Pressable>
-            {categories.map((cat) => {
-              const active = selectedCategory === cat.key;
-              return (
-                <Pressable
-                  key={cat.key}
-                  onPress={() => setSelectedCategory(active ? null : cat.key)}
-                  style={[styles.chip, active && styles.chipActive]}
-                >
-                  <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                    {cat.emoji} {cat.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
+            />
+            {categories.map((cat) => (
+              <Chip
+                key={cat.key}
+                label={`${cat.emoji} ${cat.label}`}
+                active={selectedCategory === cat.key}
+                onPress={() =>
+                  setSelectedCategory(selectedCategory === cat.key ? null : cat.key)
+                }
+              />
+            ))}
           </ScrollView>
         ) : null}
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <View style={{ paddingHorizontal: spacingB.lg }}>
+          {error ? (
+            <Text style={[typeB.body, { color: colorsB.orangeDeep, marginBottom: spacingB.md }]}>
+              {error}
+            </Text>
+          ) : null}
 
-        {visible.length === 0 ? (
-          <View style={styles.emptyCard}>
-            <Text style={styles.emptyTitle}>
-              {selectedCategory ? 'No challenges in this category' : 'No challenges open right now'}
-            </Text>
-            <Text style={styles.emptyBody}>
-              {selectedCategory
-                ? 'Try a different category or check back soon.'
-                : 'Pull down to refresh.'}
-            </Text>
-          </View>
-        ) : (
-          visible.map((c) => (
-            <DiscoverCard
-              key={c.id}
-              c={c}
-              onPress={() => router.push(`/challenge/${c.id}`)}
+          {visible.length === 0 ? (
+            <BEmpty
+              emoji={selectedCategory ? '🔍' : '🌱'}
+              title={
+                selectedCategory
+                  ? 'Nothing in this category yet'
+                  : 'No challenges open right now'
+              }
+              body={
+                selectedCategory
+                  ? 'Try a different filter — or be the first to create one.'
+                  : 'Pull down to refresh, or spin one up yourself.'
+              }
+              cta={{ label: 'Create one →', onPress: () => router.push('/create' as never) }}
             />
-          ))
-        )}
+          ) : (
+            <View style={{ gap: spacingB.lg }}>
+              {visible.map((c) => (
+                <DiscoverCard
+                  key={c.id}
+                  c={c}
+                  onPress={() => router.push(`/challenge/${c.id}`)}
+                />
+              ))}
+            </View>
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function DiscoverCard({ c, onPress }: { c: Challenge; onPress: () => void }) {
-  const gradient = categoryGradient(c.category);
-  const emoji = c.category ? categoryEmoji[c.category] : '🎯';
-  const catLabel = c.category ? categoryLabel[c.category] : 'General';
+function Chip({
+  label,
+  active,
+  onPress,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.chip,
+        active && styles.chipActive,
+        pressed && { opacity: 0.85 },
+      ]}
+    >
+      <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
+    </Pressable>
+  );
+}
 
-  const formatPill =
+function DiscoverCard({ c, onPress }: { c: Challenge; onPress: () => void }) {
+  const emoji = c.category ? categoryEmoji[c.category] : '🎯';
+  const catLab = c.category ? categoryLabel[c.category] : 'General';
+
+  const formatLabel =
     c.gameFormat === 'WEEKLY_QUOTA'
       ? `${Math.ceil(c.durationDays / 7)}-week game`
       : c.gameFormat === 'COMPLETION_COUNT'
@@ -186,197 +245,138 @@ function DiscoverCard({ c, onPress }: { c: Challenge; onPress: () => void }) {
         : `${c.durationDays}-day streak`;
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && { opacity: 0.95, transform: [{ scale: 0.99 }] }]}
-    >
-      {/* Hero gradient */}
-      <LinearGradient
-        colors={gradient as unknown as readonly [string, string]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.hero}
-      >
-        <View style={styles.heroBadge}>
-          <Text style={styles.heroBadgeText}>{emoji} {catLabel}</Text>
-        </View>
-        <View style={styles.heroEmojiCircle}>
-          <Text style={{ fontSize: 16 }}>{emoji}</Text>
-        </View>
-        <View style={styles.heroScrim} />
-      </LinearGradient>
-
-      <View style={styles.cardBody}>
-        <View style={styles.cardMetaRow}>
-          <View
-            style={[
-              styles.statusPill,
-              { backgroundColor: c.status === 'OPEN' ? '#FEF3C7' : '#DBEAFE' },
-            ]}
-          >
-            <Text
-              style={[
-                styles.statusPillText,
-                { color: c.status === 'OPEN' ? '#854D0E' : '#1E40AF' },
-              ]}
-            >
-              {c.status === 'OPEN' ? '🟡 OPEN' : '🔵 ACTIVE'}
-            </Text>
-          </View>
-          <View style={styles.formatPill}>
-            <Text style={styles.formatPillText}>{formatPill}</Text>
-          </View>
-        </View>
-
-        <Text style={styles.cardTitle}>{c.title}</Text>
-        {c.description ? (
-          <Text style={styles.cardDesc} numberOfLines={2}>
-            {c.description}
-          </Text>
-        ) : null}
-        <Text style={styles.cardDates}>{formatDateRange(c.startDate, c.endDate)}</Text>
-
-        <View style={styles.poolBlock}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.poolLabel}>Prize pool</Text>
-            <Text style={styles.poolValue}>${c.prizePool.toFixed(0)}</Text>
-          </View>
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text style={styles.poolMeta}>${c.commitmentFee.toFixed(0)} · {c.participantCount} in</Text>
-          </View>
+    <BCard onPress={onPress} large>
+      {/* Top row: pills */}
+      <View style={styles.cardTop}>
+        <BPill label={`${emoji} ${catLab}`} tone="neutral" />
+        <View style={{ flexDirection: 'row', gap: 6 }}>
+          <BPill label={c.status === 'OPEN' ? 'OPEN' : 'ACTIVE'} tone={c.status === 'OPEN' ? 'yellow' : 'blue'} />
+          <BPill label={formatLabel} tone="ink" />
         </View>
       </View>
-    </Pressable>
+
+      <Text style={styles.cardTitle}>{c.title}</Text>
+      {c.description ? (
+        <Text style={styles.cardDesc} numberOfLines={2}>
+          {c.description}
+        </Text>
+      ) : null}
+      <Text style={styles.cardDates}>{formatDateRange(c.startDate, c.endDate)}</Text>
+
+      {/* Prize pool block — orange-tinted hero strip */}
+      <View style={styles.poolBlock}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.poolLabel}>Prize pool</Text>
+          <Text style={styles.poolValue}>${c.prizePool.toFixed(0)}</Text>
+        </View>
+        <View style={{ alignItems: 'flex-end', gap: 2 }}>
+          <Text style={styles.poolMeta}>${c.commitmentFee.toFixed(0)} stake</Text>
+          <Text style={styles.poolMetaSub}>
+            {c.participantCount} {c.participantCount === 1 ? 'player' : 'players'}
+          </Text>
+        </View>
+      </View>
+    </BCard>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.bg },
+  safe: { flex: 1, backgroundColor: colorsB.bg },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  scroll: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, gap: 0 },
+  scroll: { paddingTop: 4, paddingBottom: 40 },
 
-  eyebrow: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: colors.textMicro,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginBottom: 2,
+  // Create CTA
+  createCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    padding: spacingB.lg,
+    backgroundColor: colorsB.paper,
+    borderWidth: 2,
+    borderColor: colorsB.ink,
+    borderRadius: radiusB.cardLg,
+    marginBottom: spacingB.lg,
+    ...shadowsB.heroOrange,
   },
-  title: {
-    fontSize: 30,
-    fontWeight: '800',
-    color: colors.ink,
-    letterSpacing: -0.5,
-    marginBottom: 16,
-  },
+  createEmoji: { fontSize: 28 },
+  createTitle: { fontSize: 15, fontWeight: '900', color: colorsB.ink, letterSpacing: -0.2 },
+  createSub: { fontSize: 11, fontWeight: '700', color: colorsB.inkSoft, marginTop: 2 },
+  createArrow: { fontSize: 22, fontWeight: '900', color: colorsB.orange },
 
-  chipScroller: { marginHorizontal: -20, marginBottom: 16 },
-  chipRow: { gap: 8, paddingHorizontal: 20, paddingBottom: 4 },
+  // Chips
+  chipRow: {
+    gap: 8,
+    paddingHorizontal: spacingB.lg,
+    paddingBottom: spacingB.lg,
+    paddingTop: 2,
+  },
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 9,
-    borderRadius: radius.chip,
-    borderWidth: 1.5,
-    borderColor: colors.borderStrong,
-    backgroundColor: colors.bg,
-  },
-  chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipText: { fontSize: 13, fontWeight: '600', color: colors.ink },
-  chipTextActive: { color: '#fff' },
-
-  emptyCard: {
-    backgroundColor: colors.bgSoft,
-    borderRadius: radius.card,
-    padding: 24,
-    gap: 6,
-    alignItems: 'center',
-  },
-  emptyTitle: { fontSize: 16, fontWeight: '700', color: colors.ink },
-  emptyBody: { fontSize: 13, color: colors.textMuted, textAlign: 'center' },
-
-  card: {
-    backgroundColor: colors.bg,
-    borderRadius: radius.cardLg,
-    marginBottom: 14,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadow.card,
-  },
-  hero: {
-    height: 110,
-    paddingHorizontal: 12,
-    paddingTop: 10,
-    paddingBottom: 14,
-    position: 'relative',
-  },
-  heroScrim: {
-    position: 'absolute',
-    left: 0, right: 0, bottom: 0,
-    height: 40,
-    backgroundColor: 'rgba(0,0,0,0.18)',
-  },
-  heroBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: radius.chip,
-  },
-  heroBadgeText: { fontSize: 11, fontWeight: '800', color: colors.ink },
-  heroEmojiCircle: {
-    position: 'absolute', right: 10, top: 10,
-    width: 30, height: 30, borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    alignItems: 'center', justifyContent: 'center',
-  },
-
-  cardBody: { padding: 16, gap: 8 },
-  cardMetaRow: { flexDirection: 'row', gap: 6, alignItems: 'center' },
-  statusPill: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
-  statusPillText: { fontSize: 10, fontWeight: '800' },
-  formatPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: colors.mint,
+    borderWidth: 2,
+    borderColor: colorsB.ink,
+    backgroundColor: colorsB.paper,
   },
-  formatPillText: { fontSize: 10, fontWeight: '800', color: '#14532D' },
+  chipActive: { backgroundColor: colorsB.orange },
+  chipText: { fontSize: 12, fontWeight: '900', color: colorsB.ink, letterSpacing: 0.2 },
+  chipTextActive: { color: colorsB.paper },
 
+  // Discover card
+  cardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacingB.md,
+    flexWrap: 'wrap',
+    gap: 6,
+  },
   cardTitle: {
     fontSize: 20,
-    fontWeight: '800',
-    color: colors.ink,
-    letterSpacing: -0.3,
+    fontWeight: '900',
+    color: colorsB.ink,
+    letterSpacing: -0.4,
     marginTop: 2,
   },
-  cardDesc: { fontSize: 13, color: colors.textMuted, lineHeight: 18 },
-  cardDates: { fontSize: 12, color: colors.textFaint, marginTop: 2 },
+  cardDesc: {
+    fontSize: 13,
+    color: colorsB.inkSoft,
+    lineHeight: 18,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  cardDates: {
+    fontSize: 11,
+    color: colorsB.inkFaint,
+    marginTop: 6,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
 
   poolBlock: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.mint,
-    borderRadius: radius.card,
-    padding: 14,
-    marginTop: 6,
+    backgroundColor: colorsB.orangeSoft,
+    borderRadius: radiusB.card,
+    borderWidth: 2,
+    borderColor: colorsB.ink,
+    padding: spacingB.lg,
+    marginTop: spacingB.lg,
   },
   poolLabel: {
     fontSize: 10,
-    fontWeight: '800',
-    color: colors.primary,
+    fontWeight: '900',
+    color: colorsB.orangeDeep,
     textTransform: 'uppercase',
-    letterSpacing: 1.5,
+    letterSpacing: 1.4,
   },
   poolValue: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: colors.ink,
-    letterSpacing: -0.4,
+    fontSize: 30,
+    fontWeight: '900',
+    color: colorsB.ink,
+    letterSpacing: -0.6,
     marginTop: 2,
   },
-  poolMeta: { fontSize: 12, fontWeight: '600', color: colors.primaryDark },
-
-  error: { color: colors.danger, marginBottom: 12 },
+  poolMeta: { fontSize: 12, fontWeight: '900', color: colorsB.ink },
+  poolMetaSub: { fontSize: 10, fontWeight: '700', color: colorsB.inkSoft, marginTop: 2 },
 });

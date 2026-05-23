@@ -1,0 +1,3011 @@
+{
+  "id": "01e6903f-8c71-4ab8-b0c9-08772f235eec",
+  "prevId": "fb619f94-5d9f-49b2-afef-22d61e08ca84",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.ChallengeAuditLog": {
+      "name": "ChallengeAuditLog",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "challengeId": {
+          "name": "challengeId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actorId": {
+          "name": "actorId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actorType": {
+          "name": "actorType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "action": {
+          "name": "action",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "oldValue": {
+          "name": "oldValue",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "newValue": {
+          "name": "newValue",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ipAddress": {
+          "name": "ipAddress",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "userAgent": {
+          "name": "userAgent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ChallengeAuditLog_challengeId_idx": {
+          "name": "ChallengeAuditLog_challengeId_idx",
+          "columns": [
+            {
+              "expression": "challengeId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ChallengeAuditLog_createdAt_idx": {
+          "name": "ChallengeAuditLog_createdAt_idx",
+          "columns": [
+            {
+              "expression": "createdAt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ChallengeAuditLog_challengeId_Challenge_id_fk": {
+          "name": "ChallengeAuditLog_challengeId_Challenge_id_fk",
+          "tableFrom": "ChallengeAuditLog",
+          "tableTo": "Challenge",
+          "columnsFrom": [
+            "challengeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ChallengeDispute": {
+      "name": "ChallengeDispute",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "challengeId": {
+          "name": "challengeId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "submissionId": {
+          "name": "submissionId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "participantId": {
+          "name": "participantId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "raisedBy": {
+          "name": "raisedBy",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "disputeReason": {
+          "name": "disputeReason",
+          "type": "DisputeReason",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "DisputeStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'OPEN'"
+        },
+        "resolution": {
+          "name": "resolution",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resolvedBy": {
+          "name": "resolvedBy",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resolvedAt": {
+          "name": "resolvedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ChallengeDispute_challengeId_idx": {
+          "name": "ChallengeDispute_challengeId_idx",
+          "columns": [
+            {
+              "expression": "challengeId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ChallengeDispute_status_idx": {
+          "name": "ChallengeDispute_status_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ChallengeDispute_challengeId_Challenge_id_fk": {
+          "name": "ChallengeDispute_challengeId_Challenge_id_fk",
+          "tableFrom": "ChallengeDispute",
+          "tableTo": "Challenge",
+          "columnsFrom": [
+            "challengeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ChallengeDispute_submissionId_ChallengeSubmission_id_fk": {
+          "name": "ChallengeDispute_submissionId_ChallengeSubmission_id_fk",
+          "tableFrom": "ChallengeDispute",
+          "tableTo": "ChallengeSubmission",
+          "columnsFrom": [
+            "submissionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ChallengeDispute_participantId_ChallengeParticipant_id_fk": {
+          "name": "ChallengeDispute_participantId_ChallengeParticipant_id_fk",
+          "tableFrom": "ChallengeDispute",
+          "tableTo": "ChallengeParticipant",
+          "columnsFrom": [
+            "participantId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ChallengeDispute_raisedBy_User_id_fk": {
+          "name": "ChallengeDispute_raisedBy_User_id_fk",
+          "tableFrom": "ChallengeDispute",
+          "tableTo": "User",
+          "columnsFrom": [
+            "raisedBy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ChallengeParticipant": {
+      "name": "ChallengeParticipant",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "challengeId": {
+          "name": "challengeId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "ParticipantStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ACTIVE'"
+        },
+        "commitmentPaid": {
+          "name": "commitmentPaid",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "joinedAt": {
+          "name": "joinedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "stripePaymentIntentId": {
+          "name": "stripePaymentIntentId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paymentFailed": {
+          "name": "paymentFailed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "progressValue": {
+          "name": "progressValue",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "completionCount": {
+          "name": "completionCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "missedCount": {
+          "name": "missedCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "finalScore": {
+          "name": "finalScore",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "finalRank": {
+          "name": "finalRank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resultStatus": {
+          "name": "resultStatus",
+          "type": "ResultStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rewardStatus": {
+          "name": "rewardStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "trustScoreSnapshot": {
+          "name": "trustScoreSnapshot",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "disqualifiedReason": {
+          "name": "disqualifiedReason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "ChallengeParticipant_challengeId_userId_key": {
+          "name": "ChallengeParticipant_challengeId_userId_key",
+          "columns": [
+            {
+              "expression": "challengeId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ChallengeParticipant_resultStatus_idx": {
+          "name": "ChallengeParticipant_resultStatus_idx",
+          "columns": [
+            {
+              "expression": "resultStatus",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ChallengeParticipant_challengeId_Challenge_id_fk": {
+          "name": "ChallengeParticipant_challengeId_Challenge_id_fk",
+          "tableFrom": "ChallengeParticipant",
+          "tableTo": "Challenge",
+          "columnsFrom": [
+            "challengeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ChallengeParticipant_userId_User_id_fk": {
+          "name": "ChallengeParticipant_userId_User_id_fk",
+          "tableFrom": "ChallengeParticipant",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ChallengePeerReview": {
+      "name": "ChallengePeerReview",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "submissionId": {
+          "name": "submissionId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reviewerUserId": {
+          "name": "reviewerUserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "decision": {
+          "name": "decision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ChallengePeerReview_sub_reviewer_key": {
+          "name": "ChallengePeerReview_sub_reviewer_key",
+          "columns": [
+            {
+              "expression": "submissionId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "reviewerUserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ChallengePeerReview_submissionId_ChallengeSubmission_id_fk": {
+          "name": "ChallengePeerReview_submissionId_ChallengeSubmission_id_fk",
+          "tableFrom": "ChallengePeerReview",
+          "tableTo": "ChallengeSubmission",
+          "columnsFrom": [
+            "submissionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ChallengePeerReview_reviewerUserId_User_id_fk": {
+          "name": "ChallengePeerReview_reviewerUserId_User_id_fk",
+          "tableFrom": "ChallengePeerReview",
+          "tableTo": "User",
+          "columnsFrom": [
+            "reviewerUserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ChallengePoolContribution": {
+      "name": "ChallengePoolContribution",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "winnerPoolId": {
+          "name": "winnerPoolId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "challengeId": {
+          "name": "challengeId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "participantId": {
+          "name": "participantId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'MYR'"
+        },
+        "paymentReference": {
+          "name": "paymentReference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paymentStatus": {
+          "name": "paymentStatus",
+          "type": "ContributionStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PENDING'"
+        },
+        "heldAt": {
+          "name": "heldAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refundedAt": {
+          "name": "refundedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "forfeitedAt": {
+          "name": "forfeitedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "chargebackStatus": {
+          "name": "chargebackStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "failureReason": {
+          "name": "failureReason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ChallengePoolContribution_pool_participant_key": {
+          "name": "ChallengePoolContribution_pool_participant_key",
+          "columns": [
+            {
+              "expression": "winnerPoolId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "participantId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ChallengePoolContribution_paymentReference_idx": {
+          "name": "ChallengePoolContribution_paymentReference_idx",
+          "columns": [
+            {
+              "expression": "paymentReference",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ChallengePoolContribution_paymentStatus_idx": {
+          "name": "ChallengePoolContribution_paymentStatus_idx",
+          "columns": [
+            {
+              "expression": "paymentStatus",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ChallengePoolContribution_winnerPoolId_ChallengeWinnerPool_id_fk": {
+          "name": "ChallengePoolContribution_winnerPoolId_ChallengeWinnerPool_id_fk",
+          "tableFrom": "ChallengePoolContribution",
+          "tableTo": "ChallengeWinnerPool",
+          "columnsFrom": [
+            "winnerPoolId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ChallengePoolContribution_challengeId_Challenge_id_fk": {
+          "name": "ChallengePoolContribution_challengeId_Challenge_id_fk",
+          "tableFrom": "ChallengePoolContribution",
+          "tableTo": "Challenge",
+          "columnsFrom": [
+            "challengeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ChallengePoolContribution_participantId_ChallengeParticipant_id_fk": {
+          "name": "ChallengePoolContribution_participantId_ChallengeParticipant_id_fk",
+          "tableFrom": "ChallengePoolContribution",
+          "tableTo": "ChallengeParticipant",
+          "columnsFrom": [
+            "participantId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ChallengePoolContribution_userId_User_id_fk": {
+          "name": "ChallengePoolContribution_userId_User_id_fk",
+          "tableFrom": "ChallengePoolContribution",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ChallengePoolPayout": {
+      "name": "ChallengePoolPayout",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "winnerPoolId": {
+          "name": "winnerPoolId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "challengeId": {
+          "name": "challengeId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "participantId": {
+          "name": "participantId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payoutAmount": {
+          "name": "payoutAmount",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'MYR'"
+        },
+        "payoutFormula": {
+          "name": "payoutFormula",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "payoutStatus": {
+          "name": "payoutStatus",
+          "type": "PayoutStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'NOT_READY'"
+        },
+        "payoutReference": {
+          "name": "payoutReference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "approvedBy": {
+          "name": "approvedBy",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "approvedAt": {
+          "name": "approvedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paidAt": {
+          "name": "paidAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "failureReason": {
+          "name": "failureReason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ChallengePoolPayout_pool_user_idx": {
+          "name": "ChallengePoolPayout_pool_user_idx",
+          "columns": [
+            {
+              "expression": "winnerPoolId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ChallengePoolPayout_payoutStatus_idx": {
+          "name": "ChallengePoolPayout_payoutStatus_idx",
+          "columns": [
+            {
+              "expression": "payoutStatus",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ChallengePoolPayout_winnerPoolId_ChallengeWinnerPool_id_fk": {
+          "name": "ChallengePoolPayout_winnerPoolId_ChallengeWinnerPool_id_fk",
+          "tableFrom": "ChallengePoolPayout",
+          "tableTo": "ChallengeWinnerPool",
+          "columnsFrom": [
+            "winnerPoolId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ChallengePoolPayout_challengeId_Challenge_id_fk": {
+          "name": "ChallengePoolPayout_challengeId_Challenge_id_fk",
+          "tableFrom": "ChallengePoolPayout",
+          "tableTo": "Challenge",
+          "columnsFrom": [
+            "challengeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ChallengePoolPayout_participantId_ChallengeParticipant_id_fk": {
+          "name": "ChallengePoolPayout_participantId_ChallengeParticipant_id_fk",
+          "tableFrom": "ChallengePoolPayout",
+          "tableTo": "ChallengeParticipant",
+          "columnsFrom": [
+            "participantId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ChallengePoolPayout_userId_User_id_fk": {
+          "name": "ChallengePoolPayout_userId_User_id_fk",
+          "tableFrom": "ChallengePoolPayout",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ChallengeRule": {
+      "name": "ChallengeRule",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "challengeId": {
+          "name": "challengeId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "winConditionType": {
+          "name": "winConditionType",
+          "type": "WinCondition",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metricType": {
+          "name": "metricType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "targetValue": {
+          "name": "targetValue",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "limitValue": {
+          "name": "limitValue",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "frequency": {
+          "name": "frequency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requiredCount": {
+          "name": "requiredCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "allowedMisses": {
+          "name": "allowedMisses",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "rankingOrder": {
+          "name": "rankingOrder",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "winnerCount": {
+          "name": "winnerCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "winnerPercentage": {
+          "name": "winnerPercentage",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tieBreaker": {
+          "name": "tieBreaker",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "teamTargetValue": {
+          "name": "teamTargetValue",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "individualMinimumValue": {
+          "name": "individualMinimumValue",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verificationLevel": {
+          "name": "verificationLevel",
+          "type": "VerificationLevel",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "minConfidenceScore": {
+          "name": "minConfidenceScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "ruleConfig": {
+          "name": "ruleConfig",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ChallengeRule_challengeId_key": {
+          "name": "ChallengeRule_challengeId_key",
+          "columns": [
+            {
+              "expression": "challengeId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ChallengeRule_challengeId_Challenge_id_fk": {
+          "name": "ChallengeRule_challengeId_Challenge_id_fk",
+          "tableFrom": "ChallengeRule",
+          "tableTo": "Challenge",
+          "columnsFrom": [
+            "challengeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ChallengeSubmission": {
+      "name": "ChallengeSubmission",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "challengeId": {
+          "name": "challengeId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "participantId": {
+          "name": "participantId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "submissionType": {
+          "name": "submissionType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evidenceUrl": {
+          "name": "evidenceUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metricValue": {
+          "name": "metricValue",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "submittedAt": {
+          "name": "submittedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "verificationStatus": {
+          "name": "verificationStatus",
+          "type": "SubmissionStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'SUBMITTED'"
+        },
+        "confidenceScore": {
+          "name": "confidenceScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "reviewStatus": {
+          "name": "reviewStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reviewedBy": {
+          "name": "reviewedBy",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reviewedAt": {
+          "name": "reviewedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rejectionReason": {
+          "name": "rejectionReason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "forDate": {
+          "name": "forDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "ChallengeSubmission_challengeId_idx": {
+          "name": "ChallengeSubmission_challengeId_idx",
+          "columns": [
+            {
+              "expression": "challengeId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ChallengeSubmission_participantId_idx": {
+          "name": "ChallengeSubmission_participantId_idx",
+          "columns": [
+            {
+              "expression": "participantId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ChallengeSubmission_submittedAt_idx": {
+          "name": "ChallengeSubmission_submittedAt_idx",
+          "columns": [
+            {
+              "expression": "submittedAt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ChallengeSubmission_verificationStatus_idx": {
+          "name": "ChallengeSubmission_verificationStatus_idx",
+          "columns": [
+            {
+              "expression": "verificationStatus",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ChallengeSubmission_challengeId_Challenge_id_fk": {
+          "name": "ChallengeSubmission_challengeId_Challenge_id_fk",
+          "tableFrom": "ChallengeSubmission",
+          "tableTo": "Challenge",
+          "columnsFrom": [
+            "challengeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ChallengeSubmission_participantId_ChallengeParticipant_id_fk": {
+          "name": "ChallengeSubmission_participantId_ChallengeParticipant_id_fk",
+          "tableFrom": "ChallengeSubmission",
+          "tableTo": "ChallengeParticipant",
+          "columnsFrom": [
+            "participantId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ChallengeSubmission_userId_User_id_fk": {
+          "name": "ChallengeSubmission_userId_User_id_fk",
+          "tableFrom": "ChallengeSubmission",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ChallengeWinnerPool": {
+      "name": "ChallengeWinnerPool",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "challengeId": {
+          "name": "challengeId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'MYR'"
+        },
+        "entryContributionAmount": {
+          "name": "entryContributionAmount",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "totalPoolAmount": {
+          "name": "totalPoolAmount",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "adjustedPoolAmount": {
+          "name": "adjustedPoolAmount",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "platformFeeAmount": {
+          "name": "platformFeeAmount",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "platformFeePercentage": {
+          "name": "platformFeePercentage",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "platformFeeFixed": {
+          "name": "platformFeeFixed",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "netPoolAmount": {
+          "name": "netPoolAmount",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "distributionMethod": {
+          "name": "distributionMethod",
+          "type": "DistributionMethod",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payoutConfig": {
+          "name": "payoutConfig",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "participantMinimum": {
+          "name": "participantMinimum",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "participantMaximum": {
+          "name": "participantMaximum",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payoutStatus": {
+          "name": "payoutStatus",
+          "type": "PayoutStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'NOT_READY'"
+        },
+        "disputeWindowHours": {
+          "name": "disputeWindowHours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 24
+        },
+        "autoPayoutAllowed": {
+          "name": "autoPayoutAllowed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "manualApprovalRequired": {
+          "name": "manualApprovalRequired",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "payoutHoldDays": {
+          "name": "payoutHoldDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "maxPayoutPerUser": {
+          "name": "maxPayoutPerUser",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "minimumScoreToQualify": {
+          "name": "minimumScoreToQualify",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "noWinnerRule": {
+          "name": "noWinnerRule",
+          "type": "NoWinnerRule",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'REFUND_ALL'"
+        },
+        "termsAcceptedAt": {
+          "name": "termsAcceptedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "calculatedAt": {
+          "name": "calculatedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lockedAt": {
+          "name": "lockedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "payoutsReleasedAt": {
+          "name": "payoutsReleasedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ChallengeWinnerPool_challengeId_key": {
+          "name": "ChallengeWinnerPool_challengeId_key",
+          "columns": [
+            {
+              "expression": "challengeId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ChallengeWinnerPool_payoutStatus_idx": {
+          "name": "ChallengeWinnerPool_payoutStatus_idx",
+          "columns": [
+            {
+              "expression": "payoutStatus",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ChallengeWinnerPool_challengeId_Challenge_id_fk": {
+          "name": "ChallengeWinnerPool_challengeId_Challenge_id_fk",
+          "tableFrom": "ChallengeWinnerPool",
+          "tableTo": "Challenge",
+          "columnsFrom": [
+            "challengeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Challenge": {
+      "name": "Challenge",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdById": {
+          "name": "createdById",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isPublic": {
+          "name": "isPublic",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "commitmentFee": {
+          "name": "commitmentFee",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dailyStepGoal": {
+          "name": "dailyStepGoal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 10000
+        },
+        "durationDays": {
+          "name": "durationDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "startDate": {
+          "name": "startDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "endDate": {
+          "name": "endDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "ChallengeStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'OPEN'"
+        },
+        "prizePool": {
+          "name": "prizePool",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "maxParticipants": {
+          "name": "maxParticipants",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "minParticipants": {
+          "name": "minParticipants",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 2
+        },
+        "heroImageUrl": {
+          "name": "heroImageUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category": {
+          "name": "category",
+          "type": "ChallengeCategory",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verificationMethod": {
+          "name": "verificationMethod",
+          "type": "VerificationMethod",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'AUTO_STEPS'"
+        },
+        "targetDaysComplete": {
+          "name": "targetDaysComplete",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gameFormat": {
+          "name": "gameFormat",
+          "type": "GameFormat",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'DAILY_STREAK'"
+        },
+        "activeStepGoal": {
+          "name": "activeStepGoal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "powerStepGoal": {
+          "name": "powerStepGoal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weeklyActiveDays": {
+          "name": "weeklyActiveDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 4
+        },
+        "weeklyPowerDays": {
+          "name": "weeklyPowerDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 2
+        },
+        "weeklyFreeDays": {
+          "name": "weeklyFreeDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "creatorIntent": {
+          "name": "creatorIntent",
+          "type": "CreatorIntent",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "categoryV2": {
+          "name": "categoryV2",
+          "type": "ChallengeCategoryV2",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "visibility": {
+          "name": "visibility",
+          "type": "Visibility",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lifecycle": {
+          "name": "lifecycle",
+          "type": "ChallengeLifecycle",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "riskLevel": {
+          "name": "riskLevel",
+          "type": "RiskLevel",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "moderationStatus": {
+          "name": "moderationStatus",
+          "type": "ModerationStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "moderationReason": {
+          "name": "moderationReason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "moderationReviewedBy": {
+          "name": "moderationReviewedBy",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "moderationReviewedAt": {
+          "name": "moderationReviewedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rewardType": {
+          "name": "rewardType",
+          "type": "RewardType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "timezone": {
+          "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "startAt": {
+          "name": "startAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "endAt": {
+          "name": "endAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "disputeWindowHours": {
+          "name": "disputeWindowHours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 24
+        },
+        "gracePeriodMinutes": {
+          "name": "gracePeriodMinutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "allowLateJoin": {
+          "name": "allowLateJoin",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "publishedAt": {
+          "name": "publishedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cancelledAt": {
+          "name": "cancelledAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cancelledReason": {
+          "name": "cancelledReason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Challenge_createdById_idx": {
+          "name": "Challenge_createdById_idx",
+          "columns": [
+            {
+              "expression": "createdById",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Challenge_lifecycle_idx": {
+          "name": "Challenge_lifecycle_idx",
+          "columns": [
+            {
+              "expression": "lifecycle",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Challenge_moderationStatus_idx": {
+          "name": "Challenge_moderationStatus_idx",
+          "columns": [
+            {
+              "expression": "moderationStatus",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Challenge_startAt_idx": {
+          "name": "Challenge_startAt_idx",
+          "columns": [
+            {
+              "expression": "startAt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "Challenge_createdById_User_id_fk": {
+          "name": "Challenge_createdById_User_id_fk",
+          "tableFrom": "Challenge",
+          "tableTo": "User",
+          "columnsFrom": [
+            "createdById"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Cheer": {
+      "name": "Cheer",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "fromUserId": {
+          "name": "fromUserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "toUserId": {
+          "name": "toUserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dailyProgressId": {
+          "name": "dailyProgressId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Cheer_fromUserId_dailyProgressId_key": {
+          "name": "Cheer_fromUserId_dailyProgressId_key",
+          "columns": [
+            {
+              "expression": "fromUserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "dailyProgressId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Cheer_toUserId_idx": {
+          "name": "Cheer_toUserId_idx",
+          "columns": [
+            {
+              "expression": "toUserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Cheer_dailyProgressId_idx": {
+          "name": "Cheer_dailyProgressId_idx",
+          "columns": [
+            {
+              "expression": "dailyProgressId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "Cheer_fromUserId_User_id_fk": {
+          "name": "Cheer_fromUserId_User_id_fk",
+          "tableFrom": "Cheer",
+          "tableTo": "User",
+          "columnsFrom": [
+            "fromUserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "Cheer_toUserId_User_id_fk": {
+          "name": "Cheer_toUserId_User_id_fk",
+          "tableFrom": "Cheer",
+          "tableTo": "User",
+          "columnsFrom": [
+            "toUserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "Cheer_dailyProgressId_DailyProgress_id_fk": {
+          "name": "Cheer_dailyProgressId_DailyProgress_id_fk",
+          "tableFrom": "Cheer",
+          "tableTo": "DailyProgress",
+          "columnsFrom": [
+            "dailyProgressId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.DailyProgress": {
+      "name": "DailyProgress",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "participantId": {
+          "name": "participantId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "stepsAchieved": {
+          "name": "stepsAchieved",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "goalSteps": {
+          "name": "goalSteps",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "completed": {
+          "name": "completed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "dayType": {
+          "name": "dayType",
+          "type": "DayType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proofPhotoUrl": {
+          "name": "proofPhotoUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proofSubmittedAt": {
+          "name": "proofSubmittedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "syncedAt": {
+          "name": "syncedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "DailyProgress_participantId_date_key": {
+          "name": "DailyProgress_participantId_date_key",
+          "columns": [
+            {
+              "expression": "participantId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "DailyProgress_participantId_ChallengeParticipant_id_fk": {
+          "name": "DailyProgress_participantId_ChallengeParticipant_id_fk",
+          "tableFrom": "DailyProgress",
+          "tableTo": "ChallengeParticipant",
+          "columnsFrom": [
+            "participantId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.StepLog": {
+      "name": "StepLog",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "stepsCount": {
+          "name": "stepsCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "manualEntry": {
+          "name": "manualEntry",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "syncedAt": {
+          "name": "syncedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "StepLog_userId_date_key": {
+          "name": "StepLog_userId_date_key",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "StepLog_userId_User_id_fk": {
+          "name": "StepLog_userId_User_id_fk",
+          "tableFrom": "StepLog",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Transaction": {
+      "name": "Transaction",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "TransactionType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripePaymentIntentId": {
+          "name": "stripePaymentIntentId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Transaction_userId_User_id_fk": {
+          "name": "Transaction_userId_User_id_fk",
+          "tableFrom": "Transaction",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.User": {
+      "name": "User",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "clerkId": {
+          "name": "clerkId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "passwordHash": {
+          "name": "passwordHash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "emailVerifiedAt": {
+          "name": "emailVerifiedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avatarUrl": {
+          "name": "avatarUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripeCustomerId": {
+          "name": "stripeCustomerId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripePaymentMethodId": {
+          "name": "stripePaymentMethodId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "timezone": {
+          "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Asia/Kuala_Lumpur'"
+        },
+        "expoPushToken": {
+          "name": "expoPushToken",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hasCompletedOnboarding": {
+          "name": "hasCompletedOnboarding",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "lastJoinNotifyAt": {
+          "name": "lastJoinNotifyAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentStreak": {
+          "name": "currentStreak",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "longestStreak": {
+          "name": "longestStreak",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalWon": {
+          "name": "totalWon",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "totalLost": {
+          "name": "totalLost",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "creatorStatus": {
+          "name": "creatorStatus",
+          "type": "CreatorStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'NONE'"
+        },
+        "creatorAppliedAt": {
+          "name": "creatorAppliedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creatorBio": {
+          "name": "creatorBio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "trustScore": {
+          "name": "trustScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 100
+        },
+        "fraudFlags": {
+          "name": "fraudFlags",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "kakiPoints": {
+          "name": "kakiPoints",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "isAgeVerified": {
+          "name": "isAgeVerified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "jurisdiction": {
+          "name": "jurisdiction",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isSuspended": {
+          "name": "isSuspended",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "suspendedReason": {
+          "name": "suspendedReason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "User_clerkId_key": {
+          "name": "User_clerkId_key",
+          "columns": [
+            {
+              "expression": "clerkId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "User_email_key": {
+          "name": "User_email_key",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "User_trustScore_idx": {
+          "name": "User_trustScore_idx",
+          "columns": [
+            {
+              "expression": "trustScore",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.ChallengeCategory": {
+      "name": "ChallengeCategory",
+      "schema": "public",
+      "values": [
+        "FITNESS",
+        "MINDFULNESS",
+        "READING",
+        "LEARNING",
+        "PRODUCTIVITY",
+        "CREATIVE",
+        "WELLNESS",
+        "MONEY",
+        "SOCIAL",
+        "OUTDOORS"
+      ]
+    },
+    "public.ChallengeCategoryV2": {
+      "name": "ChallengeCategoryV2",
+      "schema": "public",
+      "values": [
+        "HABIT",
+        "FITNESS",
+        "MONEY",
+        "LEARNING",
+        "WORK",
+        "SOCIAL",
+        "TRAVEL",
+        "FOOD",
+        "RETAIL",
+        "CREATIVE",
+        "COMMUNITY",
+        "EVENT",
+        "CUSTOM"
+      ]
+    },
+    "public.ChallengeLifecycle": {
+      "name": "ChallengeLifecycle",
+      "schema": "public",
+      "values": [
+        "DRAFT",
+        "PENDING_REVIEW",
+        "SCHEDULED",
+        "ACTIVE",
+        "PAUSED",
+        "ENDED",
+        "CALCULATING",
+        "DISPUTE_OPEN",
+        "LOCKED",
+        "REWARD_PROCESSING",
+        "COMPLETED",
+        "CANCELLED",
+        "SUSPENDED"
+      ]
+    },
+    "public.ChallengeStatus": {
+      "name": "ChallengeStatus",
+      "schema": "public",
+      "values": [
+        "OPEN",
+        "ACTIVE",
+        "COMPLETED",
+        "CANCELLED"
+      ]
+    },
+    "public.ContributionStatus": {
+      "name": "ContributionStatus",
+      "schema": "public",
+      "values": [
+        "PENDING",
+        "PAID",
+        "FAILED",
+        "HELD",
+        "REFUNDED",
+        "FORFEITED",
+        "PAYOUT_PENDING",
+        "PAID_OUT",
+        "CANCELLED"
+      ]
+    },
+    "public.CreatorIntent": {
+      "name": "CreatorIntent",
+      "schema": "public",
+      "values": [
+        "PERSONAL",
+        "FRIENDS",
+        "WORKPLACE",
+        "MERCHANT",
+        "EVENT",
+        "COMMUNITY",
+        "PUBLIC"
+      ]
+    },
+    "public.CreatorStatus": {
+      "name": "CreatorStatus",
+      "schema": "public",
+      "values": [
+        "NONE",
+        "APPLIED",
+        "APPROVED",
+        "REJECTED"
+      ]
+    },
+    "public.DayType": {
+      "name": "DayType",
+      "schema": "public",
+      "values": [
+        "POWER",
+        "ACTIVE",
+        "FREE",
+        "MISSED"
+      ]
+    },
+    "public.DisputeReason": {
+      "name": "DisputeReason",
+      "schema": "public",
+      "values": [
+        "FAKE_PROOF",
+        "WRONG_SCORE",
+        "LATE_SUBMISSION",
+        "RULE_VIOLATION",
+        "DUPLICATE_PROOF",
+        "UNSAFE_BEHAVIOR",
+        "OTHER"
+      ]
+    },
+    "public.DisputeStatus": {
+      "name": "DisputeStatus",
+      "schema": "public",
+      "values": [
+        "OPEN",
+        "UNDER_REVIEW",
+        "UPHELD",
+        "REJECTED",
+        "WITHDRAWN",
+        "RESOLVED_VOID"
+      ]
+    },
+    "public.DistributionMethod": {
+      "name": "DistributionMethod",
+      "schema": "public",
+      "values": [
+        "ALL_COMPLETERS_EQUAL_SPLIT",
+        "TOP_N_EQUAL_SPLIT",
+        "RANKED_PERCENTAGE",
+        "PROPORTIONAL",
+        "WINNER_TAKES_ALL",
+        "TEAM_SPLIT"
+      ]
+    },
+    "public.GameFormat": {
+      "name": "GameFormat",
+      "schema": "public",
+      "values": [
+        "DAILY_STREAK",
+        "WEEKLY_QUOTA",
+        "COMPLETION_COUNT"
+      ]
+    },
+    "public.ModerationStatus": {
+      "name": "ModerationStatus",
+      "schema": "public",
+      "values": [
+        "AUTO_APPROVED",
+        "PENDING_REVIEW",
+        "APPROVED",
+        "BLOCKED",
+        "REJECTED"
+      ]
+    },
+    "public.NoWinnerRule": {
+      "name": "NoWinnerRule",
+      "schema": "public",
+      "values": [
+        "REFUND_ALL",
+        "ROLL_TO_CHARITY",
+        "ROLL_TO_PLATFORM",
+        "ADMIN_DECISION"
+      ]
+    },
+    "public.ParticipantStatus": {
+      "name": "ParticipantStatus",
+      "schema": "public",
+      "values": [
+        "ACTIVE",
+        "QUALIFIED",
+        "ELIMINATED"
+      ]
+    },
+    "public.PayoutStatus": {
+      "name": "PayoutStatus",
+      "schema": "public",
+      "values": [
+        "NOT_READY",
+        "ON_HOLD",
+        "READY",
+        "PROCESSING",
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED"
+      ]
+    },
+    "public.ResultStatus": {
+      "name": "ResultStatus",
+      "schema": "public",
+      "values": [
+        "PENDING",
+        "SUCCESS",
+        "FAILED",
+        "DISQUALIFIED",
+        "PENDING_REVIEW",
+        "DISPUTED"
+      ]
+    },
+    "public.RewardType": {
+      "name": "RewardType",
+      "schema": "public",
+      "values": [
+        "NONE",
+        "BADGE",
+        "POINTS",
+        "VOUCHER",
+        "DISCOUNT_FREE_ITEM",
+        "SPONSOR_REWARD",
+        "REFUNDABLE_DEPOSIT",
+        "WINNER_POOL",
+        "RANDOM_PAID_PRIZE"
+      ]
+    },
+    "public.RiskLevel": {
+      "name": "RiskLevel",
+      "schema": "public",
+      "values": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "PROHIBITED"
+      ]
+    },
+    "public.SubmissionStatus": {
+      "name": "SubmissionStatus",
+      "schema": "public",
+      "values": [
+        "NOT_SUBMITTED",
+        "SUBMITTED",
+        "AUTO_APPROVED",
+        "PENDING_REVIEW",
+        "APPROVED",
+        "REJECTED",
+        "DISPUTED",
+        "EXPIRED"
+      ]
+    },
+    "public.TransactionType": {
+      "name": "TransactionType",
+      "schema": "public",
+      "values": [
+        "COMMITMENT_HOLD",
+        "COMMITMENT_CAPTURE",
+        "PRIZE_PAYOUT",
+        "REFUND"
+      ]
+    },
+    "public.VerificationLevel": {
+      "name": "VerificationLevel",
+      "schema": "public",
+      "values": [
+        "SELF_DECLARATION",
+        "PHOTO_UPLOAD",
+        "PEER_VERIFICATION",
+        "ORGANIZER_APPROVAL",
+        "QR_LOCATION",
+        "RECEIPT_POS_API",
+        "PARTNER_VERIFIED"
+      ]
+    },
+    "public.VerificationMethod": {
+      "name": "VerificationMethod",
+      "schema": "public",
+      "values": [
+        "AUTO_STEPS",
+        "PHOTO_PROOF",
+        "HONOR_TAP"
+      ]
+    },
+    "public.Visibility": {
+      "name": "Visibility",
+      "schema": "public",
+      "values": [
+        "PRIVATE",
+        "GROUP",
+        "PUBLIC"
+      ]
+    },
+    "public.WinCondition": {
+      "name": "WinCondition",
+      "schema": "public",
+      "values": [
+        "COMPLETE_ALL",
+        "COMPLETE_MINIMUM",
+        "REACH_TARGET",
+        "STAY_BELOW_LIMIT",
+        "RANK_TOP_N",
+        "RANK_TOP_PERCENT",
+        "TEAM_TARGET",
+        "LAST_REMAINING",
+        "FASTEST_COMPLETION",
+        "JUDGED_BEST",
+        "NO_VIOLATION"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

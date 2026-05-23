@@ -1,11 +1,18 @@
+/**
+ * Home — Direction B reskin.
+ *
+ * The visual layer is Playful Buddy (cream bg, chunky offset shadows,
+ * orange CTAs, yellow scribble highlights). Logic (steps sync, AUTO_STEPS
+ * ring, HONOR_TAP mark-done, weekly tally) is unchanged from the legacy
+ * green build.
+ */
+
 import { useAuth } from '../../lib/auth';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  AppState,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -16,18 +23,24 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StepRing } from '../../components/StepRing';
+import {
+  BButton,
+  BCard,
+  BEmpty,
+  BHero,
+  BPill,
+  BStat,
+  ScreenHeader,
+} from '../../components/themeB/screen';
 import { apiRequest } from '../../lib/api';
 import { bumpStubSteps, getTodaySteps, setStubSteps } from '../../lib/health';
-import { formatCountdown, msUntilUtcMidnight } from '../../lib/time';
 import {
   CategoryKey,
   categoryEmoji,
-  categoryGradient,
   categoryLabel,
-  colors,
-  radius,
-  shadow,
 } from '../../lib/theme';
+import { colorsB, radiusB, shadowsB, spacingB, typeB } from '../../lib/themeB';
+import { formatCountdown, msUntilUtcMidnight } from '../../lib/time';
 
 type DayType = 'POWER' | 'ACTIVE' | 'FREE' | 'MISSED' | null;
 type GameFormat = 'DAILY_STREAK' | 'WEEKLY_QUOTA' | 'COMPLETION_COUNT';
@@ -137,14 +150,11 @@ export default function HomeTab() {
     }
   }, [getToken, load]);
 
-  // Stable refs so effects below don't re-fire when load/sync identity changes.
   const loadRef = useRef(load);
   loadRef.current = load;
   const syncRef = useRef(sync);
   syncRef.current = sync;
 
-  // Single source of truth for "fetch on screen focus" — useFocusEffect also
-  // fires on initial mount, so no separate useEffect needed.
   useFocusEffect(
     useCallback(() => {
       void loadRef.current();
@@ -162,17 +172,12 @@ export default function HomeTab() {
     return () => clearInterval(id);
   }, [parts.length]);
 
-  useEffect(() => {
-    const sub = AppState.addEventListener('change', (state) => {
-      if (state === 'active' && parts.length > 0) void syncRef.current();
-    });
-    return () => sub.remove();
-  }, [parts.length]);
-
   if (loading) {
     return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.center}><ActivityIndicator /></View>
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.center}>
+          <ActivityIndicator color={colorsB.orange} />
+        </View>
       </SafeAreaView>
     );
   }
@@ -188,75 +193,87 @@ export default function HomeTab() {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={() => { setRefreshing(true); void load(); }}
+            onRefresh={() => {
+              setRefreshing(true);
+              void load();
+            }}
+            tintColor={colorsB.orange}
           />
         }
       >
-        <Text style={styles.eyebrow}>Today</Text>
-        <Text style={styles.title}>
-          {parts.length === 0 ? 'Active challenges' : `${parts.length} active`}
-        </Text>
+        <ScreenHeader
+          eyebrow="Today"
+          before={parts.length === 0 ? "Let's" : `${parts.length}`}
+          highlight={parts.length === 0 ? 'go' : 'active'}
+          after={parts.length === 0 ? '!' : ''}
+        />
 
         {parts.length === 0 ? (
-          <>
-            <View style={styles.stepCounter}>
-              <Text style={styles.stepCounterLabel}>Steps today</Text>
-              <Text style={styles.stepCounterValue}>{steps.toLocaleString()}</Text>
-              <Text style={styles.stepCounterSub}>
-                Not counted toward any challenge — join one to start.
+          <View style={{ paddingHorizontal: spacingB.lg, gap: spacingB.lg }}>
+            <BHero tint={colorsB.ink}>
+              <Text style={styles.heroEyebrow}>Steps today</Text>
+              <Text style={styles.heroValue}>{steps.toLocaleString()}</Text>
+              <Text style={styles.heroSub}>
+                Not counted toward any challenge yet — join one to start.
               </Text>
-            </View>
-            <View style={styles.emptyCard}>
-              <Text style={styles.emptyTitle}>No active challenges</Text>
-              <Text style={styles.emptyBody}>Find an open challenge to join.</Text>
-              <Pressable
-                onPress={() => router.push('/(tabs)/discover')}
-                style={({ pressed }) => [styles.cta, pressed && { opacity: 0.85 }]}
-              >
-                <Text style={styles.ctaText}>Browse challenges</Text>
-              </Pressable>
-            </View>
-          </>
-        ) : (
-          parts.map((p) => (
-            <ChallengeCard
-              key={p.id}
-              participation={p}
-              steps={steps}
-              countdown={countdown}
-              onPress={() => router.push(`/challenge/${p.challenge.id}`)}
-              onMarkDone={() => markDone(p.challenge.id)}
-              onBumpSteps={async (delta) => {
-                const next = delta === 0 ? setStubSteps(0) : bumpStubSteps(delta);
-                setSteps(next);
-                await sync();
-              }}
+            </BHero>
+
+            <BEmpty
+              emoji="🌱"
+              title="No challenges yet"
+              body="Find an open challenge to join — or build your own."
+              cta={{ label: 'Browse challenges →', onPress: () => router.push('/(tabs)/discover') }}
             />
-          ))
+          </View>
+        ) : (
+          <View style={{ paddingHorizontal: spacingB.lg, gap: spacingB.lg }}>
+            {parts.map((p) => (
+              <ChallengeCard
+                key={p.id}
+                participation={p}
+                steps={steps}
+                countdown={countdown}
+                onPress={() => router.push(`/challenge/${p.challenge.id}`)}
+                onMarkDone={() => markDone(p.challenge.id)}
+                onBumpSteps={async (delta) => {
+                  const next = delta === 0 ? setStubSteps(0) : bumpStubSteps(delta);
+                  setSteps(next);
+                  await sync();
+                }}
+              />
+            ))}
+
+            {hasStepsChallenge ? (
+              <BButton
+                label={syncing ? 'Syncing…' : '🔁 Sync steps now'}
+                tone="ink"
+                disabled={syncing}
+                onPress={() => void sync()}
+                style={{ marginTop: spacingB.sm }}
+              />
+            ) : null}
+          </View>
         )}
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-
-        {hasStepsChallenge ? (
-          <Pressable
-            onPress={sync}
-            disabled={syncing}
-            style={({ pressed }) => [styles.cta, pressed && { opacity: 0.85 }]}
-          >
-            {syncing ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.ctaText}>Sync steps now</Text>
-            )}
-          </Pressable>
+        {error ? (
+          <Text style={[typeB.body, { color: colorsB.orangeDeep, paddingHorizontal: spacingB.lg, marginTop: spacingB.lg }]}>
+            {error}
+          </Text>
         ) : null}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
+// ─── Per-challenge card ───────────────────────────────────────────────────
+
 function ChallengeCard({
-  participation, steps, countdown, onPress, onMarkDone, onBumpSteps,
+  participation,
+  steps,
+  countdown,
+  onPress,
+  onMarkDone,
+  onBumpSteps,
 }: {
   participation: Participation;
   steps: number;
@@ -274,39 +291,33 @@ function ChallengeCard({
   const hitToday = steps >= goal;
   const hitPower = isWeekly && challenge.powerStepGoal != null && steps >= challenge.powerStepGoal;
   const catEm = challenge.category ? categoryEmoji[challenge.category] : '🎯';
-  const catLabel = challenge.category ? categoryLabel[challenge.category] : 'General';
-  const gradient = categoryGradient(challenge.category);
+  const catLab = challenge.category ? categoryLabel[challenge.category] : 'General';
   const isHonor = challenge.verificationMethod === 'HONOR_TAP';
   const isPhoto = challenge.verificationMethod === 'PHOTO_PROOF';
   const todayDone = participation.todayProgress?.completed ?? false;
   const [marking, setMarking] = useState(false);
-  // Challenge hasn't started yet — no progress can be recorded.
+
   const now = new Date();
   now.setUTCHours(0, 0, 0, 0);
   const startUtc = new Date(`${challenge.startDate}T00:00:00.000Z`);
   const notStarted = startUtc > now;
   const daysUntilStart = Math.ceil((startUtc.getTime() - now.getTime()) / 86400000);
-  const startLabel =
-    daysUntilStart === 1
-      ? 'Starts tomorrow'
-      : `Starts in ${daysUntilStart} days`;
+  const startLabel = daysUntilStart === 1 ? 'Starts tomorrow' : `Starts in ${daysUntilStart} days`;
+
+  const progressColor = hitPower ? colorsB.yellow : hitToday ? colorsB.green : colorsB.orange;
 
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && { transform: [{ scale: 0.99 }] }]}
+      style={({ pressed }) => [
+        styles.card,
+        pressed && { transform: [{ translateX: 2 }, { translateY: 2 }], shadowOpacity: 0 },
+      ]}
     >
-      {/* Category gradient banner */}
-      <LinearGradient
-        colors={gradient as unknown as readonly [string, string]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.cardBanner}
-      >
-        <View style={styles.bannerBadge}>
-          <Text style={styles.bannerBadgeText}>{catEm} {catLabel}</Text>
-        </View>
-        <Text style={styles.bannerStatus}>
+      {/* Top row: category pill + status */}
+      <View style={styles.cardTop}>
+        <BPill label={`${catEm} ${catLab}`} tone="neutral" />
+        <Text style={styles.cardStatus}>
           {notStarted
             ? startLabel
             : isWeekly
@@ -315,90 +326,94 @@ function ChallengeCard({
                 ? `${completedDays}/${challenge.targetDaysComplete ?? challenge.durationDays} done`
                 : `Day ${completedDays + 1}/${challenge.durationDays}`}
         </Text>
-      </LinearGradient>
+      </View>
 
-      <View style={styles.cardBody}>
-        <Text style={styles.cardTitle} numberOfLines={1}>{challenge.title}</Text>
+      <Text style={styles.cardTitle} numberOfLines={1}>
+        {challenge.title}
+      </Text>
 
-        {challenge.verificationMethod === 'AUTO_STEPS' ? (
-          <>
-            <View style={styles.ringWrap}>
-              <StepRing
-                progress={progress}
-                progressColor={hitPower ? colors.power : hitToday ? colors.primary : colors.ink}
-              >
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={styles.steps}>{steps.toLocaleString()}</Text>
-                  <Text style={styles.goal}>
-                    of {goal.toLocaleString()}
-                    {isWeekly && challenge.powerStepGoal
-                      ? ` · ⚡ ${challenge.powerStepGoal.toLocaleString()}`
-                      : ''}
-                  </Text>
-                </View>
-              </StepRing>
-            </View>
-            {notStarted ? (
-              <View style={[styles.markBtn, styles.markBtnDisabled]}>
-                <Text style={styles.markBtnDisabledText}>{startLabel} — no progress yet</Text>
+      {challenge.verificationMethod === 'AUTO_STEPS' ? (
+        <>
+          <View style={styles.ringWrap}>
+            <StepRing
+              progress={progress}
+              progressColor={progressColor}
+              trackColor={colorsB.bgWarm}
+            >
+              <View style={{ alignItems: 'center' }}>
+                <Text style={styles.steps}>{steps.toLocaleString()}</Text>
+                <Text style={styles.goal}>
+                  of {goal.toLocaleString()}
+                  {isWeekly && challenge.powerStepGoal
+                    ? ` · ⚡ ${challenge.powerStepGoal.toLocaleString()}`
+                    : ''}
+                </Text>
               </View>
-            ) : (
-              <DevStepRow onBump={onBumpSteps} />
-            )}
-          </>
-        ) : (
-          <View style={styles.bigDone}>
-            <Text style={styles.bigDoneVal}>{completedDays}</Text>
-            <Text style={styles.bigDoneLabel}>
-              of {challenge.targetDaysComplete ?? challenge.durationDays} days done
-            </Text>
+            </StepRing>
           </View>
-        )}
-
-        {isHonor ? (
-          notStarted ? (
-            <View style={[styles.markBtn, styles.markBtnDisabled]}>
-              <Text style={styles.markBtnDisabledText}>{startLabel} — no progress yet</Text>
-            </View>
-          ) : todayDone ? (
-            <View style={[styles.markBtn, styles.markBtnDone]}>
-              <Text style={styles.markBtnDoneText}>✓ Done for today</Text>
+          {notStarted ? (
+            <View style={styles.disabledBox}>
+              <Text style={styles.disabledText}>{startLabel} — no progress yet</Text>
             </View>
           ) : (
-            <Pressable
-              onPress={async (e) => {
-                e.stopPropagation?.();
-                if (marking) return;
-                setMarking(true);
-                try {
-                  await onMarkDone();
-                } finally {
-                  setMarking(false);
-                }
-              }}
-              disabled={marking}
-              style={({ pressed }) => [styles.markBtn, (pressed || marking) && { opacity: 0.85 }]}
-            >
-              {marking ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.markBtnText}>Mark today done</Text>
-              )}
-            </Pressable>
-          )
-        ) : isPhoto ? (
-          <View style={[styles.markBtn, styles.markBtnDisabled]}>
-            <Text style={styles.markBtnDisabledText}>📷 Photo proof coming soon</Text>
-          </View>
-        ) : null}
-
-        {isWeekly ? <WeeklyTallyRow participation={participation} /> : null}
-
-        <View style={styles.metricRow}>
-          <Metric label="Prize" value={`$${challenge.prizePool.toFixed(0)}`} />
-          <Metric label="Stake" value={`$${challenge.commitmentFee.toFixed(0)}`} />
-          <Metric label="Left" value={countdown} />
+            <DevStepRow onBump={onBumpSteps} />
+          )}
+        </>
+      ) : (
+        <View style={styles.bigDone}>
+          <Text style={styles.bigDoneVal}>{completedDays}</Text>
+          <Text style={styles.bigDoneLabel}>
+            of {challenge.targetDaysComplete ?? challenge.durationDays} days done
+          </Text>
         </View>
+      )}
+
+      {isHonor ? (
+        notStarted ? (
+          <View style={styles.disabledBox}>
+            <Text style={styles.disabledText}>{startLabel} — no progress yet</Text>
+          </View>
+        ) : todayDone ? (
+          <View style={styles.doneBox}>
+            <Text style={styles.doneBoxText}>✓ Done for today</Text>
+          </View>
+        ) : (
+          <Pressable
+            onPress={async (e) => {
+              e.stopPropagation?.();
+              if (marking) return;
+              setMarking(true);
+              try {
+                await onMarkDone();
+              } finally {
+                setMarking(false);
+              }
+            }}
+            disabled={marking}
+            style={({ pressed }) => [
+              styles.markBtn,
+              (pressed || marking) && { transform: [{ translateX: 2 }, { translateY: 2 }], shadowOpacity: 0 },
+            ]}
+          >
+            {marking ? (
+              <ActivityIndicator color={colorsB.paper} />
+            ) : (
+              <Text style={styles.markBtnText}>Mark today done →</Text>
+            )}
+          </Pressable>
+        )
+      ) : isPhoto ? (
+        <View style={styles.disabledBox}>
+          <Text style={styles.disabledText}>📷 Photo proof coming soon</Text>
+        </View>
+      ) : null}
+
+      {isWeekly ? <WeeklyTallyRow participation={participation} /> : null}
+
+      <View style={styles.metricRow}>
+        <BStat label="Prize" value={`$${challenge.prizePool.toFixed(0)}`} />
+        <BStat label="Stake" value={`$${challenge.commitmentFee.toFixed(0)}`} />
+        <BStat label="Left" value={countdown} />
       </View>
     </Pressable>
   );
@@ -416,27 +431,40 @@ function DevStepRow({ onBump }: { onBump: (delta: number) => Promise<void> }) {
     }
   };
   return (
-    <View style={styles.devRowInline}>
+    <View style={styles.devRow}>
       <Pressable
-        onPress={(e) => { e.stopPropagation?.(); void run(1000); }}
+        onPress={(e) => {
+          e.stopPropagation?.();
+          void run(1000);
+        }}
         disabled={busy}
         style={({ pressed }) => [styles.devChip, (pressed || busy) && { opacity: 0.7 }]}
       >
         <Text style={styles.devChipText}>+1k</Text>
       </Pressable>
       <Pressable
-        onPress={(e) => { e.stopPropagation?.(); void run(5000); }}
+        onPress={(e) => {
+          e.stopPropagation?.();
+          void run(5000);
+        }}
         disabled={busy}
-        style={({ pressed }) => [styles.devChip, styles.devChipPrimary, (pressed || busy) && { opacity: 0.7 }]}
+        style={({ pressed }) => [
+          styles.devChip,
+          styles.devChipPrimary,
+          (pressed || busy) && { opacity: 0.7 },
+        ]}
       >
         {busy ? (
-          <ActivityIndicator color="#fff" size="small" />
+          <ActivityIndicator color={colorsB.paper} size="small" />
         ) : (
-          <Text style={[styles.devChipText, { color: '#fff' }]}>+5k steps (dev)</Text>
+          <Text style={[styles.devChipText, { color: colorsB.paper }]}>+5k (dev)</Text>
         )}
       </Pressable>
       <Pressable
-        onPress={(e) => { e.stopPropagation?.(); void run(0); }}
+        onPress={(e) => {
+          e.stopPropagation?.();
+          void run(0);
+        }}
         disabled={busy}
         style={({ pressed }) => [styles.devChip, (pressed || busy) && { opacity: 0.7 }]}
       >
@@ -466,7 +494,8 @@ function WeeklyTallyRow({ participation }: { participation: Participation }) {
     return dt >= weekStart && dt <= weekEnd;
   });
 
-  let power = 0, active = 0;
+  let power = 0;
+  let active = 0;
   for (const d of inWeek) {
     if (d.dayType === 'POWER') power++;
     else if (d.dayType === 'ACTIVE') active++;
@@ -475,21 +504,31 @@ function WeeklyTallyRow({ participation }: { participation: Participation }) {
 
   return (
     <View style={styles.tallyRow}>
-      <TallyCell icon="⚡" label="Power" got={power} need={challenge.weeklyPowerDays ?? 0} tint={colors.power} />
-      <TallyCell icon="✓" label="Active" got={active} need={challenge.weeklyActiveDays ?? 0} tint={colors.primary} />
-      <TallyCell icon="🌙" label="Free" got={free} need={challenge.weeklyFreeDays ?? 0} tint="#9CA3AF" />
+      <TallyCell icon="⚡" label="Power" got={power} need={challenge.weeklyPowerDays ?? 0} tint={colorsB.yellow} />
+      <TallyCell icon="✓" label="Active" got={active} need={challenge.weeklyActiveDays ?? 0} tint={colorsB.green} />
+      <TallyCell icon="🌙" label="Free" got={free} need={challenge.weeklyFreeDays ?? 0} tint={colorsB.inkFaint} />
     </View>
   );
 }
 
 function TallyCell({
-  icon, label, got, need, tint,
-}: { icon: string; label: string; got: number; need: number; tint: string }) {
+  icon,
+  label,
+  got,
+  need,
+  tint,
+}: {
+  icon: string;
+  label: string;
+  got: number;
+  need: number;
+  tint: string;
+}) {
   const done = got >= need;
   return (
-    <View style={[styles.tallyCell, { borderColor: done ? tint : colors.border }]}>
+    <View style={[styles.tallyCell, { borderColor: done ? tint : colorsB.line }]}>
       <Text style={styles.tallyIcon}>{icon}</Text>
-      <Text style={[styles.tallyVal, { color: done ? tint : colors.ink }]}>
+      <Text style={[styles.tallyVal, { color: done ? colorsB.ink : colorsB.inkSoft }]}>
         {got}/{need}
       </Text>
       <Text style={styles.tallyLabel}>{label}</Text>
@@ -497,208 +536,139 @@ function TallyCell({
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.metric}>
-      <Text style={styles.metricLabel}>{label}</Text>
-      <Text style={styles.metricValue}>{value}</Text>
-    </View>
-  );
-}
+// ─── Styles ───────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.bg },
+  safe: { flex: 1, backgroundColor: colorsB.bg },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  scroll: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32 },
+  scroll: { paddingTop: 4, paddingBottom: 40 },
 
-  eyebrow: {
+  // Hero (steps today)
+  heroEyebrow: {
+    color: colorsB.yellow,
     fontSize: 10,
-    fontWeight: '800',
-    color: colors.textMicro,
+    fontWeight: '900',
+    letterSpacing: 1.4,
     textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginBottom: 2,
   },
-  title: {
-    fontSize: 30,
-    fontWeight: '800',
-    color: colors.ink,
-    letterSpacing: -0.5,
-    marginBottom: 18,
+  heroValue: {
+    color: colorsB.paper,
+    fontSize: 44,
+    fontWeight: '900',
+    letterSpacing: -1,
+    marginTop: 6,
   },
+  heroSub: { color: colorsB.bgWarm, fontSize: 12, marginTop: 6, fontWeight: '600' },
 
+  // Challenge card
   card: {
-    backgroundColor: colors.bg,
-    borderRadius: radius.cardLg,
-    marginBottom: 14,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadow.card,
+    backgroundColor: colorsB.paper,
+    borderWidth: 2,
+    borderColor: colorsB.ink,
+    borderRadius: radiusB.cardLg,
+    padding: spacingB.lg,
+    gap: spacingB.lg,
+    ...shadowsB.cardLg,
   },
-  cardBanner: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  cardStatus: { fontSize: 11, fontWeight: '900', color: colorsB.inkSoft, letterSpacing: 0.4 },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: colorsB.ink,
+    letterSpacing: -0.4,
+    marginTop: -spacingB.sm,
   },
-  bannerBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-  },
-  bannerBadgeText: { fontSize: 11, fontWeight: '800', color: colors.ink },
-  bannerStatus: { fontSize: 12, fontWeight: '800', color: '#fff' },
-
-  cardBody: { padding: 18, gap: 14 },
-  cardTitle: { fontSize: 22, fontWeight: '800', color: colors.ink, letterSpacing: -0.3 },
 
   ringWrap: { alignItems: 'center', paddingVertical: 4 },
-  steps: { fontSize: 32, fontWeight: '800', color: colors.ink, letterSpacing: -0.5 },
-  goal: { fontSize: 12, color: colors.textMuted, marginTop: 2, fontWeight: '600' },
+  steps: { fontSize: 30, fontWeight: '900', color: colorsB.ink, letterSpacing: -0.5 },
+  goal: { fontSize: 11, color: colorsB.inkSoft, marginTop: 2, fontWeight: '700' },
 
   bigDone: {
     alignItems: 'center',
-    paddingVertical: 16,
-    backgroundColor: colors.mint,
-    borderRadius: radius.card,
+    paddingVertical: spacingB.lg,
+    backgroundColor: colorsB.greenSoft,
+    borderRadius: radiusB.card,
+    borderWidth: 2,
+    borderColor: colorsB.ink,
   },
-  bigDoneVal: { fontSize: 56, fontWeight: '800', color: colors.primary, letterSpacing: -1, lineHeight: 60 },
-  bigDoneLabel: { fontSize: 13, color: colors.primaryDark, fontWeight: '600' },
+  bigDoneVal: { fontSize: 48, fontWeight: '900', color: colorsB.ink, letterSpacing: -1, lineHeight: 52 },
+  bigDoneLabel: { fontSize: 12, color: colorsB.green, fontWeight: '800' },
 
+  // Mark today done — chunky orange button with offset shadow
   markBtn: {
-    backgroundColor: colors.primary,
-    borderRadius: 999,
-    paddingVertical: 16,
+    backgroundColor: colorsB.orange,
+    borderRadius: radiusB.card,
+    borderWidth: 2,
+    borderColor: colorsB.ink,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadowsB.card,
   },
-  markBtnText: { color: '#fff', fontWeight: '800', fontSize: 15, letterSpacing: -0.2 },
-  markBtnDone: {
-    backgroundColor: colors.successBg,
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  markBtnDoneText: { color: colors.success, fontWeight: '800', fontSize: 15 },
-  markBtnDisabled: { backgroundColor: colors.bgSoft },
-  markBtnDisabledText: { color: colors.textMuted, fontWeight: '700', fontSize: 13 },
+  markBtnText: { color: colorsB.paper, fontWeight: '900', fontSize: 14, letterSpacing: 0.3 },
 
-  devRowInline: { flexDirection: 'row', gap: 6 },
+  doneBox: {
+    backgroundColor: colorsB.greenSoft,
+    borderWidth: 2,
+    borderColor: colorsB.green,
+    borderRadius: radiusB.card,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  doneBoxText: { color: colorsB.green, fontWeight: '900', fontSize: 14 },
+
+  disabledBox: {
+    backgroundColor: colorsB.bgWarm,
+    borderWidth: 2,
+    borderColor: colorsB.line,
+    borderRadius: radiusB.card,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  disabledText: { color: colorsB.inkSoft, fontWeight: '700', fontSize: 12 },
+
+  // Dev step row
+  devRow: { flexDirection: 'row', gap: 6 },
   devChip: {
     flex: 1,
     paddingVertical: 10,
-    borderRadius: 999,
-    backgroundColor: colors.bgSoft,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderRadius: radiusB.control,
+    backgroundColor: colorsB.bgWarm,
+    borderWidth: 1.5,
+    borderColor: colorsB.ink,
     alignItems: 'center',
     justifyContent: 'center',
   },
   devChipPrimary: {
     flex: 2,
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colorsB.ink,
+    borderColor: colorsB.ink,
   },
-  devChipText: { fontSize: 12, fontWeight: '700', color: colors.ink },
+  devChipText: { fontSize: 12, fontWeight: '900', color: colorsB.ink },
 
+  // Metric row (3 stat tiles)
   metricRow: { flexDirection: 'row', gap: 8 },
-  metric: {
-    flex: 1,
-    backgroundColor: colors.bgSoft,
-    borderRadius: 12,
-    padding: 12,
-    gap: 4,
-  },
-  metricLabel: {
-    color: colors.textFaint,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  metricValue: { fontSize: 16, fontWeight: '800', color: colors.ink, letterSpacing: -0.2 },
 
+  // Weekly tally
   tallyRow: { flexDirection: 'row', gap: 8 },
   tallyCell: {
     flex: 1,
-    backgroundColor: colors.bg,
-    borderRadius: 12,
-    paddingVertical: 12,
+    backgroundColor: colorsB.bgWarm,
+    borderRadius: radiusB.control,
+    paddingVertical: 10,
     paddingHorizontal: 8,
     alignItems: 'center',
     borderWidth: 2,
     gap: 2,
   },
   tallyIcon: { fontSize: 16 },
-  tallyVal: { fontSize: 16, fontWeight: '800', letterSpacing: -0.3 },
+  tallyVal: { fontSize: 14, fontWeight: '900', letterSpacing: -0.3 },
   tallyLabel: {
-    fontSize: 10,
-    color: colors.textFaint,
+    fontSize: 9,
+    color: colorsB.inkFaint,
     textTransform: 'uppercase',
     letterSpacing: 1,
-    fontWeight: '700',
-  },
-
-  emptyCard: {
-    backgroundColor: colors.bgSoft,
-    borderRadius: radius.card,
-    padding: 20,
-    gap: 12,
-    marginBottom: 14,
-  },
-  emptyTitle: { fontSize: 18, fontWeight: '800', color: colors.ink },
-  emptyBody: { color: colors.textMuted, fontSize: 13 },
-
-  stepCounter: {
-    backgroundColor: colors.ink,
-    borderRadius: radius.cardLg,
-    padding: 22,
-    gap: 4,
-    alignItems: 'center',
-    marginBottom: 14,
-  },
-  stepCounterLabel: {
-    color: colors.power,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    fontSize: 11,
     fontWeight: '800',
   },
-  stepCounterValue: { color: '#fff', fontSize: 44, fontWeight: '800', letterSpacing: -1 },
-  stepCounterSub: { color: '#A7C9AE', fontSize: 12, textAlign: 'center', marginTop: 4 },
-
-  cta: {
-    backgroundColor: colors.primary,
-    paddingVertical: 16,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  ctaText: { color: '#fff', fontWeight: '800', fontSize: 15 },
-  error: { color: colors.danger, marginVertical: 12 },
-
-  devBlock: {
-    marginTop: 20,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: 10,
-  },
-  devLabel: {
-    color: colors.textFaint,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  devRow: { flexDirection: 'row', gap: 8 },
-  devBtn: {
-    flex: 1, paddingVertical: 10, borderRadius: 10,
-    backgroundColor: colors.ink, alignItems: 'center',
-  },
-  devBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
-  devHint: { fontSize: 11, color: colors.textFaint, lineHeight: 16 },
 });

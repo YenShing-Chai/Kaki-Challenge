@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kaki · Create Challenge · Direction B — Playful Buddy</title>
+<style>
+  :root {
+    --bg: #fef4e2;
+    --bg-warm: #fbe8c8;
+    --ink: #1c1410;
+    --ink-soft: #5a4a3e;
+    --ink-faint: #a89887;
+    --paper: #fffaf0;
+    --line: #f0d9b3;
+    --orange: #ff5a1f;
+    --orange-soft: #ffe0d0;
+    --green: #5d8a5a;
+    --green-soft: #d1e5cf;
+    --pink: #e88a8a;
+    --pink-soft: #fbdbdb;
+    --blue: #2d5d8b;
+    --blue-soft: #cee0f0;
+    --yellow: #f4c443;
+    --rounded: 'Nunito', 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  body {
+    background: #fde4b2;
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(255,90,31,0.10), transparent 40%),
+      radial-gradient(circle at 90% 100%, rgba(93,138,90,0.12), transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(232,138,138,0.05), transparent 60%);
+    font-family: var(--rounded);
+    color: var(--ink);
+    padding: 60px 40px 100px;
+    min-height: 100vh;
+  }
+  .page-title {
+    max-width: 1400px;
+    margin: 0 auto 50px;
+    text-align: center;
+  }
+  .page-title h1 {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  .page-title h1 .accent { color: var(--orange); }
+  .page-title h1 .scribble {
+    display: inline-block;
+    position: relative;
+  }
+  .page-title h1 .scribble::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -2px;
+    height: 8px;
+    background: var(--yellow);
+    z-index: -1;
+    border-radius: 4px;
+    transform: rotate(-1deg);
+  }
+  .page-title p { color: var(--ink-soft); font-size: 17px; max-width: 640px; margin: 0 auto; line-height: 1.6; font-weight: 500; }
+  .direction-card {
+    max-width: 1400px;
+    margin: 0 auto 40px;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 24px;
+    padding: 36px 44px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: center;
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  .direction-card .meta-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 14px;
+    font-weight: 800;
+  }
+  .direction-card h2 {
+    font-size: 40px;
+    font-weight: 900;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+  }
+  .direction-card p {
+    color: var(--ink-soft);
+    line-height: 1.65;
+    font-size: 15.5px;
+    max-width: 640px;
+    font-weight: 500;
+  }
+  .palette { display: flex; gap: 10px; }
+  .palette span {
+    width: 56px; height: 56px; border-radius: 18px;
+    border: 2px solid var(--ink);
+    display: flex; align-items: flex-end; justify-content: center;
+    font-size: 9px; padding-bottom: 4px; color: var(--ink);
+    font-weight: 700;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  .phone-row {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 60px 24px;
+    justify-items: center;
+  }
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .step-label {
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 800;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .step-label .num {
+    background: var(--ink);
+    color: var(--yellow);
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-size: 13px;
+    font-weight: 900;
+  }
+  .phone {
+    width: 300px;
+    height: 620px;
+    border-radius: 42px;
+    background: var(--bg);
+    border: 9px solid #1c1410;
+    box-shadow: 0 25px 50px -20px rgba(28, 20, 16, 0.4),
+                12px 12px 0 var(--orange);
+    position: relative;
+    overflow: hidden;
+    font-family: var(--rounded);
+  }
+  .notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 95px; height: 22px; background: #1c1410;
+    border-radius: 0 0 14px 14px; z-index: 100;
+  }
+  .status-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 38px;
+    padding: 12px 22px 0;
+    display: flex; justify-content: space-between;
+    font-size: 11px; font-weight: 800;
+    color: var(--ink);
+    z-index: 50;
+  }
+  .screen {
+    padding: 50px 20px 24px;
+    height: 100%;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .top-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .back-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+  }
+  .progress {
+    display: flex; gap: 4px;
+    flex: 1; margin: 0 12px;
+  }
+  .progress span {
+    flex: 1; height: 5px; background: rgba(28,20,16,0.12);
+    border-radius: 3px;
+  }
+  .progress span.done { background: var(--green); }
+  .progress span.now { background: var(--orange); }
+
+  .pill-counter {
+    background: var(--ink); color: var(--bg-warm);
+    font-size: 10.5px; font-weight: 800;
+    padding: 5px 10px;
+    border-radius: 100px;
+  }
+
+  .title {
+    font-size: 26px;
+    line-height: 1.1;
+    letter-spacing: -0.6px;
+    margin-bottom: 6px;
+    font-weight: 900;
+  }
+  .title .hl {
+    background: var(--yellow);
+    padding: 0 6px;
+    border-radius: 6px;
+    display: inline-block;
+    transform: rotate(-1deg);
+  }
+  .lead {
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .body-scroll { flex: 1; overflow: hidden; }
+
+  /* Step 1: Big bubble avatars for intent */
+  .intent-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 9px;
+  }
+  .intent-bub {
+    padding: 14px 12px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    text-align: left;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .intent-bub.active {
+    background: var(--orange);
+    color: var(--paper);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .intent-bub.active .sub { color: var(--orange-soft); }
+  .intent-bub .emoji-circle {
+    width: 36px; height: 36px;
+    background: var(--green-soft);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .intent-bub.active .emoji-circle { background: var(--yellow); }
+  .intent-bub .name { font-size: 12.5px; font-weight: 800; }
+  .intent-bub .sub { font-size: 10px; color: var(--ink-soft); margin-top: 2px; font-weight: 600; }
+
+  /* Step 2: Category — fun chip cloud */
+  .chip-cloud {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .chip {
+    padding: 9px 13px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 6px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .chip.active { background: var(--ink); color: var(--bg-warm); }
+  .chip.active .dot { background: var(--yellow); }
+
+  /* Step 3: Template chunky cards */
+  .templ-card {
+    padding: 14px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    margin-bottom: 9px;
+    box-shadow: 3px 3px 0 var(--ink);
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .templ-card.active { background: var(--green-soft); }
+  .templ-card .tx {
+    width: 44px; height: 44px;
+    background: var(--orange-soft);
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .templ-card.active .tx { background: var(--green); color: var(--paper); }
+  .templ-card .tt { font-size: 14px; font-weight: 800; margin-bottom: 3px; }
+  .templ-card .td { font-size: 10.5px; color: var(--ink-soft); line-height: 1.4; font-weight: 600; }
+
+  /* Step 4: Big number setter */
+  .big-hero {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 10px;
+    box-shadow: 4px 4px 0 var(--orange);
+  }
+  .big-hero .h-label { font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); font-weight: 800; margin-bottom: 6px; }
+  .big-hero .h-val { font-size: 44px; font-weight: 900; letter-spacing: -1.5px; line-height: 1; }
+  .big-hero .h-unit { font-size: 14px; color: var(--ink-soft); font-weight: 700; margin-left: 4px; }
+  .big-hero .h-controls { display: flex; gap: 6px; margin-top: 10px; }
+  .big-hero .ctrl {
+    flex: 1;
+    padding: 7px 0;
+    background: var(--bg-warm);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .big-hero .ctrl.on { background: var(--orange); color: var(--paper); }
+  .double-row { display: flex; gap: 8px; }
+  .double-row .mini {
+    flex: 1;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .mini .m-lab { font-size: 9.5px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+  .mini .m-val { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; margin-top: 2px; }
+
+  /* Step 5: Verification ladder */
+  .v-tile {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    margin-bottom: 7px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .v-tile.active { background: var(--green); color: var(--paper); }
+  .v-tile.active .v-strength { color: var(--green-soft); }
+  .v-tile .v-icon {
+    width: 32px; height: 32px;
+    background: var(--bg-warm);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .v-tile.active .v-icon { background: var(--yellow); color: var(--ink); }
+  .v-tile .v-name { font-size: 12.5px; font-weight: 800; }
+  .v-tile .v-strength {
+    font-size: 10px; color: var(--ink-soft); font-weight: 700;
+    display: flex; align-items: center; gap: 5px; margin-top: 2px;
+  }
+  .v-bars { display: flex; gap: 2px; }
+  .v-bars i { width: 4px; height: 9px; background: rgba(28,20,16,0.2); border-radius: 1px; display: block; }
+  .v-bars i.on { background: var(--orange); }
+  .v-tile.active .v-bars i { background: rgba(255,255,255,0.3); }
+  .v-tile.active .v-bars i.on { background: var(--yellow); }
+
+  /* Step 6: Reward */
+  .r-card {
+    padding: 14px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    margin-bottom: 8px;
+    box-shadow: 2px 2px 0 var(--ink);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .r-card.active { background: var(--orange); color: var(--paper); }
+  .r-card.active .r-d { color: var(--orange-soft); }
+  .r-card.locked { opacity: 0.5; }
+  .r-card .r-emoji {
+    width: 44px; height: 44px;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .r-card .r-n { font-size: 14px; font-weight: 800; }
+  .r-card .r-d { font-size: 10.5px; color: var(--ink-soft); margin-top: 2px; font-weight: 600; line-height: 1.35; }
+  .badge-pill {
+    font-size: 9px; padding: 3px 8px;
+    background: var(--ink); color: var(--bg-warm);
+    border-radius: 100px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .badge-pill.phase { background: var(--pink); color: var(--paper); }
+
+  /* Step 7 Schedule */
+  .cal-card {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: 3px 3px 0 var(--green);
+  }
+  .cal-card .cal-head { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 8px; }
+  .cal-card .cal-range { font-size: 17px; font-weight: 900; letter-spacing: -0.4px; }
+  .cal-card .cal-sub { font-size: 10.5px; color: var(--ink-soft); margin-top: 3px; font-weight: 600; }
+  .vis-pills { display: flex; gap: 5px; }
+  .vis-pills span {
+    flex: 1; text-align: center;
+    padding: 9px 0;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    font-size: 11px; font-weight: 800;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .vis-pills span.on { background: var(--orange); color: var(--paper); }
+  .toggle-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 12px;
+    padding: 11px 14px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+  }
+  .toggle-row .tg-lab { font-size: 12px; font-weight: 800; }
+  .toggle-row .tg-sub { font-size: 10px; color: var(--ink-soft); font-weight: 600; }
+  .toggle-row .tg {
+    width: 38px; height: 22px;
+    background: var(--green);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    position: relative;
+  }
+  .toggle-row .tg::after {
+    content: ''; position: absolute;
+    width: 14px; height: 14px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    top: 2px; right: 2px;
+  }
+
+  /* Step 8 Review */
+  .hero-summary {
+    background: var(--orange);
+    color: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 10px;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .hero-summary .hs-tag { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 800; margin-bottom: 6px; }
+  .hero-summary .hs-title { font-size: 19px; font-weight: 900; letter-spacing: -0.4px; line-height: 1.15; margin-bottom: 8px; }
+  .hero-summary .hs-meta { display: flex; flex-wrap: wrap; gap: 5px; }
+  .hero-summary .hs-meta span { background: rgba(255,255,255,0.18); padding: 4px 9px; border-radius: 100px; font-size: 10px; font-weight: 700; }
+  .breakdown {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .br-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 11px; }
+  .br-row .l { color: var(--ink-soft); font-weight: 600; }
+  .br-row .r { font-weight: 800; }
+  .risk-banner {
+    background: var(--green-soft);
+    border: 2px solid var(--green);
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 10.5px;
+    color: #2a4a28;
+    font-weight: 600;
+    line-height: 1.5;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .risk-banner .check {
+    width: 22px; height: 22px;
+    background: var(--green);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--paper);
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .risk-banner strong { font-weight: 900; color: #1f3a1d; }
+
+  .cta {
+    margin-top: 12px;
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 14px;
+    border-radius: 16px;
+    text-align: center;
+    font-size: 13.5px;
+    font-weight: 900;
+    letter-spacing: 0.3px;
+    border: 2px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--orange);
+  }
+  .secondary-cta {
+    text-align: center; margin-top: 8px;
+    font-size: 11px; color: var(--ink-soft); font-weight: 700;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>Direction B · <span class="scribble">Playful Buddy</span></h1>
+  <p>Warm cream, vivid orange, chunky rounded type. Sticker accents and hard drop-shadows give Kaki the feel of a friend-group app — closer to BeReal or Duolingo than a fintech tool.</p>
+</div>
+
+<div class="direction-card">
+  <div>
+    <span class="meta-tag">Direction B</span>
+    <h2>Playful Buddy</h2>
+    <p>Built around personality. Rounded sans with extra weight, "scribble" yellow highlight under key words, and hard offset shadows that feel handmade rather than digital. Every step gets a small color shift and a chunky icon. Best for an app that wants to feel like fun with friends — even when the moderation engine is doing serious work under the hood.</p>
+  </div>
+  <div class="palette">
+    <span style="background:#fef4e2">cream</span>
+    <span style="background:#1c1410;color:#fef4e2">ink</span>
+    <span style="background:#ff5a1f;color:#fff">orange</span>
+    <span style="background:#5d8a5a;color:#fff">green</span>
+    <span style="background:#f4c443">yellow</span>
+  </div>
+</div>
+
+<div class="phone-row">
+
+  <!-- ============== STEP 1: CREATOR INTENT ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">✕</div>
+          <div class="progress"><span class="now"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="pill-counter">1 / 8</div>
+        </div>
+        <div class="title">Who's <span class="hl">in?</span></div>
+        <div class="lead">We'll set things up based on your squad.</div>
+        <div class="body-scroll">
+          <div class="intent-grid">
+            <div class="intent-bub">
+              <div class="emoji-circle">🧍</div>
+              <div class="name">Just me</div>
+              <div class="sub">solo goals</div>
+            </div>
+            <div class="intent-bub active">
+              <div class="emoji-circle">👯</div>
+              <div class="name">Friends</div>
+              <div class="sub">private squad</div>
+            </div>
+            <div class="intent-bub">
+              <div class="emoji-circle">💼</div>
+              <div class="name">Work team</div>
+              <div class="sub">HR · wellness</div>
+            </div>
+            <div class="intent-bub">
+              <div class="emoji-circle">🏪</div>
+              <div class="name">My shop</div>
+              <div class="sub">customer loyalty</div>
+            </div>
+            <div class="intent-bub">
+              <div class="emoji-circle">🏕</div>
+              <div class="name">Trip / Event</div>
+              <div class="sub">camp · party</div>
+            </div>
+            <div class="intent-bub">
+              <div class="emoji-circle">🌍</div>
+              <div class="name">Community</div>
+              <div class="sub">club · charity</div>
+            </div>
+          </div>
+        </div>
+        <div class="cta">Let's go →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">1</span>Who is it for</div>
+  </div>
+
+  <!-- ============== STEP 2: CATEGORY ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <div class="progress"><span class="done"></span><span class="now"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="pill-counter">2 / 8</div>
+        </div>
+        <div class="title">What <span class="hl">kind?</span></div>
+        <div class="lead">Pick the vibe of your challenge.</div>
+        <div class="body-scroll">
+          <div class="chip-cloud">
+            <div class="chip"><span class="dot" style="background:var(--green);"></span>Habits</div>
+            <div class="chip active"><span class="dot"></span>Fitness 💪</div>
+            <div class="chip"><span class="dot" style="background:var(--green);"></span>Money 💰</div>
+            <div class="chip"><span class="dot" style="background:var(--green);"></span>Learning 📚</div>
+            <div class="chip"><span class="dot" style="background:var(--green);"></span>Work 💼</div>
+            <div class="chip"><span class="dot" style="background:var(--yellow);"></span>Social 🎉</div>
+            <div class="chip"><span class="dot" style="background:var(--yellow);"></span>Travel ✈️</div>
+            <div class="chip"><span class="dot" style="background:var(--green);"></span>Food 🍜</div>
+            <div class="chip"><span class="dot" style="background:var(--yellow);"></span>Shopping 🛍</div>
+            <div class="chip"><span class="dot" style="background:var(--green);"></span>Creative 🎨</div>
+            <div class="chip"><span class="dot" style="background:var(--yellow);"></span>Community 🤝</div>
+            <div class="chip"><span class="dot" style="background:var(--yellow);"></span>Event 🎪</div>
+            <div class="chip"><span class="dot" style="background:var(--pink);"></span>Custom ✨</div>
+          </div>
+          <div style="margin-top:14px;padding:11px;background:var(--green-soft);border:2px dashed var(--green);border-radius:12px;font-size:10.5px;font-weight:600;color:#2a4a28;">
+            💡 <strong>Fitness</strong> templates: streaks, step goals, workouts &amp; more.
+          </div>
+        </div>
+        <div class="cta">Pick template →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">2</span>Category</div>
+  </div>
+
+  <!-- ============== STEP 3: TEMPLATE ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="pill-counter">3 / 8</div>
+        </div>
+        <div class="title">How do you <span class="hl">win?</span></div>
+        <div class="lead">Pick a way to settle who's the champ.</div>
+        <div class="body-scroll">
+          <div class="templ-card active">
+            <div class="tx">🔥</div>
+            <div>
+              <div class="tt">Daily Streak</div>
+              <div class="td">Hit the target every single day. Miss one = streak resets.</div>
+            </div>
+          </div>
+          <div class="templ-card">
+            <div class="tx">🎯</div>
+            <div>
+              <div class="tt">Reach a Target</div>
+              <div class="td">First to the goal wins. Step count, kms, whatever fits.</div>
+            </div>
+          </div>
+          <div class="templ-card">
+            <div class="tx">🛑</div>
+            <div>
+              <div class="tt">Stay Under</div>
+              <div class="td">Keep something below a ceiling — spend, screen time…</div>
+            </div>
+          </div>
+          <div class="templ-card">
+            <div class="tx">🏆</div>
+            <div>
+              <div class="tt">Best Submission</div>
+              <div class="td">Everyone posts. Group picks the winner.</div>
+            </div>
+          </div>
+        </div>
+        <div class="cta">Use this →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">3</span>Template</div>
+  </div>
+
+  <!-- ============== STEP 4: TARGET ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span><span></span><span></span></div>
+          <div class="pill-counter">4 / 8</div>
+        </div>
+        <div class="title">Set the <span class="hl">goal</span></div>
+        <div class="lead">Family · 7-day streak · Steps</div>
+        <div class="body-scroll">
+          <div class="big-hero">
+            <div class="h-label">Daily target</div>
+            <div class="h-val">8,000<span class="h-unit">steps</span></div>
+            <div class="h-controls">
+              <div class="ctrl">5k</div>
+              <div class="ctrl on">8k</div>
+              <div class="ctrl">10k</div>
+              <div class="ctrl">15k</div>
+            </div>
+          </div>
+          <div class="double-row">
+            <div class="mini"><div class="m-lab">Days</div><div class="m-val">7</div></div>
+            <div class="mini"><div class="m-lab">Free skips</div><div class="m-val">1</div></div>
+          </div>
+          <div style="margin-top:10px;padding:11px;background:var(--orange-soft);border:2px solid var(--orange);border-radius:12px;font-size:11px;font-weight:700;color:#7a2a10;text-align:center;">
+            💪 Ambitious! 8k/day is above average.
+          </div>
+        </div>
+        <div class="cta">Looks good →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">4</span>Goal &amp; rules</div>
+  </div>
+
+  <!-- ============== STEP 5: VERIFICATION ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span><span></span></div>
+          <div class="pill-counter">5 / 8</div>
+        </div>
+        <div class="title">How do we <span class="hl">prove it?</span></div>
+        <div class="lead">Stronger proof unlocks bigger rewards.</div>
+        <div class="body-scroll">
+          <div class="v-tile">
+            <div class="v-icon">🤞</div>
+            <div style="flex:1">
+              <div class="v-name">Honor system</div>
+              <div class="v-strength"><div class="v-bars"><i class="on"></i><i></i><i></i><i></i><i></i></div>Lowest trust</div>
+            </div>
+          </div>
+          <div class="v-tile">
+            <div class="v-icon">📸</div>
+            <div style="flex:1">
+              <div class="v-name">Daily photo</div>
+              <div class="v-strength"><div class="v-bars"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>Snap proof</div>
+            </div>
+          </div>
+          <div class="v-tile">
+            <div class="v-icon">👍</div>
+            <div style="flex:1">
+              <div class="v-name">Friends approve</div>
+              <div class="v-strength"><div class="v-bars"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>2 confirm daily</div>
+            </div>
+          </div>
+          <div class="v-tile active">
+            <div class="v-icon">⌚</div>
+            <div style="flex:1">
+              <div class="v-name">Phone/watch auto</div>
+              <div class="v-strength"><div class="v-bars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>Apple Health · Recommended</div>
+            </div>
+          </div>
+          <div class="v-tile">
+            <div class="v-icon">📍</div>
+            <div style="flex:1">
+              <div class="v-name">QR check-in</div>
+              <div class="v-strength"><div class="v-bars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>Scan at place</div>
+            </div>
+          </div>
+        </div>
+        <div class="cta">Continue →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">5</span>Verification</div>
+  </div>
+
+  <!-- ============== STEP 6: REWARD ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span></div>
+          <div class="pill-counter">6 / 8</div>
+        </div>
+        <div class="title">What's the <span class="hl">prize?</span></div>
+        <div class="lead">Brag-rights or something a bit shinier.</div>
+        <div class="body-scroll">
+          <div class="r-card">
+            <div class="r-emoji" style="background:var(--green-soft);">🤐</div>
+            <div style="flex:1"><div class="r-n">Nothing</div><div class="r-d">Brag-rights only.</div></div>
+          </div>
+          <div class="r-card active">
+            <div class="r-emoji" style="background:var(--yellow);">🏅</div>
+            <div style="flex:1">
+              <div class="r-n">Custom badge</div>
+              <div class="r-d">Pin a winner-badge on your profile.</div>
+            </div>
+            <span class="badge-pill">PICKED</span>
+          </div>
+          <div class="r-card">
+            <div class="r-emoji" style="background:var(--pink-soft);">⭐</div>
+            <div style="flex:1"><div class="r-n">Kaki points</div><div class="r-d">Trade for swag &amp; perks.</div></div>
+          </div>
+          <div class="r-card">
+            <div class="r-emoji" style="background:var(--blue-soft);">🎟</div>
+            <div style="flex:1"><div class="r-n">Voucher</div><div class="r-d">Merchant or sponsor gift.</div></div>
+          </div>
+          <div class="r-card">
+            <div class="r-emoji" style="background:var(--bg-warm);">💸</div>
+            <div style="flex:1"><div class="r-n">Cash pool</div><div class="r-d">Stakes &amp; payouts · private only · admin review.</div></div>
+            <span class="badge-pill">NEW</span>
+          </div>
+        </div>
+        <div class="cta">Continue →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">6</span>Reward</div>
+  </div>
+
+  <!-- ============== STEP 7: SCHEDULE ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span></div>
+          <div class="pill-counter">7 / 8</div>
+        </div>
+        <div class="title">When &amp; <span class="hl">who?</span></div>
+        <div class="lead">Set the dates and squad size.</div>
+        <div class="body-scroll">
+          <div class="cal-card">
+            <div class="cal-head"><span>📅 STARTS</span><span style="color:var(--ink-soft)">change</span></div>
+            <div class="cal-range">Sat 23 May → Fri 29 May</div>
+            <div class="cal-sub">7 days · GMT+8 Kuala Lumpur</div>
+          </div>
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--ink-soft);margin:6px 2px 8px;">Visibility</div>
+          <div class="vis-pills">
+            <span class="on">🔒 Invite</span><span>👥 Group</span><span>🌍 Public</span>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="tg-lab">Allow late-join</div>
+              <div class="tg-sub">Within first 24 hrs</div>
+            </div>
+            <div class="tg"></div>
+          </div>
+        </div>
+        <div class="cta">Review →</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">7</span>Schedule &amp; visibility</div>
+  </div>
+
+  <!-- ============== STEP 8: REVIEW ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span></div>
+          <div class="pill-counter">8 / 8</div>
+        </div>
+        <div class="title">Look <span class="hl">right?</span></div>
+        <div class="lead">Last check before we send it.</div>
+        <div class="body-scroll">
+          <div class="hero-summary">
+            <div class="hs-tag">YOUR CHALLENGE</div>
+            <div class="hs-title">Family 7-day Step Streak 🔥</div>
+            <div class="hs-meta">
+              <span>👯 Friends</span><span>💪 Fitness</span><span>8k × 7d</span><span>⌚ Auto</span><span>🏅 Badge</span>
+            </div>
+          </div>
+          <div class="breakdown">
+            <div class="br-row"><span class="l">Starts</span><span class="r">Sat 23 May</span></div>
+            <div class="br-row"><span class="l">Squad size</span><span class="r">up to 8</span></div>
+            <div class="br-row"><span class="l">Dispute window</span><span class="r">24 hrs</span></div>
+          </div>
+          <div class="risk-banner">
+            <div class="check">✓</div>
+            <div><strong>All clear.</strong> Safe to publish — auto-approved.</div>
+          </div>
+        </div>
+        <div class="cta">🚀 Send to squad</div>
+        <div class="secondary-cta">save as draft</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">8</span>Review &amp; publish</div>
+  </div>
+
+</div>
+
+</body>
+</html>

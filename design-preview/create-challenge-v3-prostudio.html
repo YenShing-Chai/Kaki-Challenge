@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kaki · Create Challenge · Direction C — Pro Studio</title>
+<style>
+  :root {
+    --bg: #0d0d10;
+    --surface: #18181d;
+    --surface-2: #22222a;
+    --surface-3: #2c2c36;
+    --line: #2e2e38;
+    --line-bright: #3d3d4a;
+    --ink: #f2f2ee;
+    --ink-soft: #9b9ba8;
+    --ink-faint: #5b5b68;
+    --lime: #c8ff3a;
+    --lime-dim: #6a8a1c;
+    --pink: #ff5fa2;
+    --blue: #5fa8ff;
+    --amber: #ffb547;
+    --mono: 'JetBrains Mono', 'Menlo', 'Roboto Mono', monospace;
+    --sans: 'Inter', 'Söhne', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  body {
+    background: #050507;
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(200,255,58,0.07), transparent 35%),
+      radial-gradient(circle at 85% 90%, rgba(95,168,255,0.05), transparent 35%);
+    font-family: var(--sans);
+    color: var(--ink);
+    padding: 60px 40px 100px;
+    min-height: 100vh;
+  }
+  .page-title {
+    max-width: 1400px;
+    margin: 0 auto 50px;
+  }
+  .page-title .marker {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--lime);
+    letter-spacing: 2px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .page-title .marker::before {
+    content: '';
+    width: 28px; height: 1px; background: var(--lime);
+    display: inline-block;
+  }
+  .page-title h1 {
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+    line-height: 1;
+  }
+  .page-title h1 .lime { color: var(--lime); }
+  .page-title h1 .slash { color: var(--ink-faint); margin: 0 14px; font-weight: 300; }
+  .page-title p { color: var(--ink-soft); font-size: 16px; max-width: 640px; line-height: 1.6; }
+  .direction-card {
+    max-width: 1400px;
+    margin: 30px auto 40px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 32px 40px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+  }
+  .direction-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--lime);
+    border-radius: 6px 0 0 6px;
+  }
+  .direction-card .meta-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .direction-card h2 {
+    font-size: 38px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+  }
+  .direction-card p {
+    color: var(--ink-soft);
+    line-height: 1.65;
+    font-size: 15px;
+    max-width: 660px;
+  }
+  .palette { display: flex; gap: 8px; }
+  .palette span {
+    width: 56px; height: 56px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    display: flex; align-items: flex-end; justify-content: center;
+    font-family: var(--mono);
+    font-size: 9px; padding-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .phone-row {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 60px 24px;
+    justify-items: center;
+  }
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .step-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    display: flex; align-items: center; gap: 10px;
+    letter-spacing: 1px;
+  }
+  .step-label .num {
+    color: var(--lime);
+    font-weight: 600;
+  }
+  .step-label .pipe { color: var(--ink-faint); }
+  .phone {
+    width: 300px;
+    height: 620px;
+    border-radius: 42px;
+    background: var(--bg);
+    border: 9px solid #050507;
+    box-shadow: 0 0 0 1px var(--line),
+                0 30px 60px -20px rgba(0, 0, 0, 0.8),
+                0 0 80px -30px rgba(200, 255, 58, 0.25);
+    position: relative;
+    overflow: hidden;
+    font-family: var(--sans);
+  }
+  .notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 95px; height: 22px; background: #050507;
+    border-radius: 0 0 14px 14px; z-index: 100;
+  }
+  .status-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 38px;
+    padding: 12px 22px 0;
+    display: flex; justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 600;
+    color: var(--ink);
+    z-index: 50;
+  }
+  .screen {
+    padding: 50px 20px 24px;
+    height: 100%;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .top-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-soft);
+    letter-spacing: 1px;
+  }
+  .back-btn {
+    width: 24px; height: 24px;
+    border: 1px solid var(--line-bright);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: var(--ink);
+  }
+  .step-meta {
+    color: var(--lime);
+    font-weight: 600;
+  }
+
+  .progress-bar {
+    height: 1px;
+    background: var(--line);
+    margin: 0 0 22px;
+    position: relative;
+  }
+  .progress-bar::after {
+    content: '';
+    position: absolute; left: 0; top: -1px;
+    height: 3px;
+    background: var(--lime);
+    box-shadow: 0 0 8px rgba(200,255,58,0.5);
+  }
+
+  .label-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .label-row .req { color: var(--lime); }
+
+  .title {
+    font-size: 24px;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .title .dim { color: var(--ink-faint); }
+  .lead {
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  .body-scroll { flex: 1; overflow: hidden; }
+
+  /* Step 1 — Intent list */
+  .intent-line {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--surface);
+    margin-bottom: 6px;
+    font-family: var(--sans);
+  }
+  .intent-line.active { border-color: var(--lime); background: rgba(200,255,58,0.06); }
+  .intent-line .code {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--lime);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .intent-line .name { font-size: 12.5px; font-weight: 600; }
+  .intent-line .sub { font-size: 10.5px; color: var(--ink-soft); margin-top: 1px; }
+  .intent-line .arr { color: var(--ink-faint); font-size: 14px; }
+  .intent-line.active .arr { color: var(--lime); }
+
+  /* Step 2 — Category grid */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .cat-cell {
+    padding: 11px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    position: relative;
+  }
+  .cat-cell.active { background: var(--lime); color: var(--bg); border-color: var(--lime); }
+  .cat-cell .c-name { font-size: 12px; font-weight: 700; letter-spacing: -0.2px; }
+  .cat-cell .c-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--ink-faint);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .cat-cell.active .c-tag { color: rgba(13,13,16,0.6); }
+  .cat-cell .risk-bar {
+    position: absolute; right: 10px; top: 11px;
+    display: flex; gap: 2px;
+  }
+  .cat-cell .risk-bar i {
+    width: 3px; height: 8px; background: var(--line-bright); border-radius: 1px;
+  }
+  .cat-cell .risk-bar i.on { background: var(--amber); }
+  .cat-cell.active .risk-bar i { background: rgba(13,13,16,0.2); }
+  .cat-cell.active .risk-bar i.on { background: var(--bg); }
+
+  /* Step 3 — Template (cleaner spec card) */
+  .templ-row {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .templ-row.active { border-color: var(--lime); background: var(--surface-2); }
+  .templ-row .code-blk {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--lime);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    padding: 6px 8px;
+    border-radius: 3px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+  .templ-row .tn { font-size: 13px; font-weight: 700; }
+  .templ-row .ts { font-size: 10.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.4; }
+  .templ-row .pick {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--lime);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Step 4 — JSON-style spec */
+  .spec-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .spec-line { display: flex; justify-content: space-between; padding: 4px 0; }
+  .spec-line .k { color: var(--ink-soft); }
+  .spec-line .v { color: var(--lime); font-weight: 600; }
+  .spec-line .v.text { color: var(--ink); }
+  .input-block {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+  }
+  .input-block .ib-lab {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--ink-soft);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .input-block .ib-val {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .input-block .ib-unit {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--lime);
+    margin-left: 5px;
+  }
+  .slider {
+    margin-top: 10px;
+    height: 6px;
+    background: var(--line);
+    border-radius: 3px;
+    position: relative;
+  }
+  .slider::before {
+    content: '';
+    position: absolute; left: 0; top: 0;
+    width: 55%; height: 100%;
+    background: var(--lime);
+    border-radius: 3px;
+  }
+  .slider::after {
+    content: '';
+    position: absolute; left: 53%; top: -5px;
+    width: 16px; height: 16px;
+    background: var(--lime);
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+  }
+  .pair-row { display: flex; gap: 8px; }
+  .pair-row .input-block { flex: 1; margin-bottom: 0; }
+
+  /* Step 5 — Verification ladder with data table feel */
+  .v-row {
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+  .v-row.active { border-color: var(--lime); background: rgba(200,255,58,0.06); }
+  .v-row .lvl {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+  }
+  .v-row.active .lvl { color: var(--lime); }
+  .v-row .vn { font-size: 12.5px; font-weight: 600; }
+  .v-row .vd { font-size: 10px; color: var(--ink-soft); margin-top: 1px; font-family: var(--mono); letter-spacing: 0.3px; }
+  .conf-pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 7px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--ink);
+  }
+  .conf-pill.high { color: var(--lime); border-color: var(--lime); background: rgba(200,255,58,0.08); }
+  .conf-pill.med { color: var(--amber); border-color: rgba(255,181,71,0.4); }
+  .conf-pill.low { color: var(--ink-faint); }
+
+  /* Step 6 — Reward */
+  .reward-block {
+    padding: 13px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    margin-bottom: 6px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+  }
+  .reward-block.active { border-color: var(--lime); background: var(--surface-2); }
+  .reward-block.locked { opacity: 0.4; }
+  .reward-block .rn { font-size: 13px; font-weight: 700; }
+  .reward-block .rd { font-size: 10.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.4; }
+  .reward-block .rt {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .reward-block .rt.ok { color: var(--lime); border-color: rgba(200,255,58,0.5); }
+  .reward-block .rt.review { color: var(--amber); border-color: rgba(255,181,71,0.5); }
+  .reward-block .rt.lock { color: var(--pink); border-color: rgba(255,95,162,0.5); }
+  .reward-block.active .rt { background: var(--lime); color: var(--bg); border-color: var(--lime); }
+
+  /* Step 7 schedule */
+  .field-block {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin-bottom: 6px;
+  }
+  .field-block .fb-row { display: flex; justify-content: space-between; align-items: center; }
+  .field-block .fb-k {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--ink-soft);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  .field-block .fb-v { font-size: 13px; font-weight: 600; }
+  .field-block .fb-sub { font-size: 10.5px; color: var(--ink-soft); margin-top: 4px; font-family: var(--mono); }
+  .seg {
+    display: flex;
+    margin-top: 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .seg span {
+    flex: 1;
+    padding: 7px 0;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.5px;
+    border-right: 1px solid var(--line);
+  }
+  .seg span:last-child { border-right: none; }
+  .seg span.on { background: var(--lime); color: var(--bg); font-weight: 600; }
+
+  /* Step 8 summary */
+  .summary-hero {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .summary-hero::before {
+    content: '';
+    position: absolute;
+    left: -1px; top: -1px;
+    width: 3px; height: calc(100% + 2px);
+    background: var(--lime);
+    border-radius: 4px 0 0 4px;
+  }
+  .summary-hero .sh-id {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+  }
+  .summary-hero .sh-id .lime { color: var(--lime); }
+  .summary-hero .sh-title { font-size: 18px; font-weight: 700; line-height: 1.2; margin-bottom: 12px; letter-spacing: -0.4px; }
+  .summary-hero .row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 11.5px; font-family: var(--mono); }
+  .summary-hero .row .k { color: var(--ink-soft); }
+  .summary-hero .row .v { color: var(--ink); font-weight: 600; }
+  .risk-card {
+    background: rgba(200,255,58,0.05);
+    border: 1px solid rgba(200,255,58,0.3);
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .risk-card .r-head {
+    display: flex; gap: 8px; align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--lime);
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  .risk-card .r-dot { width: 8px; height: 8px; background: var(--lime); border-radius: 50%; box-shadow: 0 0 8px var(--lime); }
+  .risk-card .r-msg { font-size: 11px; color: var(--ink); line-height: 1.5; }
+
+  /* CTA */
+  .cta {
+    margin-top: auto;
+    background: var(--lime);
+    color: var(--bg);
+    padding: 14px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    font-family: var(--sans);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .cta .cta-arrow { font-family: var(--mono); font-size: 14px; }
+  .cta.outline {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line-bright);
+    margin-top: 8px;
+  }
+  .ghost-link {
+    text-align: center;
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <div class="marker">DIRECTION 03 · DARK · TECHNICAL</div>
+  <h1>Pro<span class="slash">/</span><span class="lime">Studio</span></h1>
+  <p>Dark-mode-first, technical aesthetic. Monospaced labels, sharp 4px corners, electric lime accent against deep ink. Built to make the moderation engine and rules system feel like a power tool — appeals to merchants, HR admins, and creator-power-users running structured campaigns.</p>
+</div>
+
+<div class="direction-card">
+  <div>
+    <span class="meta-tag">DIRECTION_03</span>
+    <h2>Pro Studio</h2>
+    <p>Inter for headings + JetBrains Mono for labels/codes. Cards are flat surfaces with thin hairlines and the occasional lime accent stripe. Every input shows its underlying spec (win-condition code, confidence score, risk level) — the engine's logic becomes the design language. Trades warmth for precision. Strong fit if you want public/merchant challenges to feel official and trustworthy.</p>
+  </div>
+  <div class="palette">
+    <span style="background:#0d0d10;color:#9b9ba8;">bg</span>
+    <span style="background:#18181d;color:#9b9ba8;">surf</span>
+    <span style="background:#c8ff3a;color:#0d0d10;">lime</span>
+    <span style="background:#ffb547;color:#0d0d10;">amber</span>
+    <span style="background:#ff5fa2;color:#0d0d10;">pink</span>
+  </div>
+</div>
+
+<div class="phone-row">
+
+  <!-- ============== STEP 1: CREATOR INTENT ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">×</div>
+          <span>NEW_CHALLENGE</span>
+          <span class="step-meta">01/08</span>
+        </div>
+        <div class="progress-bar" style="--p:12.5%;"></div>
+        <style>.progress-bar::after{width:12.5%}</style>
+        <div class="label-row"><span>// STEP_01</span><span class="req">REQUIRED</span></div>
+        <div class="title">Define the <span class="dim">audience.</span></div>
+        <div class="lead">Audience determines templates, verification baseline, and moderation level.</div>
+        <div class="body-scroll">
+          <div class="intent-line">
+            <div class="code">PRSNL</div>
+            <div><div class="name">Personal</div><div class="sub">Self · low moderation</div></div>
+            <div class="arr">→</div>
+          </div>
+          <div class="intent-line active">
+            <div class="code">FRND</div>
+            <div><div class="name">Friends / private group</div><div class="sub">Invite-only · medium</div></div>
+            <div class="arr">→</div>
+          </div>
+          <div class="intent-line">
+            <div class="code">WORK</div>
+            <div><div class="name">Workplace / HR</div><div class="sub">Company domain · medium</div></div>
+            <div class="arr">→</div>
+          </div>
+          <div class="intent-line">
+            <div class="code">MRCH</div>
+            <div><div class="name">Business / merchant</div><div class="sub">Public · high moderation</div></div>
+            <div class="arr">→</div>
+          </div>
+          <div class="intent-line">
+            <div class="code">EVNT</div>
+            <div><div class="name">Event / trip</div><div class="sub">Group · medium</div></div>
+            <div class="arr">→</div>
+          </div>
+          <div class="intent-line">
+            <div class="code">PUB</div>
+            <div><div class="name">Public</div><div class="sub">Open · high moderation</div></div>
+            <div class="arr">→</div>
+          </div>
+        </div>
+        <div class="cta">Next step <span class="cta-arrow">→</span></div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">01</span><span class="pipe">/</span>creator_intent</div>
+  </div>
+
+  <!-- ============== STEP 2: CATEGORY ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <span>FRND · NEW</span>
+          <span class="step-meta">02/08</span>
+        </div>
+        <div class="progress-bar"></div>
+        <style>.phone-wrap:nth-child(2) .progress-bar::after{width:25%}</style>
+        <div class="label-row"><span>// STEP_02</span><span>13 OPTIONS</span></div>
+        <div class="title">Choose <span class="dim">category.</span></div>
+        <div class="lead">Each carries a default risk profile.</div>
+        <div class="body-scroll">
+          <div class="cat-grid">
+            <div class="cat-cell"><div class="c-name">Habit</div><div class="c-tag">DAILY · MED</div><div class="risk-bar"><i class="on"></i><i class="on"></i><i></i></div></div>
+            <div class="cat-cell active"><div class="c-name">Fitness</div><div class="c-tag">ACTIVE · MED</div><div class="risk-bar"><i class="on"></i><i class="on"></i><i></i></div></div>
+            <div class="cat-cell"><div class="c-name">Money</div><div class="c-tag">SAVE · MED</div><div class="risk-bar"><i class="on"></i><i class="on"></i><i></i></div></div>
+            <div class="cat-cell"><div class="c-name">Learning</div><div class="c-tag">SKILLS · LOW</div><div class="risk-bar"><i class="on"></i><i></i><i></i></div></div>
+            <div class="cat-cell"><div class="c-name">Work</div><div class="c-tag">TEAM · LOW</div><div class="risk-bar"><i class="on"></i><i></i><i></i></div></div>
+            <div class="cat-cell"><div class="c-name">Social</div><div class="c-tag">GROUP · MED</div><div class="risk-bar"><i class="on"></i><i class="on"></i><i></i></div></div>
+            <div class="cat-cell"><div class="c-name">Travel</div><div class="c-tag">TRIP · MED</div><div class="risk-bar"><i class="on"></i><i class="on"></i><i></i></div></div>
+            <div class="cat-cell"><div class="c-name">Food</div><div class="c-tag">LIFE · LOW</div><div class="risk-bar"><i class="on"></i><i></i><i></i></div></div>
+            <div class="cat-cell"><div class="c-name">Retail</div><div class="c-tag">SHOP · MED</div><div class="risk-bar"><i class="on"></i><i class="on"></i><i></i></div></div>
+            <div class="cat-cell"><div class="c-name">Creative</div><div class="c-tag">MAKE · LOW</div><div class="risk-bar"><i class="on"></i><i></i><i></i></div></div>
+            <div class="cat-cell"><div class="c-name">Community</div><div class="c-tag">CIVIC · MED</div><div class="risk-bar"><i class="on"></i><i class="on"></i><i></i></div></div>
+            <div class="cat-cell"><div class="c-name">Custom</div><div class="c-tag">FREE · HIGH</div><div class="risk-bar"><i class="on"></i><i class="on"></i><i class="on"></i></div></div>
+          </div>
+        </div>
+        <div class="cta">Next step <span class="cta-arrow">→</span></div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">02</span><span class="pipe">/</span>category</div>
+  </div>
+
+  <!-- ============== STEP 3: TEMPLATE ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <span>FRND · FITNESS</span>
+          <span class="step-meta">03/08</span>
+        </div>
+        <div class="progress-bar"></div>
+        <style>.phone-wrap:nth-child(3) .progress-bar::after{width:37.5%}</style>
+        <div class="label-row"><span>// STEP_03 · WIN_CONDITION</span><span>4 OPTIONS</span></div>
+        <div class="title">Define how to <span class="dim">win.</span></div>
+        <div class="lead">Maps to one of 11 win-condition codes.</div>
+        <div class="body-scroll">
+          <div class="templ-row active">
+            <div class="code-blk">REACH_<br>TARGET</div>
+            <div>
+              <div class="tn">Daily streak</div>
+              <div class="ts">Hit target each day · grace window optional</div>
+            </div>
+            <div class="pick">✓ SET</div>
+          </div>
+          <div class="templ-row">
+            <div class="code-blk">REACH_<br>TARGET</div>
+            <div>
+              <div class="tn">Total target</div>
+              <div class="ts">Cumulative goal by end-date</div>
+            </div>
+            <div class="pick">→</div>
+          </div>
+          <div class="templ-row">
+            <div class="code-blk">STAY_<br>BELOW</div>
+            <div>
+              <div class="tn">Stay under limit</div>
+              <div class="ts">Metric ≤ threshold throughout</div>
+            </div>
+            <div class="pick">→</div>
+          </div>
+          <div class="templ-row">
+            <div class="code-blk">RANK_<br>TOP_N</div>
+            <div>
+              <div class="tn">Top ranking</div>
+              <div class="ts">Highest metric · top N take prize</div>
+            </div>
+            <div class="pick">→</div>
+          </div>
+          <div class="templ-row">
+            <div class="code-blk">JUDGED_<br>BEST</div>
+            <div>
+              <div class="tn">Best submission</div>
+              <div class="ts">Group vote determines winner</div>
+            </div>
+            <div class="pick">→</div>
+          </div>
+        </div>
+        <div class="cta">Configure <span class="cta-arrow">→</span></div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">03</span><span class="pipe">/</span>template</div>
+  </div>
+
+  <!-- ============== STEP 4: SPEC ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <span>WIN_COND · STREAK</span>
+          <span class="step-meta">04/08</span>
+        </div>
+        <div class="progress-bar"></div>
+        <style>.phone-wrap:nth-child(4) .progress-bar::after{width:50%}</style>
+        <div class="label-row"><span>// CONFIG · STREAK</span><span class="req">EDITABLE</span></div>
+        <div class="title">Set <span class="dim">parameters.</span></div>
+        <div class="lead" style="font-family:var(--mono);font-size:11px;">type = REACH_TARGET · daily</div>
+        <div class="body-scroll">
+          <div class="input-block">
+            <div class="ib-lab">metric.target_value</div>
+            <div class="ib-val">8,000<span class="ib-unit">steps/day</span></div>
+            <div class="slider"></div>
+          </div>
+          <div class="pair-row">
+            <div class="input-block">
+              <div class="ib-lab">required_count</div>
+              <div class="ib-val">7<span class="ib-unit">days</span></div>
+            </div>
+            <div class="input-block">
+              <div class="ib-lab">allowed_misses</div>
+              <div class="ib-val">1<span class="ib-unit">day</span></div>
+            </div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-line"><span class="k">tie_breaker</span><span class="v">NONE</span></div>
+            <div class="spec-line"><span class="k">grace_period</span><span class="v">24h</span></div>
+            <div class="spec-line"><span class="k">title</span><span class="v text">Family step streak</span></div>
+          </div>
+        </div>
+        <div class="cta">Validate <span class="cta-arrow">→</span></div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">04</span><span class="pipe">/</span>parameters</div>
+  </div>
+
+  <!-- ============== STEP 5: VERIFICATION ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <span>VERIFICATION</span>
+          <span class="step-meta">05/08</span>
+        </div>
+        <div class="progress-bar"></div>
+        <style>.phone-wrap:nth-child(5) .progress-bar::after{width:62.5%}</style>
+        <div class="label-row"><span>// LEVEL 1–7</span><span>CONF_SCORE</span></div>
+        <div class="title">Proof <span class="dim">method.</span></div>
+        <div class="lead">Confidence ≥ 75 enables auto-approve.</div>
+        <div class="body-scroll">
+          <div class="v-row">
+            <span class="lvl">L1</span>
+            <div><div class="vn">Self-declare</div><div class="vd">honor system</div></div>
+            <span class="conf-pill low">20</span>
+          </div>
+          <div class="v-row">
+            <span class="lvl">L2</span>
+            <div><div class="vn">Photo upload</div><div class="vd">image_proof + EXIF</div></div>
+            <span class="conf-pill med">40</span>
+          </div>
+          <div class="v-row">
+            <span class="lvl">L3</span>
+            <div><div class="vn">Peer approval</div><div class="vd">2 of N · 24h</div></div>
+            <span class="conf-pill med">55</span>
+          </div>
+          <div class="v-row active">
+            <span class="lvl">L4</span>
+            <div><div class="vn">Auto · Health</div><div class="vd">apple_health.steps</div></div>
+            <span class="conf-pill high">75</span>
+          </div>
+          <div class="v-row">
+            <span class="lvl">L5</span>
+            <div><div class="vn">QR · GPS</div><div class="vd">geo_match + scan</div></div>
+            <span class="conf-pill high">75</span>
+          </div>
+          <div class="v-row">
+            <span class="lvl">L6</span>
+            <div><div class="vn">Receipt · POS</div><div class="vd">merchant_api</div></div>
+            <span class="conf-pill high">90</span>
+          </div>
+          <div class="v-row">
+            <span class="lvl">L7</span>
+            <div><div class="vn">Partner verified</div><div class="vd">org_admin · attested</div></div>
+            <span class="conf-pill high">95</span>
+          </div>
+        </div>
+        <div class="cta">Next <span class="cta-arrow">→</span></div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">05</span><span class="pipe">/</span>verification</div>
+  </div>
+
+  <!-- ============== STEP 6: REWARD ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <span>REWARD</span>
+          <span class="step-meta">06/08</span>
+        </div>
+        <div class="progress-bar"></div>
+        <style>.phone-wrap:nth-child(6) .progress-bar::after{width:75%}</style>
+        <div class="label-row"><span>// MVP_REWARDS</span><span>5 SAFE · 1 GATED</span></div>
+        <div class="title">Pick a <span class="dim">reward.</span></div>
+        <div class="lead">Each reward tier requires a min verification level.</div>
+        <div class="body-scroll">
+          <div class="reward-block">
+            <div><div class="rn">None</div><div class="rd">No reward · brag-rights only</div></div>
+            <span class="rt ok">OK</span>
+          </div>
+          <div class="reward-block active">
+            <div><div class="rn">Badge</div><div class="rd">Profile pin · awarded on win</div></div>
+            <span class="rt">SET</span>
+          </div>
+          <div class="reward-block">
+            <div><div class="rn">Points</div><div class="rd">Kaki points → swag store</div></div>
+            <span class="rt ok">OK</span>
+          </div>
+          <div class="reward-block">
+            <div><div class="rn">Voucher</div><div class="rd">Sponsor or merchant credit</div></div>
+            <span class="rt review">REVIEW</span>
+          </div>
+          <div class="reward-block">
+            <div><div class="rn">Discount / free item</div><div class="rd">Merchant fulfilment required</div></div>
+            <span class="rt review">REVIEW</span>
+          </div>
+          <div class="reward-block locked">
+            <div><div class="rn">Cash pool</div><div class="rd">User-funded stake pool · gated</div></div>
+            <span class="rt lock">PHASE_2</span>
+          </div>
+        </div>
+        <div class="cta">Schedule <span class="cta-arrow">→</span></div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">06</span><span class="pipe">/</span>reward</div>
+  </div>
+
+  <!-- ============== STEP 7: SCHEDULE ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <span>SCHEDULE</span>
+          <span class="step-meta">07/08</span>
+        </div>
+        <div class="progress-bar"></div>
+        <style>.phone-wrap:nth-child(7) .progress-bar::after{width:87.5%}</style>
+        <div class="label-row"><span>// WINDOW · VISIBILITY</span><span>UTC+8</span></div>
+        <div class="title">Duration <span class="dim">&amp; access.</span></div>
+        <div class="lead">All times relative to creator timezone.</div>
+        <div class="body-scroll">
+          <div class="field-block">
+            <div class="fb-row"><span class="fb-k">start_at</span><span class="fb-v">2026-05-23 00:00</span></div>
+            <div class="fb-sub">UTC+8 Kuala Lumpur</div>
+          </div>
+          <div class="field-block">
+            <div class="fb-row"><span class="fb-k">end_at</span><span class="fb-v">2026-05-29 23:59</span></div>
+            <div class="fb-sub">7 days · 0 grace</div>
+          </div>
+          <div class="field-block">
+            <div class="fb-k">visibility</div>
+            <div class="seg">
+              <span class="on">INVITE</span><span>GROUP</span><span>PUBLIC</span>
+            </div>
+          </div>
+          <div class="field-block">
+            <div class="fb-row"><span class="fb-k">max_participants</span><span class="fb-v">8</span></div>
+          </div>
+          <div class="field-block">
+            <div class="fb-row"><span class="fb-k">dispute_window</span><span class="fb-v">24h</span></div>
+          </div>
+        </div>
+        <div class="cta">Review <span class="cta-arrow">→</span></div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">07</span><span class="pipe">/</span>schedule</div>
+  </div>
+
+  <!-- ============== STEP 8: REVIEW ============== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span>● ●</span></div>
+      <div class="screen">
+        <div class="top-nav">
+          <div class="back-btn">←</div>
+          <span>FINAL_REVIEW</span>
+          <span class="step-meta">08/08</span>
+        </div>
+        <div class="progress-bar"></div>
+        <style>.phone-wrap:nth-child(8) .progress-bar::after{width:100%}</style>
+        <div class="label-row"><span>// VALIDATE · PUBLISH</span><span class="req">READY</span></div>
+        <div class="title">Final <span class="dim">check.</span></div>
+        <div class="lead">All fields valid. Risk classifier passed.</div>
+        <div class="body-scroll">
+          <div class="summary-hero">
+            <div class="sh-id">ID <span class="lime">CH_2A91F0</span> · DRAFT</div>
+            <div class="sh-title">Family step streak</div>
+            <div class="row"><span class="k">intent</span><span class="v">FRND</span></div>
+            <div class="row"><span class="k">category</span><span class="v">FITNESS</span></div>
+            <div class="row"><span class="k">win_condition</span><span class="v">REACH_TARGET</span></div>
+            <div class="row"><span class="k">target</span><span class="v">8k × 7d</span></div>
+            <div class="row"><span class="k">verification</span><span class="v">L4 · AUTO</span></div>
+            <div class="row"><span class="k">reward</span><span class="v">BADGE</span></div>
+            <div class="row"><span class="k">conf_score</span><span class="v">75</span></div>
+          </div>
+          <div class="risk-card">
+            <div class="r-head"><div class="r-dot"></div>RISK · LOW · AUTO_APPROVED</div>
+            <div class="r-msg">No prohibited keywords. Verification meets reward tier. Safe to publish to invited group.</div>
+          </div>
+        </div>
+        <div class="cta">Publish <span class="cta-arrow">⏎</span></div>
+        <div class="ghost-link">// save_as_draft</div>
+      </div>
+    </div>
+    <div class="step-label"><span class="num">08</span><span class="pipe">/</span>review_publish</div>
+  </div>
+
+</div>
+
+</body>
+</html>
