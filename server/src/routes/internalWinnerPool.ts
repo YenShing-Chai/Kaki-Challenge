@@ -21,6 +21,7 @@ import {
   challengeWinnerPools,
   challengePoolContributions,
   challengePoolPayouts,
+  users,
 } from '../db/schema';
 
 import { evaluateAll, type ParticipantSnapshot, type WinConditionCode } from '../lib/winConditions';
@@ -28,6 +29,7 @@ import { calculatePool, distribute, type DistributionMethod } from '../lib/winne
 import { checkPayoutGate } from '../lib/disputes';
 import { logAudit, logAuditMany, AUDIT_ACTIONS } from '../lib/auditLog';
 import { stripe } from '../lib/stripe';
+import { canReceivePayouts, transferToConnect } from '../lib/stripeConnect';
 
 export const internalWinnerPoolRouter = Router();
 
@@ -344,7 +346,9 @@ internalWinnerPoolRouter.post(
         }
       }
 
-      // Mark READY (and execute Stripe transfer if configured)
+      // Stripe Transfer per ready payout. Idempotent by payoutId so cron
+      // retries don't double-pay. canReceivePayouts() also re-pulls Stripe
+      // status first — guards against a stale ACTIVE row.
       const ready = await db
         .select()
         .from(challengePoolPayouts)
@@ -352,31 +356,50 @@ internalWinnerPoolRouter.post(
 
       let released = 0;
       let failed = 0;
+      const failures: Array<{ payoutId: string; userId: string; reason: string }> = [];
+
       for (const p of ready) {
         try {
-          // For MVP: payouts are tracked but Stripe transfer integration requires
-          // Stripe Connect on the winner side. Compliance review (§4.2) covers
-          // this. For now we mark as COMPLETED and log; real money transfer
-          // happens once Connect is wired.
+          if (!stripe) {
+            throw new Error('stripe_not_configured');
+          }
+          const gate = await canReceivePayouts(p.userId);
+          if (!gate.ok || !gate.accountId) {
+            throw new Error(`connect_${gate.reason ?? 'unknown'}`);
+          }
+
+          const amountCents = Math.round(Number(p.payoutAmount) * 100);
+          const transfer = await transferToConnect({
+            payoutId: p.id,
+            destinationAccountId: gate.accountId,
+            amountCents,
+            currency: p.currency,
+            challengeId,
+            userId: p.userId,
+          });
+
           await db
             .update(challengePoolPayouts)
             .set({
-              payoutStatus: stripe ? 'COMPLETED' : 'COMPLETED',
+              payoutStatus: 'COMPLETED',
+              payoutReference: transfer.transferId,
               paidAt: new Date(),
               updatedAt: new Date(),
             })
             .where(eq(challengePoolPayouts.id, p.id));
           released++;
         } catch (err) {
+          const reason = err instanceof Error ? err.message : 'unknown';
           await db
             .update(challengePoolPayouts)
             .set({
               payoutStatus: 'FAILED',
-              failureReason: (err as Error).message,
+              failureReason: reason,
               updatedAt: new Date(),
             })
             .where(eq(challengePoolPayouts.id, p.id));
           failed++;
+          failures.push({ payoutId: p.id, userId: p.userId, reason });
         }
       }
 
@@ -389,10 +412,15 @@ internalWinnerPoolRouter.post(
         })
         .where(eq(challengeWinnerPools.id, pool.id));
 
-      await db
-        .update(challenges)
-        .set({ lifecycle: 'COMPLETED', updatedAt: new Date() })
-        .where(eq(challenges.id, challengeId));
+      // Only flip challenge to COMPLETED if every payout went through.
+      // Otherwise leave it at LOCKED so the admin can nudge the affected
+      // winners to onboard Connect, then re-run release-payout (idempotent).
+      if (failed === 0) {
+        await db
+          .update(challenges)
+          .set({ lifecycle: 'COMPLETED', updatedAt: new Date() })
+          .where(eq(challenges.id, challengeId));
+      }
 
       // Mark contributions PAYOUT (winners) or FORFEITED (losers)
       // For now we leave losing contributions in HELD — they're already
@@ -403,10 +431,15 @@ internalWinnerPoolRouter.post(
         challengeId,
         action: AUDIT_ACTIONS.PAYOUT_RELEASED,
         actorType: 'SYSTEM',
-        newValue: { released, failed },
+        newValue: { released, failed, failures },
       });
 
-      res.json({ released, failed, lifecycle: 'COMPLETED' });
+      res.json({
+        released,
+        failed,
+        lifecycle: failed > 0 ? challenge.lifecycle : 'COMPLETED',
+        failures,
+      });
     } catch (err) {
       next(err);
     }

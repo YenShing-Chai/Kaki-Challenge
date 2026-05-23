@@ -272,6 +272,25 @@ export const users = pgTable(
     avatarUrl: text('avatarUrl'),
     stripeCustomerId: text('stripeCustomerId'),
     stripePaymentMethodId: text('stripePaymentMethodId'),
+    // ─── Stripe Connect Express (Winner Pool payouts) ───────────────────
+    // Account ID of the winner's connected Express account. Populated when
+    // the user clicks "Connect Stripe" in Profile. Required to receive
+    // Winner Pool payouts. Holders can still join challenges without it
+    // (joining = paying in), but the payout side blocks until set.
+    stripeConnectAccountId: text('stripeConnectAccountId'),
+    // Mirrors Stripe's account.charges_enabled / payouts_enabled — refreshed
+    // on every status poll. False until the user completes onboarding and
+    // Stripe finishes verification.
+    connectChargesEnabled: boolean('connectChargesEnabled').notNull().default(false),
+    connectPayoutsEnabled: boolean('connectPayoutsEnabled').notNull().default(false),
+    // NONE → no account · PENDING → account exists, onboarding incomplete ·
+    // ACTIVE → fully verified · RESTRICTED → Stripe asked for more info ·
+    // DISABLED → blocked. We compute this from Stripe's requirements blob.
+    connectStatus: text('connectStatus').notNull().default('NONE'),
+    // Raw `account.requirements.currently_due` array from Stripe so admins
+    // can surface "missing tax ID" / "bank account needed" copy.
+    connectRequirementsDue: jsonb('connectRequirementsDue'),
+    connectOnboardedAt: timestamp('connectOnboardedAt', { precision: 3, mode: 'date' }),
     timezone: text('timezone').notNull().default('Asia/Kuala_Lumpur'),
     expoPushToken: text('expoPushToken'),
     hasCompletedOnboarding: boolean('hasCompletedOnboarding').notNull().default(false),

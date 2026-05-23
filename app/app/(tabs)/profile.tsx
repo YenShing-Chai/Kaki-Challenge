@@ -58,6 +58,7 @@ type ProfileData = {
   canCreateChallenges: boolean;
   heatmap: HeatmapData | null;
   achievements: AchievementsResponse | null;
+  payouts: { connected: boolean; status: string } | null;
 };
 
 type HeatmapData = {
@@ -100,7 +101,7 @@ export default function ProfileTab() {
   const load = useCallback(async () => {
     try {
       const token = await getToken();
-      const [meRes, activity, { method }, heatmap, achievements] = await Promise.all([
+      const [meRes, activity, { method }, heatmap, achievements, payouts] = await Promise.all([
         apiRequest<{ user: ProfileData['user']; isAdmin: boolean; canCreateChallenges: boolean }>(
           '/users/me',
           { token },
@@ -112,6 +113,9 @@ export default function ProfileTab() {
         apiRequest<{ method: ProfileData['method'] }>('/payments/method', { token }),
         apiRequest<HeatmapData>('/users/me/heatmap', { token }).catch(() => null),
         apiRequest<AchievementsResponse>('/users/me/achievements', { token }).catch(() => null),
+        apiRequest<{ connected: boolean; status: string }>('/api/stripe-connect/status', {
+          token,
+        }).catch(() => null),
       ]);
       setData({
         user: meRes.user,
@@ -121,6 +125,7 @@ export default function ProfileTab() {
         canCreateChallenges: meRes.canCreateChallenges,
         heatmap,
         achievements,
+        payouts,
       });
     } finally {
       setLoading(false);
@@ -260,6 +265,11 @@ export default function ProfileTab() {
                     : 'None'
                 }
               />
+              <BRow
+                label="💸 Payouts (Stripe Connect)"
+                value={payoutsRowValue(data.payouts)}
+                onPress={() => router.push('/payouts' as never)}
+              />
               <BButton
                 label={data.method ? 'Replace test card (dev)' : 'Attach test card (dev)'}
                 tone="paper"
@@ -282,14 +292,25 @@ export default function ProfileTab() {
           {/* Legal */}
           <BSection title="Legal">
             <BCard>
-              <BRow label="Privacy Policy" onPress={() => router.push('/(legal)/privacy')} />
               <BRow label="Terms of Service" onPress={() => router.push('/(legal)/terms')} />
+              <BRow label="Privacy Policy" onPress={() => router.push('/(legal)/privacy')} />
+              <BRow label="Refund Policy" onPress={() => router.push('/(legal)/refund' as never)} />
+              <BRow
+                label="Dispute Policy"
+                onPress={() => router.push('/(legal)/dispute' as never)}
+              />
             </BCard>
           </BSection>
 
           {/* Creator */}
           <BSection title="Creator">
             <BCard>
+              {data.isAdmin ? (
+                <BRow
+                  label="🛡️ Review queue"
+                  onPress={() => router.push('/admin/queue' as never)}
+                />
+              ) : null}
               {data.canCreateChallenges ? (
                 <BRow
                   label={data.isAdmin ? '⚡ Create challenge (admin)' : '⚡ Create challenge'}
@@ -579,6 +600,16 @@ function AchievementCard({ a }: { a: Achievement }) {
 }
 
 // ─── Local helpers ────────────────────────────────────────────────────────
+
+// Stripe Connect status → short summary string for the Profile row.
+function payoutsRowValue(payouts: ProfileData['payouts']): string {
+  if (!payouts || !payouts.connected) return 'Not set up';
+  if (payouts.status === 'ACTIVE') return 'Active ✓';
+  if (payouts.status === 'PENDING') return 'Finish onboarding';
+  if (payouts.status === 'RESTRICTED') return 'Action required';
+  if (payouts.status === 'DISABLED') return 'Disabled';
+  return payouts.status;
+}
 
 function ToggleRow({
   label,

@@ -15,6 +15,7 @@ import { authRouter } from './routes/auth';
 import { challengesV2Router } from './routes/challengesV2';
 import { internalWinnerPoolRouter } from './routes/internalWinnerPool';
 import { adminChallengesRouter } from './routes/adminChallenges';
+import { stripeConnectRouter } from './routes/stripeConnect';
 import { startDailyResolutionCron } from './jobs/dailyResolution';
 import { startPushCron } from './jobs/pushNotifications';
 
@@ -47,6 +48,7 @@ app.use(cheersRouter); // /daily-progress/:id/cheer (no shared prefix)
 
 // PRD §15 / §24 routes — coexist with legacy /challenges
 app.use('/api/challenges', challengesV2Router);
+app.use('/api/stripe-connect', stripeConnectRouter);
 app.use('/internal', internalWinnerPoolRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
