@@ -1,4 +1,20 @@
-import type { ChallengeCategory, VerificationMethod } from '@prisma/client';
+// Local string-union types — were imported from @prisma/client before the
+// Drizzle migration. The Drizzle pgEnum lives in src/db/schema.ts but we
+// keep this file decoupled to avoid pulling the full schema module into
+// callers that only need category metadata.
+export type ChallengeCategory =
+  | 'FITNESS'
+  | 'MINDFULNESS'
+  | 'READING'
+  | 'LEARNING'
+  | 'PRODUCTIVITY'
+  | 'CREATIVE'
+  | 'WELLNESS'
+  | 'MONEY'
+  | 'SOCIAL'
+  | 'OUTDOORS';
+
+export type VerificationMethod = 'AUTO_STEPS' | 'PHOTO_PROOF' | 'HONOR_TAP';
 
 export type CategoryMeta = {
   key: ChallengeCategory;
